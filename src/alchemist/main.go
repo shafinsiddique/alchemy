@@ -13,4 +13,5 @@ func main() {
 	read, _ := f.Read(bootrom)
 	fmt.Println("Bytes Read", read)
 	cpu.LoadBootRom(bootrom)
+	cpu.RunBootSequence()
 }
