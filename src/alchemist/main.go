@@ -1,13 +1,16 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"os"
+)
 
 func main() {
-	registers := InitializeRegisters()
-	registers.A.Set(0xA2)
-	registers.F.Set(0xF0)
-	fmt.Println(registers.AF.Get())
-	registers.A.Set(0xC2)
-	fmt.Println(registers.AF.Get())
-
+	cpu := NewCPU()
+	p, _ := os.Getwd()
+	f, _ := os.Open(p + "/src/alchemist/bootstrap.gb")
+	bootrom := make([]byte, 256)
+	read, _ := f.Read(bootrom)
+	fmt.Println("Bytes Read", read)
+	cpu.LoadBootRom(bootrom)
 }
