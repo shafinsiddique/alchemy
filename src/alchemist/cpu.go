@@ -1,6 +1,8 @@
 package main
 
 type CPU struct {
-	Registers Registers
+	Registers *Registers
 
 }
+
+
