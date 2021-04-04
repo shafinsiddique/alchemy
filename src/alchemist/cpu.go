@@ -71,14 +71,11 @@ func (cpu *CPU) Oxcb() {
 func (cpu *CPU) jrNzS8(){
 	zFlag := cpu.Registers.F.GetBit(Z_FLAG)
 	pc := &cpu.PC
+	*pc += 1
 	if zFlag == 0 {
-		*pc += 1
+		steps := GetTwosComplement(cpu.Memory[*pc])
 		fmt.Println(*pc)
-		fmt.Println(cpu.Memory[*pc])
-		steps := cpu.Memory[*pc]
-		*pc += uint16(steps)
-		fmt.Println(*pc)
-		fmt.Println(cpu.Memory[*pc])
+		fmt.Println(int(*pc) + steps)
 	}
 }
 
@@ -99,7 +96,7 @@ func (cpu *CPU) FetchDecodeExecute() {
 		fmt.Println("here")
 		hex := fmt.Sprintf("%x", opcode)
 		fmt.Println("0x" + hex)
-		cpu.jrNzS8()
+		cpu.jrNzS8() // s8 stands for signed 8 bit.
 		fmt.Println("finished")
 
 	default:

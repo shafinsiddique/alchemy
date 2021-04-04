@@ -21,26 +21,14 @@ func (register *EightBitRegister) Get() byte {
 }
 
 func (register *EightBitRegister) GetBit(index int) byte{
-	/*
-		index range 0-7. counting from right to left, weird idk.
-	*/
+	/* index range 0-7. counting from right to left, weird idk. */
 	val := register.Get()
-	bit := (val & (1 << index)) != 0
-	if bit {
-		return 1
-	}
-	return 0
+	return GetBit(val, index)
 }
 
-func (register *EightBitRegister) SetBit(val byte, index int) {
-	var newVal byte
-	if val == 1 {
-		newVal = val | (1 << index)
-	} else {
-		newVal = val & ((1 << index) ^ 1) // XOR 1 gets the complement.
-	}
-
-	register.Set(newVal)
+func (register *EightBitRegister) SetBit(bit byte, index int) {
+	current := register.Get()
+	register.Set(SetBit(current, bit, index))
 }
 
 type SixteenBitRegister struct {
