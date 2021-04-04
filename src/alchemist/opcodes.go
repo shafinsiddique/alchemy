@@ -1,7 +1,5 @@
 package main
 
-import "fmt"
-
 func (cpu *CPU) LD_SP_D16(){
 	// 0x31
 	pc := &cpu.PC
@@ -35,17 +33,18 @@ func (cpu *CPU) LD_HL_D16() {
 	cpu.Registers.L.Set(low)
 }
 
-
-
-
-
 func (cpu *CPU) JR_NZ_S8(){
 	zFlag := cpu.Registers.F.GetBit(Z_FLAG)
 	pc := &cpu.PC
 	*pc += 1
 	if zFlag == 0 {
 		steps := GetTwosComplement(cpu.Memory[*pc])
-		fmt.Println(*pc)
-		fmt.Println(int(*pc) + steps)
+		*pc += int16(steps)
 	}
+}
+
+func (cpu *CPU) LD_A8_A(){
+	//pc := &cpu.PC
+
+
 }

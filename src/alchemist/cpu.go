@@ -5,7 +5,7 @@ import "fmt"
 type CPU struct {
 	Registers *Registers
 	Memory []byte
-	PC uint16
+	PC int16
 	SP uint16
 }
 
@@ -24,19 +24,31 @@ func (cpu *CPU) FetchDecodeExecute() {
 	pc := &cpu.PC
 	switch opcode := cpu.Memory[*pc]; opcode {
 	case 0x31:
+		fmt.Println("executing 1")
 		cpu.LD_SP_D16()
 	case 0xaf:
+		fmt.Println("executing 2")
+
 		cpu.XOR_A()
 	case 0x21:
+		fmt.Println("executing 3")
+
 		cpu.LD_HL_D16()
 	case 0x32:
+		fmt.Println("executing 4")
+
 		cpu.LD_HL_A()
 	case 0xcb:
+		fmt.Println("executing 5")
+
 		cpu.Oxcb()
 	case 0x20:
+		fmt.Println("executing 6")
+
 		cpu.JR_NZ_S8() // s8 stands for signed 8 bit.
+		fmt.Println(*pc)
 	default:
-		hex := fmt.Sprintf("%x", opcode)
+		hex := fmt.Sprintf("%x %d", opcode, *pc)
 		fmt.Println("0x" + hex)
 	}
 	*pc += 1 // always increment one, even if other instructions increment, we need to increment from that position to
