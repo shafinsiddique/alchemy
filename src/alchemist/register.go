@@ -20,6 +20,30 @@ func (register *EightBitRegister) Set(value byte) {
 func (register *EightBitRegister) Get() byte {
 	return register.Value
 }
+
+func (register *EightBitRegister) GetBit(index int) byte{
+	/*
+		index range 0-7. counting from right to left, weird idk.
+	*/
+	val := register.Get()
+	bit := (val & (1 << index)) != 0
+	if bit {
+		return 1
+	}
+	return 0
+}
+
+func (register *EightBitRegister) SetBit(val byte, index int) {
+	var newVal byte
+	if val == 1 {
+		newVal = val | (1 << index)
+	} else {
+		newVal = val & ((1 << index) ^ 1) // XOR 1 gets the complement.
+	}
+
+	register.Set(newVal)
+}
+
 type SixteenBitRegister struct {
 	Low *EightBitRegister
 	High *EightBitRegister
@@ -38,11 +62,10 @@ func (register *SixteenBitRegister) Get()uint16 {
 
 func (register *SixteenBitRegister) Decrement(){
 	val := register.Get()
+	decremented := val-1
 	bytes := make([]byte, 2)
-	binary.BigEndian.PutUint16(bytes, val)
-	fmt.Println("here")
-	fmt.Println(bytes[0])
-	fmt.Println(bytes[1])
-	fmt.Println(MergeBytes(bytes[0],bytes[1]))
-	fmt.Println(val)
+	binary.BigEndian.PutUint16(bytes, decremented)
+	register.High.Set(bytes[0])
+	register.Low.Set(bytes[1])
+	fmt.Println(register.Get())
 }
