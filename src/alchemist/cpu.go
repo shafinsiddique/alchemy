@@ -55,7 +55,7 @@ func (cpu *CPU) ldHlD16() {
 func (cpu *CPU) bit7H()  {
 	// copy the contents of of bit 7 in register H to the z flag of the F register.
 	bit := cpu.Registers.H.GetBit(7) ^ 1 // take complemeent of the bit in position 7.
-	cpu.Registers.F.SetBit(bit, 7)
+	cpu.Registers.F.SetBit(bit, Z_FLAG)
 }
 
 func (cpu *CPU) Oxcb() {
@@ -66,6 +66,20 @@ func (cpu *CPU) Oxcb() {
 		cpu.bit7H()
 	}
 
+}
+
+func (cpu *CPU) jrNzS8(){
+	zFlag := cpu.Registers.F.GetBit(Z_FLAG)
+	pc := &cpu.PC
+	if zFlag == 0 {
+		*pc += 1
+		fmt.Println(*pc)
+		fmt.Println(cpu.Memory[*pc])
+		steps := cpu.Memory[*pc]
+		*pc += uint16(steps)
+		fmt.Println(*pc)
+		fmt.Println(cpu.Memory[*pc])
+	}
 }
 
 func (cpu *CPU) FetchDecodeExecute() {
@@ -81,6 +95,13 @@ func (cpu *CPU) FetchDecodeExecute() {
 		cpu.ldHlA()
 	case 0xcb:
 		cpu.Oxcb()
+	case 0x20:
+		fmt.Println("here")
+		hex := fmt.Sprintf("%x", opcode)
+		fmt.Println("0x" + hex)
+		cpu.jrNzS8()
+		fmt.Println("finished")
+
 	default:
 		hex := fmt.Sprintf("%x", opcode)
 		fmt.Println("0x" + hex)

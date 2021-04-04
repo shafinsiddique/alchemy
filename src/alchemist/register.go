@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/binary"
-	"fmt"
 )
 
 type EightBitRegister struct {
@@ -67,5 +66,4 @@ func (register *SixteenBitRegister) Decrement(){
 	binary.BigEndian.PutUint16(bytes, decremented)
 	register.High.Set(bytes[0])
 	register.Low.Set(bytes[1])
-	fmt.Println(register.Get())
 }
