@@ -26,6 +26,18 @@ func (cpu *CPU) PushToStack(item byte) {
 	cpu.Memory[*sp] = item
 }
 
+func (cpu *CPU) IncrementPC()  {
+	cpu.PC += 1
+}
+
+func (cpu *CPU) DecrementPC(){
+	cpu.PC -=1
+}
+
+func (cpu *CPU) GetElementAtPC() byte {
+	return cpu.Memory[cpu.PC]
+}
+
 func (cpu *CPU) FetchDecodeExecute() {
 	pc := &cpu.PC
 	switch opcode := cpu.Memory[*pc]; opcode {
