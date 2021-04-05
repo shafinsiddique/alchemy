@@ -53,7 +53,6 @@ func (cpu *CPU) GetElementAtPC() byte {
 }
 
 func (cpu *CPU) FetchDecodeExecute() {
-	pc := &cpu.PC
 	switch opcode := cpu.FetchAndIncrement(); opcode {
 	case 0x31:
 		cpu.LD_SP_D16()
@@ -75,8 +74,36 @@ func (cpu *CPU) FetchDecodeExecute() {
 		cpu.LD_LOC_C_A()
 	case 0xcd:
 		cpu.CALL_A16()
+	case 0x0c:
+		cpu.INC_C()
+	case 0x77:
+		cpu.LD_LOC_HL_A()
+	case 0xe0:
+		cpu.LD_LOC_A8_A()
+	case 0x11:
+		cpu.LD_DE_D16()
+	case 0x1a:
+		cpu.LD_A_LOC_DE()
+	case 0x4f:
+		cpu.LD_C_A()
+	case 0x06:
+		cpu.LD_B_D8()
+	case 0xc5:
+		cpu.PUSH_BC()
+	case 0x17:
+		cpu.RLA()
+	case 0xc1:
+		cpu.POP_BC()
+	case 0x5:
+		cpu.DEC_B()
+	case 0x22:
+		cpu.LD_LOC_HL_A_INC()
+	case 0x23:
+		cpu.INC_HL()
+	case 0xc9:
+		cpu.RET()
 	default:
-		hex := fmt.Sprintf("0x%x %d", opcode, *pc)
+		hex := fmt.Sprintf("0x%x %d", opcode, cpu.PC-1)
 		fmt.Println(hex)
 	}
 }

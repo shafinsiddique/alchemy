@@ -31,8 +31,9 @@ func (cpu *CPU) LD_HL_D16() {
 
 func (cpu *CPU) JR_NZ_S8(){
 	zFlag := cpu.Registers.F.GetBit(Z_FLAG)
+	nextByte := cpu.FetchAndIncrement()
 	if zFlag == 0 {
-		steps, isNegative := GetTwosComplement(cpu.FetchAndIncrement())
+		steps, isNegative := GetTwosComplement(nextByte)
 		if isNegative {
 			cpu.PC -= uint16(steps)
 		} else {
@@ -62,15 +63,14 @@ func (cpu *CPU) INC_C() {
 	cpu.Registers.C.Set(cpu.Registers.C.Get() + 1)
 }
 
-func (cpu *CPU) LD_HL_A() {
+func (cpu *CPU) LD_LOC_HL_A() {
 	// store the contents of register a in the memory location specified by HL
 	cpu.Memory[cpu.Registers.HL.Get()] = cpu.Registers.A.Get()
 }
 
-func (cpu *CPU) LD_A8_A() {
+func (cpu *CPU) LD_LOC_A8_A() {
 	// store the contents of register A in the range 0xFF00-0xFFf specified by immediarte
 	// operand a8.
-
 	addr := 0xff + cpu.FetchAndIncrement()
 	cpu.Memory[addr] = cpu.Registers.A.Get()
 }
@@ -94,9 +94,9 @@ func (cpu *CPU) CALL_A16(){
 	// Then load the 16 bit immediate operand a16 into PC.
 	sp := &cpu.SP
 	*sp -= 1
-	bytes := SplitInt16ToBytes(uint16(cpu.PC + 3)) // + 3 because length of instruction in
-	cpu.Memory[*sp] = bytes[0]                     // high byte placed on top of low byte.
-	*sp -= 1
+	bytes := SplitInt16ToBytes(uint16(cpu.PC + 2)) // + 2 because current PC = Position of Call + 1
+	cpu.Memory[*sp] = bytes[0]                     // current byte and next byte is included so + 2 goes to next
+	*sp -= 1										// instruction
 	cpu.Memory[*sp] = bytes[1] // low byte placed bottom , i guess the name makes sense?
 
 	// part ii load 16 bit immediate operand.
