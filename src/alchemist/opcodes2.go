@@ -15,3 +15,5 @@ func (cpu *CPU) BIT_7H()  {
 	bit := cpu.Registers.H.GetBit(7) ^ 1 // take complemeent of the bit in position 7.
 	cpu.Registers.F.SetBit(bit, Z_FLAG)
 }
+
+
