@@ -2,11 +2,8 @@ package main
 
 func (cpu *CPU) LD_SP_D16(){
 	// 0x31
-	pc := &cpu.PC
-	*pc += 1
-	low := cpu.Memory[*pc]
-	*pc += 1
-	high := cpu.Memory[*pc]
+	low := cpu.FetchAndIncrement()
+	high := cpu.FetchAndIncrement()
 	cpu.SP = MergeBytes(high, low)
 }
 
@@ -25,11 +22,8 @@ func (cpu *CPU) LD_HL_A_DEC() {
 
 func (cpu *CPU) LD_HL_D16() {
 	// 0x21
-	pc := &cpu.PC
-	*pc += 1
-	low := cpu.Memory[*pc]
-	*pc += 1
-	high := cpu.Memory[*pc]
+	low := cpu.FetchAndIncrement()
+	high := cpu.FetchAndIncrement()
 	cpu.Registers.H.Set(high)
 	cpu.Registers.L.Set(low)
 
@@ -46,16 +40,12 @@ func (cpu *CPU) JR_NZ_S8(){
 }
 
 func (cpu *CPU) LD_C_D8() {
-	pc := &cpu.PC
-	*pc += 1
-	nextByte := cpu.Memory[*pc]
+	nextByte := cpu.FetchAndIncrement()
 	cpu.Registers.C.Set(nextByte)
 }
 
 func (cpu *CPU) LD_A_D8(){
-	pc := &cpu.PC
-	*pc += 1
-	nextByte := cpu.Memory[*pc]
+	nextByte := cpu.FetchAndIncrement()
 	cpu.Registers.A.Set(nextByte)
 }
 
@@ -79,19 +69,14 @@ func (cpu *CPU) LD_A8_A() {
 	// store the contents of register A in the range 0xFF00-0xFFf specified by immediarte
 	// operand a8.
 
-	pc := &cpu.PC
-	*pc += 1
-	addr := 0xff + cpu.Memory[*pc]
+	addr := 0xff + cpu.FetchAndIncrement()
 	cpu.Memory[addr] = cpu.Registers.A.Get()
 }
 
 func (cpu *CPU) LD_DE_D16() {
 	// load the 2 bytes of immediate data into register pair DE.
-	pc := &cpu.PC
-	*pc += 1
-	low := cpu.Memory[*pc]
-	*pc += 1
-	high := cpu.Memory[*pc]
+	low := cpu.FetchAndIncrement()
+	high := cpu.FetchAndIncrement()
 	cpu.Registers.D.Set(high)
 	cpu.Registers.E.Set(low)
 }
@@ -105,21 +90,18 @@ func (cpu *CPU) CALL_A16(){
 	// push the program counter PC value corresponding to the address following the CALL instruction.
 	// TO the 2 bytes following the byte specified by the current statck pointer SP.
 	// Then load the 16 bit immediate operand a16 into PC.
-	pc := &cpu.PC // part 1 store PC following this instruction in stack pointer.
 	sp := &cpu.SP
 	*sp -= 1
-	bytes := SplitInt16ToBytes(uint16(*pc)+3) // + 3 because length of instruction in
-	cpu.Memory[*sp] = bytes[0] // high byte placed on top of low byte.
+	bytes := SplitInt16ToBytes(uint16(cpu.PC + 3)) // + 3 because length of instruction in
+	cpu.Memory[*sp] = bytes[0]                     // high byte placed on top of low byte.
 	*sp -= 1
 	cpu.Memory[*sp] = bytes[1] // low byte placed bottom , i guess the name makes sense?
 
 	// part ii load 16 bit immediate operand.
-	*pc +=1
-	low := cpu.Memory[*pc]
-	*pc += 1
-	high := cpu.Memory[*pc]
+	low := cpu.FetchAndIncrement()
+	high := cpu.FetchAndIncrement()
 
-	*pc = int16(MergeBytes(high, low)) - 1 // minus 1 because in the fetchExecuteDecode method, the pc will
+	cpu.PC = int16(MergeBytes(high, low))
 	// be incremented once this function returns.
 }
 
@@ -129,9 +111,7 @@ func (cpu *CPU) LD_C_A() {
 
 func (cpu *CPU) LD_B_D8(){
 	// ld 8 bit immediate into register b.
-	pc := &cpu.PC
-	*pc += 1
-	cpu.Registers.B.Set(cpu.Memory[*pc])
+	cpu.Registers.B.Set(cpu.FetchAndIncrement())
 }
 
 func (cpu *CPU) PUSH_BC() {

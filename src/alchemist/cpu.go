@@ -33,6 +33,13 @@ func (cpu *CPU) PopFromStack()byte {
 	return item
 }
 
+func (cpu *CPU) FetchAndIncrement() byte {
+	pc := &cpu.PC
+	item := cpu.Memory[*pc]
+	*pc += 1
+	return item
+}
+
 func (cpu *CPU) IncrementPC()  {
 	cpu.PC += 1
 }
@@ -47,7 +54,7 @@ func (cpu *CPU) GetElementAtPC() byte {
 
 func (cpu *CPU) FetchDecodeExecute() {
 	pc := &cpu.PC
-	switch opcode := cpu.Memory[*pc]; opcode {
+	switch opcode := cpu.FetchAndIncrement(); opcode {
 	case 0x31:
 		cpu.LD_SP_D16()
 	case 0xaf:
