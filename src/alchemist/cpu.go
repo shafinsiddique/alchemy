@@ -40,6 +40,7 @@ func (cpu *CPU) FetchDecodeExecute() {
 	case 0x3e:
 		cpu.LD_A_D8()
 	case 0xe2:
+		cpu.LD_C_A()
 
 	default:
 		hex := fmt.Sprintf("%x %d", opcode, *pc)

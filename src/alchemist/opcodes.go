@@ -60,6 +60,14 @@ func (cpu *CPU) LD_A_D8(){
 }
 
 func (cpu *CPU) LD_C_A() {
-
+	// store the contents of register A in the internal ram, ad the range 0xff00-0xffff specified by register c.
+	// disassembly in boot rom : LD (0xFF00 + C), A
+	addr := 0xff + cpu.Registers.C.Get()
+	cpu.Memory[addr] = cpu.Registers.A.Get()
 }
 
+func (cpu *CPU) INC_C() {
+	cpu.Registers.C.Set(cpu.Registers.C.Get() + 1)
+}
+
+func (cpu *)
