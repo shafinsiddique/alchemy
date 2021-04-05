@@ -7,6 +7,7 @@ type CPU struct {
 	Memory []byte
 	PC int16
 	SP uint16
+	incremented bool
 }
 
 func NewCPU() *CPU {
@@ -19,6 +20,11 @@ func (cpu *CPU) LoadBootRom(bootrom []byte) {
 	}
 }
 
+func (cpu *CPU) PushToStack(item byte) {
+	sp := &cpu.SP
+	*sp -= 1
+	cpu.Memory[*sp] = item
+}
 
 func (cpu *CPU) FetchDecodeExecute() {
 	pc := &cpu.PC
@@ -30,7 +36,7 @@ func (cpu *CPU) FetchDecodeExecute() {
 	case 0x21:
 		cpu.LD_HL_D16()
 	case 0x32:
-		cpu.LD_HL_A()
+		cpu.LD_HL_A_DEC()
 	case 0xcb:
 		cpu.Oxcb()
 	case 0x20:
@@ -40,15 +46,14 @@ func (cpu *CPU) FetchDecodeExecute() {
 	case 0x3e:
 		cpu.LD_A_D8()
 	case 0xe2:
-		cpu.LD_C_A()
-
+		cpu.LD_LOC_C_A()
+	case 0xcd:
+		cpu.CALL_A16()
 	default:
-		hex := fmt.Sprintf("%x %d", opcode, *pc)
-		fmt.Println("0x" + hex)
+		hex := fmt.Sprintf("0x%x %d", opcode, *pc)
+		fmt.Println(hex)
 	}
-	*pc += 1 // always increment one, even if other instructions increment, we need to increment from that position to
-	// go to the next one. basically, this allows us to not worry abouyt incrementing one at the end of every single
-	// function.
+	*pc += 1
 
 }
 

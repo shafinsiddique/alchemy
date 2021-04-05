@@ -55,3 +55,11 @@ func (register *SixteenBitRegister) Decrement(){
 	register.High.Set(bytes[0])
 	register.Low.Set(bytes[1])
 }
+
+func (register *SixteenBitRegister) GetHigh() byte{
+	return register.High.Get()
+}
+
+func (register *SixteenBitRegister) GetLow() byte {
+	return register.Low.Get()
+}

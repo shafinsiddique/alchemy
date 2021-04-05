@@ -1,10 +1,18 @@
 package main
 
+import "encoding/binary"
+
 func MergeBytes(high byte, low byte) uint16{
 	high_16 := uint16(high)
 	low_16 := uint16(low)
 
 	return high_16 << 8 | low_16
+}
+
+func SplitInt16ToBytes(num uint16)[]byte {
+	output := make([]byte, 2)
+	binary.BigEndian.PutUint16(output, num)
+	return output
 }
 
 func GetBit(val byte, index int) byte {
