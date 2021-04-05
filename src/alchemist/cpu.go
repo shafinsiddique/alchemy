@@ -5,7 +5,7 @@ import "fmt"
 type CPU struct {
 	Registers *Registers
 	Memory []byte
-	PC int16
+	PC uint16
 	SP uint16
 	incremented bool
 }
@@ -79,8 +79,6 @@ func (cpu *CPU) FetchDecodeExecute() {
 		hex := fmt.Sprintf("0x%x %d", opcode, *pc)
 		fmt.Println(hex)
 	}
-	*pc += 1
-
 }
 
 func (cpu *CPU) RunBootSequence(){

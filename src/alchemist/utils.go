@@ -35,13 +35,14 @@ func SetBit(value byte, bit byte, index int) byte {
 	return newVal
 }
 
-func GetTwosComplement(value byte) int{
+func GetTwosComplement(value byte) (byte, bool){ // using bool to indicate whether a number is negative.
+	// probably a better way to do this but i don't want the program counter to be a SIGNED int.
 	sign := GetBit(value, 7)
-	val := int8(value)
+	val := value
 	if sign == 1 {
 		val = ^val
 		val += 1
-		val = 0-val
+		return val, true // if true, number is negative.
 	}
-	return int(val)
+	return val, false
 }

@@ -31,11 +31,13 @@ func (cpu *CPU) LD_HL_D16() {
 
 func (cpu *CPU) JR_NZ_S8(){
 	zFlag := cpu.Registers.F.GetBit(Z_FLAG)
-	pc := &cpu.PC
-	*pc += 1
 	if zFlag == 0 {
-		steps := GetTwosComplement(cpu.Memory[*pc])
-		*pc += int16(steps)
+		steps, isNegative := GetTwosComplement(cpu.FetchAndIncrement())
+		if isNegative {
+			cpu.PC -= uint16(steps)
+		} else {
+			cpu.PC += uint16(steps)
+		}
 	}
 }
 
@@ -101,7 +103,7 @@ func (cpu *CPU) CALL_A16(){
 	low := cpu.FetchAndIncrement()
 	high := cpu.FetchAndIncrement()
 
-	cpu.PC = int16(MergeBytes(high, low))
+	cpu.PC = MergeBytes(high, low)
 	// be incremented once this function returns.
 }
 
@@ -160,7 +162,7 @@ func (cpu *CPU) RET(){
 	// pop from the stack the PC value pushed when subroutine was called.
 	low := cpu.PopFromStack()
 	high := cpu.PopFromStack()
-	cpu.PC = int16(MergeBytes(high, low) - 1) // -1 for now because the pc will be incremement. TODO: fix
+	cpu.PC = MergeBytes(high, low)
 }
 
 

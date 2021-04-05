@@ -1,9 +1,7 @@
 package main
 
 func (cpu *CPU) Oxcb() {
-	pc := &cpu.PC
-	*pc += 1
-	switch opcode := cpu.Memory[*pc] ; opcode {
+	switch opcode := cpu.FetchAndIncrement() ; opcode {
 	case 0x7c:
 		cpu.BIT_7H()
 	}
