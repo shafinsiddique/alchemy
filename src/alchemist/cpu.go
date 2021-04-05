@@ -26,6 +26,13 @@ func (cpu *CPU) PushToStack(item byte) {
 	cpu.Memory[*sp] = item
 }
 
+func (cpu *CPU) PopFromStack()byte {
+	sp := &cpu.SP
+	item := cpu.Memory[*sp]
+	*sp += 1
+	return item
+}
+
 func (cpu *CPU) IncrementPC()  {
 	cpu.PC += 1
 }
