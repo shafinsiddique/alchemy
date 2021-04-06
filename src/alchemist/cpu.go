@@ -102,6 +102,33 @@ func (cpu *CPU) FetchDecodeExecute() {
 		cpu.INC_HL()
 	case 0xc9:
 		cpu.RET()
+	case 0x13:
+		cpu.INC_DE()
+	case 0x7b:
+		cpu.LD_A_E()
+	case 0xfe:
+		cpu.CP_D8()
+	case 0xea:
+		cpu.LD_LOC_A16_A()
+	case 0x3d:
+		cpu.DEC_A()
+	case 0x28:
+		cpu.JR_Z_S8()
+	case 0x67:
+		cpu.LD_H_A()
+	case 0x57:
+		cpu.LD_D_A()
+	case 0x4:
+		cpu.INC_B()
+	case 0x1e:
+		cpu.LD_E_D8()
+	case 0xf0:
+		cpu.LD_A_LOC_A8()
+	case 0xd:
+		cpu.DEC_C()
+	case 0x1d:
+		cpu.DEC_E()
+
 	default:
 		hex := fmt.Sprintf("0x%x %d", opcode, cpu.PC-1)
 		fmt.Println(hex)
@@ -113,4 +140,6 @@ func (cpu *CPU) RunBootSequence(){
 		cpu.FetchDecodeExecute()
 	}
 }
+
+
 

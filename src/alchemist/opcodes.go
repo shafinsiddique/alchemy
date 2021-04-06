@@ -29,10 +29,10 @@ func (cpu *CPU) LD_HL_D16() {
 
 }
 
-func (cpu *CPU) JR_NZ_S8(){
+func (cpu *CPU) JR_COMMON_S8(flag byte) { // not actual instreuction, code reuse.
 	zFlag := cpu.Registers.F.GetBit(Z_FLAG)
 	nextByte := cpu.FetchAndIncrement()
-	if zFlag == 0 {
+	if zFlag == flag {
 		steps, isNegative := GetTwosComplement(nextByte)
 		if isNegative {
 			cpu.PC -= uint16(steps)
@@ -40,6 +40,10 @@ func (cpu *CPU) JR_NZ_S8(){
 			cpu.PC += uint16(steps)
 		}
 	}
+}
+
+func (cpu *CPU) JR_NZ_S8(){
+	cpu.JR_COMMON_S8(0)
 }
 
 func (cpu *CPU) LD_C_D8() {
@@ -55,7 +59,7 @@ func (cpu *CPU) LD_A_D8(){
 func (cpu *CPU) LD_LOC_C_A() {
 	// store the contents of register A in the internal ram, ad the range 0xff00-0xffff specified by register c.
 	// disassembly in boot rom : LD (0xFF00 + C), A
-	addr := 0xff + cpu.Registers.C.Get()
+	addr := 0xff00 + uint16(cpu.Registers.C.Get())
 	cpu.Memory[addr] = cpu.Registers.A.Get()
 }
 
@@ -71,7 +75,7 @@ func (cpu *CPU) LD_LOC_HL_A() {
 func (cpu *CPU) LD_LOC_A8_A() {
 	// store the contents of register A in the range 0xFF00-0xFFf specified by immediarte
 	// operand a8.
-	addr := 0xff + cpu.FetchAndIncrement()
+	addr := 0xff00 + uint16(cpu.FetchAndIncrement())
 	cpu.Memory[addr] = cpu.Registers.A.Get()
 }
 
@@ -163,6 +167,67 @@ func (cpu *CPU) RET(){
 	low := cpu.PopFromStack()
 	high := cpu.PopFromStack()
 	cpu.PC = MergeBytes(high, low)
+}
+
+func (cpu *CPU) INC_DE() {
+	cpu.Registers.DE.Increment()
+}
+
+func (cpu *CPU) LD_A_E() {
+	// load the contents of register E into register A.
+	cpu.Registers.A.Set(cpu.Registers.E.Get())
+}
+
+func (cpu *CPU) CP_D8() {
+	// compare the contents of reigster A with immediate 8 bit operand d8. set z flag if they are
+	// equal.
+	if cpu.Registers.A.Get() - cpu.FetchAndIncrement() == 0 {
+		cpu.Registers.F.SetBit(1, Z_FLAG)
+	}
+}
+
+func (cpu *CPU) LD_LOC_A16_A(){
+	// store the contents of register A in the internal ram specified by the 16 bit immeidate operand a16.
+	low := cpu.FetchAndIncrement()
+	high := cpu.FetchAndIncrement()
+	cpu.Memory[MergeBytes(high, low)] = cpu.Registers.A.Get()
+}
+
+func (cpu *CPU) DEC_A() {
+	cpu.Registers.A.Decrement()
+}
+
+func (cpu *CPU) JR_Z_S8() {
+	cpu.JR_COMMON_S8(1)
+}
+
+func (cpu *CPU) LD_H_A() {
+	cpu.Registers.H.Set(cpu.Registers.A.Get())
+}
+
+func (cpu *CPU) LD_D_A() {
+	cpu.Registers.D.Set(cpu.Registers.A.Get())
+}
+
+func (cpu *CPU) INC_B() {
+	cpu.Registers.B.Increment()
+}
+
+func (cpu *CPU) LD_E_D8() {
+	cpu.Registers.E.Set(cpu.FetchAndIncrement())
+}
+
+func (cpu *CPU) LD_A_LOC_A8() {
+	addr := 0xff00 + uint16(cpu.FetchAndIncrement())
+	cpu.Registers.A.Set(cpu.Memory[addr])
+}
+
+func (cpu *CPU) DEC_C(){
+	cpu.Registers.C.Decrement()
+}
+
+func (cpu *CPU) DEC_E() {
+	cpu.Registers.E.Decrement()
 }
 
 
