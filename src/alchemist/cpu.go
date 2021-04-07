@@ -53,6 +53,9 @@ func (cpu *CPU) GetElementAtPC() byte {
 }
 
 func (cpu *CPU) FetchDecodeExecute() {
+	if cpu.PC == 136 {
+		fmt.Println("hello ")
+	}
 	opcode := cpu.FetchAndIncrement()
 	fmt.Println(fmt.Sprintf("Executing Instruction %x At PC %d",opcode, cpu.PC - 1))
 	switch opcode {
@@ -134,6 +137,14 @@ func (cpu *CPU) FetchDecodeExecute() {
 		cpu.DEC_D()
 	case 0x16:
 		cpu.LD_D_D8()
+	case 0x24:
+		cpu.INC_H()
+	case 0x7c:
+		cpu.LD_A_H()
+	case 0x90:
+		cpu.SUB_B()
+	case 0x18:
+		cpu.JR_S8()
 	default:
 		hex := fmt.Sprintf("0x%x %d", opcode, cpu.PC-1)
 		fmt.Println(hex)

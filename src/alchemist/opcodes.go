@@ -1,7 +1,5 @@
 package main
 
-import "fmt"
-
 func (cpu *CPU) LD_SP_D16(){
 	// 0x31
 	low := cpu.FetchAndIncrement()
@@ -19,7 +17,6 @@ func (cpu *CPU) LD_HL_A_DEC() {
 	a := cpu.Registers.A.Get()
 	cpu.Memory[cpu.Registers.HL.Get()] = a
 	cpu.Registers.HL.Decrement()
-	fmt.Println("Decrementing HL : ", cpu.Registers.HL.Get())
 }
 
 
@@ -29,7 +26,6 @@ func (cpu *CPU) LD_HL_D16() {
 	high := cpu.FetchAndIncrement()
 	cpu.Registers.H.Set(high)
 	cpu.Registers.L.Set(low)
-	fmt.Println("Setting HL : ", cpu.Registers.HL.Get())
 
 }
 
@@ -250,4 +246,18 @@ func (cpu *CPU) INC_H(){
 	cpu.Registers.H.Increment()
 }
 
+func (cpu *CPU) LD_A_H() {
+	cpu.Registers.A.Set(cpu.Registers.H.Get())
+}
 
+func (cpu *CPU) JR_S8() {
+	// jump s8 steps from current.
+
+	steps, isN := GetTwosComplement(cpu.FetchAndIncrement())
+	steps16 := uint16(steps)
+	if isN {
+		cpu.PC -= steps16
+	} else {
+		cpu.PC += steps16
+	}
+}

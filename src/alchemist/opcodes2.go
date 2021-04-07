@@ -28,4 +28,8 @@ func (cpu *CPU) RL_C(){
 	cpu.RL(cpu.Registers.C)
 }
 
+func (cpu *CPU) SUB_B() {
+	cpu.Registers.A.Set(cpu.Registers.A.Get()-cpu.Registers.B.Get())
+}
+
 
