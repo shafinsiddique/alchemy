@@ -16,11 +16,10 @@ func (cpu *CPU) BIT_7H()  {
 	// copy the contents of of bit 7 in register H to the z flag of the F register.
 	bit := cpu.Registers.H.GetBit(7) ^ 1 // take complemeent of the bit in position 7.
 	cpu.Registers.F.SetBit(bit, Z_FLAG)
-
+	cpu.Registers.F.SetBit(1, HALF_CARRY_FLAG)
 	if bit == 1 {
 		fmt.Println(cpu.Registers.HL.Get())
 		fmt.Println(cpu.Registers.F.GetBit(Z_FLAG))
-		fmt.Println("hello world.")
 	}
 }
 

@@ -10,6 +10,7 @@ func (cpu *CPU) LD_SP_D16(){
 func (cpu *CPU) XOR_A() {
 	// xor A
 	cpu.Registers.A.Set(cpu.Registers.A.Value ^ cpu.Registers.A.Value)
+	cpu.Registers.F.SetBit(1, Z_FLAG)
 }
 
 func (cpu *CPU) LD_HL_A_DEC() {

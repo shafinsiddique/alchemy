@@ -53,11 +53,8 @@ func (cpu *CPU) GetElementAtPC() byte {
 }
 
 func (cpu *CPU) FetchDecodeExecute() {
-	if cpu.PC == 136 {
-		fmt.Println("hello ")
-	}
 	opcode := cpu.FetchAndIncrement()
-	fmt.Println(fmt.Sprintf("Executing Instruction %x At PC %d",opcode, cpu.PC - 1))
+	fmt.Println(fmt.Sprintf("Executing Instruction 0x %x", opcode))
 	switch opcode {
 	case 0x31:
 		cpu.LD_SP_D16()
@@ -154,6 +151,16 @@ func (cpu *CPU) FetchDecodeExecute() {
 func (cpu *CPU) RunBootSequence(){
 	for cpu.PC < 256 {
 		cpu.FetchDecodeExecute()
+		fmt.Println(fmt.Sprintf("AF : %x", cpu.Registers.AF.Get()))
+		fmt.Println(fmt.Sprintf("BC : %x", cpu.Registers.BC.Get()))
+		fmt.Println(fmt.Sprintf("DE : %x", cpu.Registers.DE.Get()))
+		fmt.Println(fmt.Sprintf("HL : %x", cpu.Registers.HL.Get()))
+		fmt.Println(fmt.Sprintf("SP : %x", cpu.SP))
+		fmt.Println(fmt.Sprintf("PC : %x", cpu.PC))
+		fmt.Println("END.")
+		//if cpu.PC >= 12 {
+		//
+		//}
 	}
 }
 
