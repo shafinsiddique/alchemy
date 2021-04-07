@@ -46,6 +46,15 @@ func (cpu *CPU) JR_COMMON_S8(flag byte) { // not actual instreuction, code reuse
 	}
 }
 
+func (cpu *CPU) RL(register *EightBitRegister){
+	for i:= 7; i >= 0; i-- {
+		bit := register.GetBit(i)
+		carry := cpu.Registers.F.GetBit(CARRY_FLAG)
+		cpu.Registers.F.SetBit(bit, CARRY_FLAG)
+		register.SetBit(carry, i)
+	}
+}
+
 func (cpu *CPU) JR_NZ_S8(){
 	cpu.JR_COMMON_S8(0)
 }
@@ -130,16 +139,10 @@ func (cpu *CPU) PUSH_BC() {
 	cpu.PushToStack(cpu.Registers.BC.GetLow())
 }
 
-func (cpu *CPU) RLA(){
+func (cpu *CPU) RL_A(){
 	// rotate the contents of reigster a to the left, trhough the carry flag.
 	// i.e bit 0 -> bit 1 -> bit 2
-	for i:= 0; i < 8; i++ {
-		bit := cpu.Registers.A.GetBit(i)
-		carry := cpu.Registers.F.GetBit(CARRY_FLAG)
-		cpu.Registers.F.SetBit(bit, CARRY_FLAG)
-		cpu.Registers.A.SetBit(carry, i)
-
-	}
+	cpu.RL(cpu.Registers.A)
 }
 
 func (cpu *CPU) POP_BC() {
