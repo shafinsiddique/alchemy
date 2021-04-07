@@ -1,5 +1,7 @@
 package main
 
+import "fmt"
+
 func (cpu *CPU) LD_SP_D16(){
 	// 0x31
 	low := cpu.FetchAndIncrement()
@@ -17,6 +19,7 @@ func (cpu *CPU) LD_HL_A_DEC() {
 	a := cpu.Registers.A.Get()
 	cpu.Memory[cpu.Registers.HL.Get()] = a
 	cpu.Registers.HL.Decrement()
+	fmt.Println("Decrementing HL : ", cpu.Registers.HL.Get())
 }
 
 
@@ -26,6 +29,7 @@ func (cpu *CPU) LD_HL_D16() {
 	high := cpu.FetchAndIncrement()
 	cpu.Registers.H.Set(high)
 	cpu.Registers.L.Set(low)
+	fmt.Println("Setting HL : ", cpu.Registers.HL.Get())
 
 }
 
@@ -181,7 +185,8 @@ func (cpu *CPU) LD_A_E() {
 func (cpu *CPU) CP_D8() {
 	// compare the contents of reigster A with immediate 8 bit operand d8. set z flag if they are
 	// equal.
-	if cpu.Registers.A.Get() - cpu.FetchAndIncrement() == 0 {
+	i := cpu.FetchAndIncrement()
+	if cpu.Registers.A.Get() - i == 0 {
 		cpu.Registers.F.SetBit(1, Z_FLAG)
 	}
 }
@@ -230,6 +235,16 @@ func (cpu *CPU) DEC_E() {
 	cpu.Registers.E.Decrement()
 }
 
+func (cpu *CPU) DEC_D(){
+	cpu.Registers.D.Decrement()
+}
 
+func (cpu *CPU) LD_D_D8(){
+	cpu.Registers.D.Set(cpu.FetchAndIncrement())
+}
+
+func (cpu *CPU) INC_H(){
+	cpu.Registers.H.Increment()
+}
 
 
