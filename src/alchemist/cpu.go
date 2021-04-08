@@ -78,7 +78,7 @@ func(cpu *CPU) IncrementRegister8Bit(register *EightBitRegister) {
 	initial := register.Get()
 	register.Increment()
 	cpu.CheckAndSetZeroFlag(register.Get())
-	cpu.CheckAndSetHCFlag(int8(initial), 1)
+	cpu.CheckAndSetHCFlag(initial, 1, false)
 	cpu.Registers.F.SetBit(0, NEGATIVE_FLAG)
 
 }
@@ -89,7 +89,7 @@ func (cpu *CPU) DecrementRegister8Bit(register *EightBitRegister) {
 	current := register.Get()
 	cpu.Registers.F.SetBit(1, NEGATIVE_FLAG)
 	cpu.CheckAndSetZeroFlag(current)
-	cpu.CheckAndSetHCFlag(int8(initial),-1)
+	cpu.CheckAndSetHCFlag(initial,1, true)
 }
 
 func(cpu *CPU) CheckAndSetZeroFlag(value byte)  {
@@ -100,8 +100,15 @@ func(cpu *CPU) CheckAndSetZeroFlag(value byte)  {
 	}
 }
 
-func (cpu *CPU) CheckAndSetHCFlag(a int8, b int8) {
-	if (((a & 0xf) + (b & 0xf)) & 0x10) == 0x10 {
+func (cpu *CPU) CheckAndSetHCFlag(a byte, b byte, negative bool) {
+	var sum byte
+	if negative {
+		sum = (a & 0xf) + (b & 0xf)
+	} else {
+		sum = (a & 0xf) - (b & 0xf)
+	}
+
+	if (sum & 0x10) == 0x10 {
 		cpu.Registers.F.SetBit(1, HALF_CARRY_FLAG)
 	} else {
 		cpu.Registers.F.SetBit(0, HALF_CARRY_FLAG)
