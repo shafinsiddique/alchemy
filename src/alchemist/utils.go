@@ -1,6 +1,8 @@
 package main
 
-import "encoding/binary"
+import (
+	"encoding/binary"
+)
 
 func MergeBytes(high byte, low byte) uint16{
 	high_16 := uint16(high)
@@ -46,3 +48,4 @@ func GetTwosComplement(value byte) (byte, bool){ // using bool to indicate wheth
 	}
 	return val, false
 }
+

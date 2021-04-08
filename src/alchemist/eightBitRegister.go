@@ -34,3 +34,5 @@ func (register *EightBitRegister) Increment(){
 func (register *EightBitRegister) Decrement() {
 	register.Value -= 1
 }
+
+// SET

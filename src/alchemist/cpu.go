@@ -1,6 +1,8 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+)
 
 type CPU struct {
 	Registers *Registers
@@ -50,6 +52,31 @@ func (cpu *CPU) DecrementPC(){
 
 func (cpu *CPU) GetElementAtPC() byte {
 	return cpu.Memory[cpu.PC]
+}
+
+func(cpu *CPU) IncrementRegister8Bit(register *EightBitRegister) {
+	initial := register.Get()
+	register.Increment()
+	cpu.CheckAndSetZeroFlag(register.Get())
+	cpu.CheckAndSetHCFlag(initial, 1)
+	cpu.Registers.F.SetBit(0, NEGATIVE_FLAG)
+
+}
+
+func(cpu *CPU) CheckAndSetZeroFlag(value byte)  {
+	if value == 0 {
+		cpu.Registers.F.SetBit(1, Z_FLAG)
+	} else {
+		cpu.Registers.F.SetBit(0, Z_FLAG)
+	}
+}
+
+func (cpu *CPU) CheckAndSetHCFlag(a byte, b byte) {
+	if (((a & 0xf) + (b & 0xf)) & 0x10) == 0x10 {
+		cpu.Registers.F.SetBit(1, HALF_CARRY_FLAG)
+	} else {
+		cpu.Registers.F.SetBit(0, HALF_CARRY_FLAG)
+	}
 }
 
 func (cpu *CPU) FetchDecodeExecute() {
@@ -151,13 +178,16 @@ func (cpu *CPU) FetchDecodeExecute() {
 func (cpu *CPU) RunBootSequence(){
 	for cpu.PC < 256 {
 		cpu.FetchDecodeExecute()
-		fmt.Println(fmt.Sprintf("AF : %x", cpu.Registers.AF.Get()))
-		fmt.Println(fmt.Sprintf("BC : %x", cpu.Registers.BC.Get()))
-		fmt.Println(fmt.Sprintf("DE : %x", cpu.Registers.DE.Get()))
-		fmt.Println(fmt.Sprintf("HL : %x", cpu.Registers.HL.Get()))
-		fmt.Println(fmt.Sprintf("SP : %x", cpu.SP))
-		fmt.Println(fmt.Sprintf("PC : %x", cpu.PC))
-		fmt.Println("END.")
+		if cpu.PC >= 12 {
+			fmt.Println(fmt.Sprintf("AF : %x", cpu.Registers.AF.Get()))
+			fmt.Println(fmt.Sprintf("BC : %x", cpu.Registers.BC.Get()))
+			fmt.Println(fmt.Sprintf("DE : %x", cpu.Registers.DE.Get()))
+			fmt.Println(fmt.Sprintf("HL : %x", cpu.Registers.HL.Get()))
+			fmt.Println(fmt.Sprintf("SP : %x", cpu.SP))
+			fmt.Println(fmt.Sprintf("PC : %x", cpu.PC))
+			fmt.Println("END.")
+		}
+
 		//if cpu.PC >= 12 {
 		//
 		//}

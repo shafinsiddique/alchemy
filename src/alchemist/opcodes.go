@@ -74,7 +74,7 @@ func (cpu *CPU) LD_LOC_C_A() {
 }
 
 func (cpu *CPU) INC_C() {
-	cpu.Registers.C.Set(cpu.Registers.C.Get() + 1)
+	cpu.IncrementRegister8Bit(cpu.Registers.C)
 }
 
 func (cpu *CPU) LD_LOC_HL_A() {
