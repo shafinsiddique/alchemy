@@ -215,7 +215,7 @@ func (cpu *CPU) LD_D_A() {
 }
 
 func (cpu *CPU) INC_B() {
-	cpu.Registers.B.Increment()
+	cpu.IncrementRegister8Bit(cpu.Registers.B)
 }
 
 func (cpu *CPU) LD_E_D8() {
@@ -244,7 +244,7 @@ func (cpu *CPU) LD_D_D8(){
 }
 
 func (cpu *CPU) INC_H(){
-	cpu.Registers.H.Increment()
+	cpu.IncrementRegister8Bit(cpu.Registers.H)
 }
 
 func (cpu *CPU) LD_A_H() {
