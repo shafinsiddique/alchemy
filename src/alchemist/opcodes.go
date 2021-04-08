@@ -44,7 +44,7 @@ func (cpu *CPU) JR_COMMON_S8(flag byte) { // not actual instreuction, code reuse
 }
 
 func (cpu *CPU) RL(register *EightBitRegister){
-	for i:= 7; i >= 0; i-- {
+	for i:= 0; i <= 7; i++ {
 		bit := register.GetBit(i)
 		carry := cpu.Registers.F.GetBit(CARRY_FLAG)
 		cpu.Registers.F.SetBit(bit, CARRY_FLAG)
