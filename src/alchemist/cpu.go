@@ -5,39 +5,61 @@ import (
 )
 
 type CPU struct {
-	Registers *Registers
-	Memory []byte
-	PC uint16
-	SP uint16
-	incremented bool
+	Registers     *Registers
+	BootRomMemory []byte
+	Memory        []byte
+	PC            uint16
+	SP            uint16
+	bootMode bool
 }
 
 func NewCPU() *CPU {
-	return &CPU{Registers: InitializeRegisters(), Memory: make([]byte,0x10000)}
+	return &CPU{Registers: InitializeRegisters(), BootRomMemory: make([]byte,0x10000),
+		Memory: make([]byte, 0x1000)}
+}
+
+func (cpu *CPU) Read(addr uint16) byte {
+	if cpu.bootMode && addr < 256 {
+		return cpu.BootRomMemory[addr]
+	} else {
+		return cpu.Memory[addr]
+	}
+}
+
+func (cpu *CPU) Write(addr uint16, val byte) {
+	if addr >= 0xc000 && addr <= 0xDFFF {
+		cpu.Memory[addr] = val
+	}
 }
 
 func (cpu *CPU) LoadBootRom(bootrom []byte) {
 	for i := 0; i < len(bootrom) ; i++ {
-		cpu.Memory[i] = bootrom[i]
+		cpu.BootRomMemory[i] = bootrom[i]
+	}
+}
+
+func (cpu *CPU) LoadRomBank0(rom []byte) {
+	for i:= 0; i < len(rom) ; i ++ {
+		cpu.Memory[i] = rom[i]
 	}
 }
 
 func (cpu *CPU) PushToStack(item byte) {
 	sp := &cpu.SP
 	*sp -= 1
-	cpu.Memory[*sp] = item
+	cpu.BootRomMemory[*sp] = item
 }
 
 func (cpu *CPU) PopFromStack()byte {
 	sp := &cpu.SP
-	item := cpu.Memory[*sp]
+	item := cpu.BootRomMemory[*sp]
 	*sp += 1
 	return item
 }
 
 func (cpu *CPU) FetchAndIncrement() byte {
 	pc := &cpu.PC
-	item := cpu.Memory[*pc]
+	item := cpu.BootRomMemory[*pc]
 	*pc += 1
 	return item
 }
@@ -51,16 +73,25 @@ func (cpu *CPU) DecrementPC(){
 }
 
 func (cpu *CPU) GetElementAtPC() byte {
-	return cpu.Memory[cpu.PC]
+	return cpu.BootRomMemory[cpu.PC]
 }
 
 func(cpu *CPU) IncrementRegister8Bit(register *EightBitRegister) {
 	initial := register.Get()
 	register.Increment()
 	cpu.CheckAndSetZeroFlag(register.Get())
-	cpu.CheckAndSetHCFlag(initial, 1)
+	cpu.CheckAndSetHCFlag(int8(initial), 1)
 	cpu.Registers.F.SetBit(0, NEGATIVE_FLAG)
 
+}
+
+func (cpu *CPU) DecrementRegister8Bit(register *EightBitRegister) {
+	initial := register.Get()
+	register.Decrement()
+	current := register.Get()
+	cpu.Registers.F.SetBit(1, NEGATIVE_FLAG)
+	cpu.CheckAndSetZeroFlag(current)
+	cpu.CheckAndSetHCFlag(int8(initial),-1)
 }
 
 func(cpu *CPU) CheckAndSetZeroFlag(value byte)  {
@@ -71,7 +102,7 @@ func(cpu *CPU) CheckAndSetZeroFlag(value byte)  {
 	}
 }
 
-func (cpu *CPU) CheckAndSetHCFlag(a byte, b byte) {
+func (cpu *CPU) CheckAndSetHCFlag(a int8, b int8) {
 	if (((a & 0xf) + (b & 0xf)) & 0x10) == 0x10 {
 		cpu.Registers.F.SetBit(1, HALF_CARRY_FLAG)
 	} else {
