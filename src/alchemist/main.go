@@ -18,7 +18,6 @@ func main() {
 	fmt.Println("Rom Bytes Read", romRead)
 	cpu.LoadBootRom(bootrom)
 	cpu.LoadRomBank0(rom)
-	fmt.Println(fmt.Sprintf("%x",cpu.Memory[260]))
-	//cpu.RunBootSequence()
+	cpu.RunBootSequence()
 
 }

@@ -14,8 +14,8 @@ type CPU struct {
 }
 
 func NewCPU() *CPU {
-	return &CPU{Registers: InitializeRegisters(), BootRomMemory: make([]byte,0x10000),
-		Memory: make([]byte, 0x1000)}
+	return &CPU{Registers: InitializeRegisters(), BootRomMemory: make([]byte,256),
+		Memory: make([]byte, 0x10000)}
 }
 
 func (cpu *CPU) Read(addr uint16) byte {
@@ -27,9 +27,7 @@ func (cpu *CPU) Read(addr uint16) byte {
 }
 
 func (cpu *CPU) Write(addr uint16, val byte) {
-	if addr >= 0xc000 && addr <= 0xDFFF {
-		cpu.Memory[addr] = val
-	}
+	cpu.Memory[addr] = val
 }
 
 func (cpu *CPU) LoadBootRom(bootrom []byte) {
@@ -47,19 +45,19 @@ func (cpu *CPU) LoadRomBank0(rom []byte) {
 func (cpu *CPU) PushToStack(item byte) {
 	sp := &cpu.SP
 	*sp -= 1
-	cpu.BootRomMemory[*sp] = item
+	cpu.Write(*sp, item)
 }
 
 func (cpu *CPU) PopFromStack()byte {
 	sp := &cpu.SP
-	item := cpu.BootRomMemory[*sp]
+	item := cpu.Read(*sp)
 	*sp += 1
 	return item
 }
 
 func (cpu *CPU) FetchAndIncrement() byte {
 	pc := &cpu.PC
-	item := cpu.BootRomMemory[*pc]
+	item := cpu.Read(*pc)
 	*pc += 1
 	return item
 }
@@ -73,7 +71,7 @@ func (cpu *CPU) DecrementPC(){
 }
 
 func (cpu *CPU) GetElementAtPC() byte {
-	return cpu.BootRomMemory[cpu.PC]
+	return cpu.Read(cpu.PC)
 }
 
 func(cpu *CPU) IncrementRegister8Bit(register *EightBitRegister) {
@@ -207,6 +205,7 @@ func (cpu *CPU) FetchDecodeExecute() {
 }
 
 func (cpu *CPU) RunBootSequence(){
+	cpu.bootMode = true
 	for cpu.PC < 256 {
 		cpu.FetchDecodeExecute()
 		if cpu.PC >= 12 {

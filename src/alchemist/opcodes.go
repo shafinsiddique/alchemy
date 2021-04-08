@@ -1,7 +1,5 @@
 package main
 
-import "fmt"
-
 func (cpu *CPU) LD_SP_D16(){
 	// 0x31
 	low := cpu.FetchAndIncrement()
@@ -18,7 +16,7 @@ func (cpu *CPU) XOR_A() {
 func (cpu *CPU) LD_HL_A_DEC() {
 	// LD_HL_A_DEC
 	a := cpu.Registers.A.Get()
-	cpu.BootRomMemory[cpu.Registers.HL.Get()] = a
+	cpu.Write(cpu.Registers.HL.Get(), a)
 	cpu.Registers.HL.Decrement()
 }
 
@@ -72,7 +70,7 @@ func (cpu *CPU) LD_LOC_C_A() {
 	// store the contents of register A in the internal ram, ad the range 0xff00-0xffff specified by register c.
 	// disassembly in boot rom : LD (0xFF00 + C), A
 	addr := 0xff00 + uint16(cpu.Registers.C.Get())
-	cpu.BootRomMemory[addr] = cpu.Registers.A.Get()
+	cpu.Write(addr, cpu.Registers.A.Get())
 }
 
 func (cpu *CPU) INC_C() {
@@ -81,14 +79,14 @@ func (cpu *CPU) INC_C() {
 
 func (cpu *CPU) LD_LOC_HL_A() {
 	// store the contents of register a in the memory location specified by HL
-	cpu.BootRomMemory[cpu.Registers.HL.Get()] = cpu.Registers.A.Get()
+	cpu.Write(cpu.Registers.HL.Get(), cpu.Registers.A.Get())
 }
 
 func (cpu *CPU) LD_LOC_A8_A() {
 	// store the contents of register A in the range 0xFF00-0xFFf specified by immediarte
 	// operand a8.
 	addr := 0xff00 + uint16(cpu.FetchAndIncrement())
-	cpu.BootRomMemory[addr] = cpu.Registers.A.Get()
+	cpu.Write(addr, cpu.Registers.A.Get())
 }
 
 func (cpu *CPU) LD_DE_D16() {
@@ -101,9 +99,7 @@ func (cpu *CPU) LD_DE_D16() {
 
 func (cpu *CPU) LD_A_LOC_DE() {
 	// store the 8 bit contents in the memory location of the value of DE into register A.
-	fmt.Println(cpu.BootRomMemory[cpu.Registers.DE.Get()])
-	fmt.Println(cpu.Registers.DE.Get())
-	cpu.Registers.A.Set(cpu.BootRomMemory[cpu.Registers.DE.Get()])
+	cpu.Registers.A.Set(cpu.Read(cpu.Registers.DE.Get()))
 }
 
 func (cpu *CPU) CALL_A16(){
@@ -113,9 +109,9 @@ func (cpu *CPU) CALL_A16(){
 	sp := &cpu.SP
 	*sp -= 1
 	bytes := SplitInt16ToBytes(uint16(cpu.PC + 2)) // + 2 because current PC = Position of Call + 1
-	cpu.BootRomMemory[*sp] = bytes[0]              // current byte and next byte is included so + 2 goes to next
-	*sp -= 1                                       // instruction
-	cpu.BootRomMemory[*sp] = bytes[1]              // low byte placed bottom , i guess the name makes sense?
+	cpu.Write(*sp, bytes[0]) // high byte placed at the top.
+	*sp -= 1
+	cpu.Write(*sp, bytes[1]) // low byte placed bottom , i guess the name makes sense?
 
 	// part ii load 16 bit immediate operand.
 	low := cpu.FetchAndIncrement()
@@ -161,8 +157,7 @@ func (cpu *CPU) DEC_B() {
 func (cpu *CPU) LD_LOC_HL_A_INC() {
 	// store the element in memory loc HL into register A.
 	// also increment HL.
-
-	cpu.Registers.A.Set(cpu.BootRomMemory[cpu.Registers.HL.Get()])
+	cpu.Registers.A.Set(cpu.Read(cpu.Registers.HL.Get()))
 	cpu.Registers.HL.Increment()
 }
 
@@ -199,7 +194,7 @@ func (cpu *CPU) LD_LOC_A16_A(){
 	// store the contents of register A in the internal ram specified by the 16 bit immeidate operand a16.
 	low := cpu.FetchAndIncrement()
 	high := cpu.FetchAndIncrement()
-	cpu.BootRomMemory[MergeBytes(high, low)] = cpu.Registers.A.Get()
+	cpu.Write(MergeBytes(high, low), cpu.Registers.A.Get())
 }
 
 func (cpu *CPU) DEC_A() {
@@ -228,7 +223,7 @@ func (cpu *CPU) LD_E_D8() {
 
 func (cpu *CPU) LD_A_LOC_A8() {
 	addr := 0xff00 + uint16(cpu.FetchAndIncrement())
-	cpu.Registers.A.Set(cpu.BootRomMemory[addr])
+	cpu.Registers.A.Set(cpu.Read(addr))
 }
 
 func (cpu *CPU) DEC_C(){
