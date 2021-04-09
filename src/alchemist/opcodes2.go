@@ -20,6 +20,9 @@ func (cpu *CPU) BIT_7H()  {
 
 func (cpu *CPU) RL_C(){
 	cpu.RL(cpu.Registers.C)
+	cpu.CheckAndSetZeroFlag(cpu.Registers.C.Get())
+	cpu.Registers.F.SetBit(0, NEGATIVE_FLAG)
+	cpu.Registers.F.SetBit(0, HALF_CARRY_FLAG)
 }
 
 func (cpu *CPU) SUB_B() {

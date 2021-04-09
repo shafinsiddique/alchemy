@@ -140,6 +140,10 @@ func (cpu *CPU) RL_A(){
 	// rotate the contents of reigster a to the left, trhough the carry flag.
 	// i.e bit 0 -> bit 1 -> bit 2
 	cpu.RL(cpu.Registers.A)
+	cpu.Registers.F.SetBit(0, Z_FLAG)
+	cpu.Registers.F.SetBit(0, NEGATIVE_FLAG)
+	cpu.Registers.F.SetBit(0, HALF_CARRY_FLAG)
+
 }
 
 func (cpu *CPU) POP_BC() {
@@ -157,7 +161,7 @@ func (cpu *CPU) DEC_B() {
 func (cpu *CPU) LD_LOC_HL_A_INC() {
 	// store the element in memory loc HL into register A.
 	// also increment HL.
-	cpu.Registers.A.Set(cpu.Read(cpu.Registers.HL.Get()))
+	cpu.Write(cpu.Registers.HL.Get(), cpu.Registers.A.Get())
 	cpu.Registers.HL.Increment()
 }
 
@@ -260,4 +264,8 @@ func (cpu *CPU) JR_S8() {
 	} else {
 		cpu.PC += steps16
 	}
+}
+
+func (cpu *CPU) LD_L_D8() {
+	cpu.Registers.L.Set(cpu.FetchAndIncrement())
 }

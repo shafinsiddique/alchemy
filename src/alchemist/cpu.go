@@ -205,6 +205,8 @@ func (cpu *CPU) FetchDecodeExecute() {
 		cpu.SUB_B()
 	case 0x18:
 		cpu.JR_S8()
+	case 0x2e:
+		cpu.LD_L_D8()
 	default:
 		hex := fmt.Sprintf("0x%x %d", opcode, cpu.PC-1)
 		fmt.Println(hex)
@@ -224,10 +226,6 @@ func (cpu *CPU) RunBootSequence(){
 			fmt.Println(fmt.Sprintf("PC : %x", cpu.PC))
 			fmt.Println("END.")
 		}
-
-		//if cpu.PC >= 12 {
-		//
-		//}
 	}
 }
 
