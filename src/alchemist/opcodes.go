@@ -189,9 +189,17 @@ func (cpu *CPU) CP_D8() {
 	// compare the contents of reigster A with immediate 8 bit operand d8. set z flag if they are
 	// equal.
 	i := cpu.FetchAndIncrement()
-	if cpu.Registers.A.Get() - i == 0 {
-		cpu.Registers.F.SetBit(1, Z_FLAG)
+	val := cpu.Registers.A.Get()
+
+	if !cpu.CheckAndSetOverflowFlag(val, i, true) {
+		cpu.CheckAndSetZeroFlag(val - i)
+		cpu.CheckAndSetHCFlag(cpu.Registers.A.Get(), i, true)
+	} else { // since the val is definitely not zero and definitely not gonna have a half carry.
+		cpu.ClearZeroFlag()
+		cpu.ClearHCFlag()
 	}
+	cpu.SetNegativeFlag()
+
 }
 
 func (cpu *CPU) LD_LOC_A16_A(){

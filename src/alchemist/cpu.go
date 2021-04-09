@@ -92,28 +92,6 @@ func (cpu *CPU) DecrementRegister8Bit(register *EightBitRegister) {
 	cpu.CheckAndSetHCFlag(initial,1, true)
 }
 
-func(cpu *CPU) CheckAndSetZeroFlag(value byte)  {
-	if value == 0 {
-		cpu.Registers.F.SetBit(1, Z_FLAG)
-	} else {
-		cpu.Registers.F.SetBit(0, Z_FLAG)
-	}
-}
-
-func (cpu *CPU) CheckAndSetHCFlag(a byte, b byte, negative bool) {
-	var sum byte
-	if negative {
-		sum = (a & 0xf) + (b & 0xf)
-	} else {
-		sum = (a & 0xf) - (b & 0xf)
-	}
-
-	if (sum & 0x10) == 0x10 {
-		cpu.Registers.F.SetBit(1, HALF_CARRY_FLAG)
-	} else {
-		cpu.Registers.F.SetBit(0, HALF_CARRY_FLAG)
-	}
-}
 
 func (cpu *CPU) FetchDecodeExecute() {
 	opcode := cpu.FetchAndIncrement()
