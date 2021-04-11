@@ -71,22 +71,23 @@ func (cpu *CPU) DecrementPC() {
 	cpu.PC -= 1
 }
 
-func (cpu *CPU) IncrementRegister8Bit(register *EightBitRegister) {
+func (cpu *CPU) IncrementRegister8Bit(register *EightBitRegister) int {
 	initial := register.Get()
 	register.Increment()
 	cpu.CheckAndSetZeroFlag(register.Get())
 	cpu.CheckAndSetHCFlag(initial, 1, false)
 	cpu.Registers.F.SetBit(0, NEGATIVE_FLAG)
-
+	return 4
 }
 
-func (cpu *CPU) DecrementRegister8Bit(register *EightBitRegister) {
+func (cpu *CPU) DecrementRegister8Bit(register *EightBitRegister) int {
 	initial := register.Get()
 	register.Decrement()
 	current := register.Get()
 	cpu.Registers.F.SetBit(1, NEGATIVE_FLAG)
 	cpu.CheckAndSetZeroFlag(current)
 	cpu.CheckAndSetHCFlag(initial, 1, true)
+	return 4
 }
 
 func (cpu *CPU) FetchDecodeExecute() {

@@ -8,8 +8,9 @@ func NewEightBitRegister() *EightBitRegister {
 	return &EightBitRegister{}
 }
 
-func (register *EightBitRegister) Set(value byte) {
+func (register *EightBitRegister) Set(value byte) int {
 	register.Value = value
+	return 4
 }
 
 func (register *EightBitRegister) Get() byte {
