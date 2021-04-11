@@ -1,5 +1,7 @@
 package main
 
+import "fmt"
+
 func (cpu *CPU) LD_SP_D16(){
 	// 0x31
 	low := cpu.FetchAndIncrement()
@@ -235,6 +237,7 @@ func (cpu *CPU) LD_E_D8() {
 
 func (cpu *CPU) LD_A_LOC_A8() {
 	addr := 0xff00 + uint16(cpu.FetchAndIncrement())
+	fmt.Println(cpu.Read(addr))
 	cpu.Registers.A.Set(cpu.Read(addr))
 }
 

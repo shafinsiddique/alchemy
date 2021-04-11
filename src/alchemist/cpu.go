@@ -10,11 +10,12 @@ type CPU struct {
 	Memory        []byte
 	PC            uint16
 	SP            uint16
-	bootMode bool
+	bootMode      bool
+	debug bool
 }
 
 func NewCPU() *CPU {
-	return &CPU{Registers: InitializeRegisters(), BootRomMemory: make([]byte,256),
+	return &CPU{Registers: InitializeRegisters(), BootRomMemory: make([]byte, 256),
 		Memory: make([]byte, 0x10000)}
 }
 
@@ -31,13 +32,13 @@ func (cpu *CPU) Write(addr uint16, val byte) {
 }
 
 func (cpu *CPU) LoadBootRom(bootrom []byte) {
-	for i := 0; i < len(bootrom) ; i++ {
+	for i := 0; i < len(bootrom); i++ {
 		cpu.BootRomMemory[i] = bootrom[i]
 	}
 }
 
 func (cpu *CPU) LoadRomBank0(rom []byte) {
-	for i:= 0; i < len(rom) ; i ++ {
+	for i := 0; i < len(rom); i++ {
 		cpu.Memory[i] = rom[i]
 	}
 }
@@ -48,7 +49,7 @@ func (cpu *CPU) PushToStack(item byte) {
 	cpu.Write(*sp, item)
 }
 
-func (cpu *CPU) PopFromStack()byte {
+func (cpu *CPU) PopFromStack() byte {
 	sp := &cpu.SP
 	item := cpu.Read(*sp)
 	*sp += 1
@@ -62,19 +63,15 @@ func (cpu *CPU) FetchAndIncrement() byte {
 	return item
 }
 
-func (cpu *CPU) IncrementPC()  {
+func (cpu *CPU) IncrementPC() {
 	cpu.PC += 1
 }
 
-func (cpu *CPU) DecrementPC(){
-	cpu.PC -=1
+func (cpu *CPU) DecrementPC() {
+	cpu.PC -= 1
 }
 
-func (cpu *CPU) GetElementAtPC() byte {
-	return cpu.Read(cpu.PC)
-}
-
-func(cpu *CPU) IncrementRegister8Bit(register *EightBitRegister) {
+func (cpu *CPU) IncrementRegister8Bit(register *EightBitRegister) {
 	initial := register.Get()
 	register.Increment()
 	cpu.CheckAndSetZeroFlag(register.Get())
@@ -89,9 +86,8 @@ func (cpu *CPU) DecrementRegister8Bit(register *EightBitRegister) {
 	current := register.Get()
 	cpu.Registers.F.SetBit(1, NEGATIVE_FLAG)
 	cpu.CheckAndSetZeroFlag(current)
-	cpu.CheckAndSetHCFlag(initial,1, true)
+	cpu.CheckAndSetHCFlag(initial, 1, true)
 }
-
 
 func (cpu *CPU) FetchDecodeExecute() {
 	opcode := cpu.FetchAndIncrement()
@@ -191,11 +187,16 @@ func (cpu *CPU) FetchDecodeExecute() {
 	}
 }
 
-func (cpu *CPU) RunBootSequence(){
+func (cpu *CPU) RunBootSequence() {
 	cpu.bootMode = true
+
 	for cpu.PC < 256 {
 		cpu.FetchDecodeExecute()
-		if cpu.PC >= 12 {
+		if cpu.PC == 0x0064  {
+			cpu.debug = true
+		}
+
+		if cpu.debug {
 			fmt.Println(fmt.Sprintf("AF : %x", cpu.Registers.AF.Get()))
 			fmt.Println(fmt.Sprintf("BC : %x", cpu.Registers.BC.Get()))
 			fmt.Println(fmt.Sprintf("DE : %x", cpu.Registers.DE.Get()))
@@ -206,6 +207,3 @@ func (cpu *CPU) RunBootSequence(){
 		}
 	}
 }
-
-
-

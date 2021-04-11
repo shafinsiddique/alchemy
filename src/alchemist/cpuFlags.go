@@ -27,9 +27,9 @@ func(cpu *CPU) CheckAndSetZeroFlag(value byte)  {
 func (cpu *CPU) CheckAndSetHCFlag(a byte, b byte, negative bool) {
 	var sum byte
 	if negative {
-		sum = (a & 0xf) + (b & 0xf)
-	} else {
 		sum = (a & 0xf) - (b & 0xf)
+	} else {
+		sum = (a & 0xf) + (b & 0xf)
 	}
 
 	if (sum & 0x10) == 0x10 {
