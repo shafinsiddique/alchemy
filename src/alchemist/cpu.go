@@ -64,14 +64,6 @@ func (cpu *CPU) FetchAndIncrement() byte {
 	return item
 }
 
-func (cpu *CPU) IncrementPC() {
-	cpu.PC += 1
-}
-
-func (cpu *CPU) DecrementPC() {
-	cpu.PC -= 1
-}
-
 func (cpu *CPU) IncrementRegister8Bit(register *EightBitRegister) int {
 	initial := register.Get()
 	cycles := register.Increment()
