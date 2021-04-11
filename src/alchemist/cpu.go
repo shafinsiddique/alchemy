@@ -27,8 +27,9 @@ func (cpu *CPU) Read(addr uint16) byte {
 	}
 }
 
-func (cpu *CPU) Write(addr uint16, val byte) {
+func (cpu *CPU) Write(addr uint16, val byte) int {
 	cpu.Memory[addr] = val
+	return 4
 }
 
 func (cpu *CPU) LoadBootRom(bootrom []byte) {
@@ -73,21 +74,21 @@ func (cpu *CPU) DecrementPC() {
 
 func (cpu *CPU) IncrementRegister8Bit(register *EightBitRegister) int {
 	initial := register.Get()
-	register.Increment()
+	cycles := register.Increment()
 	cpu.CheckAndSetZeroFlag(register.Get())
 	cpu.CheckAndSetHCFlag(initial, 1, false)
 	cpu.Registers.F.SetBit(0, NEGATIVE_FLAG)
-	return 4
+	return cycles
 }
 
 func (cpu *CPU) DecrementRegister8Bit(register *EightBitRegister) int {
 	initial := register.Get()
-	register.Decrement()
+	cycles := register.Decrement()
 	current := register.Get()
 	cpu.Registers.F.SetBit(1, NEGATIVE_FLAG)
 	cpu.CheckAndSetZeroFlag(current)
 	cpu.CheckAndSetHCFlag(initial, 1, true)
-	return 4
+	return cycles
 }
 
 func (cpu *CPU) FetchDecodeExecute() {

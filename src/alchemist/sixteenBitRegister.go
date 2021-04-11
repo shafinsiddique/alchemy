@@ -16,20 +16,18 @@ func (register *SixteenBitRegister) Get()uint16 {
 	return high << 8 | low
 }
 
-func (register *SixteenBitRegister) Decrement(){
+func (register *SixteenBitRegister) Decrement() int {
 	val := register.Get()
 	decremented := val-1
 	bytes := SplitInt16ToBytes(decremented)
-	register.High.Set(bytes[0])
-	register.Low.Set(bytes[1])
+	return register.High.Set(bytes[0]) + register.Low.Set(bytes[1])
 }
 
-func (register *SixteenBitRegister) Increment() {
+func (register *SixteenBitRegister) Increment() int {
 	val := register.Get()
 	incremented := val+1
 	bytes := SplitInt16ToBytes(incremented)
-	register.High.Set(bytes[0])
-	register.Low.Set(bytes[1])
+	return register.High.Set(bytes[0]) + register.Low.Set(bytes[1])
 }
 
 func (register *SixteenBitRegister) GetHigh() byte{
