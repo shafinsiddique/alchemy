@@ -18,11 +18,13 @@ func (ppu *PPU) StartScanline(){
 }
 
 func (ppu *PPU) UpdateGraphics(cycles int) {
-	if ppu.LCDEnabled() {
-		ppu.Cycles -= cycles
-		if ppu.Cycles <= 0 { // new scanline.
-			ppu.StartScanline()
-		}
+	if !ppu.LCDEnabled() {
+		return
+	}
+
+	ppu.Cycles -= cycles
+	if ppu.Cycles <= 0 { // new scanline.
+		ppu.StartScanline()
 	}
 }
 

@@ -11,13 +11,10 @@ func RunBootSequence(cpu *CPU, mmu *MMU, ppu *PPU) {
 	for cpu.PC < 256 {
 		cycles := cpu.FetchDecodeExecute()
 		ppu.UpdateGraphics(cycles)
-		if cpu.PC == 0x0064 {
+		if cpu.PC == 0x006A {
 			debug = true
 		}
 
-		//if cpu.PC == 0x0c {
-		//	debug = true
-		//}
 		if debug {
 			fmt.Println(fmt.Sprintf("AF : %x", cpu.Registers.AF.Get()))
 			fmt.Println(fmt.Sprintf("BC : %x", cpu.Registers.BC.Get()))
