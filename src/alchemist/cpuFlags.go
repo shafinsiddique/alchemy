@@ -16,7 +16,7 @@ func (cpu *CPU) ClearNegativeFlag() {
 	cpu.Registers.F.SetBit(0, NEGATIVE_FLAG)
 }
 
-func(cpu *CPU) CheckAndSetZeroFlag(value byte)  {
+func (cpu *CPU) CheckAndSetZeroFlag(value byte) {
 	if value == 0 {
 		cpu.Registers.F.SetBit(1, Z_FLAG)
 	} else {
@@ -42,11 +42,11 @@ func (cpu *CPU) CheckAndSetHCFlag(a byte, b byte, negative bool) {
 func (cpu *CPU) CheckAndSetOverflowFlag(a byte, b byte, negative bool) bool {
 	var overflow bool
 	if negative {
-		if a < b + 0 {
+		if a < b+0 {
 			overflow = true
 		}
 	} else {
-		if a > 255 - b {
+		if a > 255-b {
 			overflow = true
 		}
 	}

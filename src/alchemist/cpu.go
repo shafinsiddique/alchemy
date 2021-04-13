@@ -10,57 +10,25 @@ type CPU struct {
 	Memory        []byte
 	PC            uint16
 	SP            uint16
-	bootMode      bool
-	MMU *MMU
-	debug bool
-}
-
-func NewCPU() *CPU {
-	return &CPU{Registers: InitializeRegisters(), BootRomMemory: make([]byte, 256),
-		Memory: make([]byte, 0x10000), MMU: NewMMU()}
-}
-
-func (cpu *CPU) Read(addr uint16) byte {
-	if cpu.bootMode && addr < 256 {
-		return cpu.BootRomMemory[addr]
-	} else {
-		return cpu.Memory[addr]
-	}
-}
-
-func (cpu *CPU) Write(addr uint16, val byte) int {
-	cpu.Memory[addr] = val
-	return 4
-}
-
-func (cpu *CPU) LoadBootRom(bootrom []byte) {
-	for i := 0; i < len(bootrom); i++ {
-		cpu.MMU.Write(uint16(i), bootrom[i])
-	}
-}
-
-func (cpu *CPU) LoadRomBank0(rom []byte) {
-	for i := 0; i < len(rom); i++ {
-		cpu.Memory[i] = rom[i]
-	}
+	MMU           *MMU
 }
 
 func (cpu *CPU) PushToStack(item byte) {
 	sp := &cpu.SP
 	*sp -= 1
-	cpu.Write(*sp, item)
+	cpu.MMU.Write(*sp, item)
 }
 
 func (cpu *CPU) PopFromStack() byte {
 	sp := &cpu.SP
-	item := cpu.Read(*sp)
+	item := cpu.MMU.Read(*sp)
 	*sp += 1
 	return item
 }
 
 func (cpu *CPU) FetchAndIncrement() byte {
 	pc := &cpu.PC
-	item := cpu.Read(*pc)
+	item := cpu.MMU.Read(*pc)
 	*pc += 1
 	return item
 }
@@ -184,23 +152,4 @@ func (cpu *CPU) FetchDecodeExecute() int {
 	return cycles
 }
 
-func (cpu *CPU) RunBootSequence() {
-	cpu.bootMode = true
 
-	for cpu.PC < 256 {
-		cpu.FetchDecodeExecute()
-		if cpu.PC == 0x0064  {
-			cpu.debug = true
-		}
-
-		if cpu.debug {
-			fmt.Println(fmt.Sprintf("AF : %x", cpu.Registers.AF.Get()))
-			fmt.Println(fmt.Sprintf("BC : %x", cpu.Registers.BC.Get()))
-			fmt.Println(fmt.Sprintf("DE : %x", cpu.Registers.DE.Get()))
-			fmt.Println(fmt.Sprintf("HL : %x", cpu.Registers.HL.Get()))
-			fmt.Println(fmt.Sprintf("SP : %x", cpu.SP))
-			fmt.Println(fmt.Sprintf("PC : %x", cpu.PC))
-			fmt.Println("END.")
-		}
-	}
-}

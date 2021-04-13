@@ -2,11 +2,11 @@ package main
 
 type MMU struct {
 	BootRomMemory []byte
-	Memory []byte
-	BootMode bool
+	Memory        []byte
+	BootMode      bool
 }
 
-func NewMMU()*MMU {
+func NewMMU() *MMU {
 	return &MMU{BootRomMemory: make([]byte, 256), Memory: make([]byte, 0x10000)}
 }
 
@@ -26,12 +26,25 @@ func (mmu *MMU) Write(addr uint16, val byte) {
 	}
 }
 
-func (mmu *MMU) SetBootMode(){
+func (mmu *MMU) SetBootMode() {
 	mmu.BootMode = true
 }
 
-func (mmu *MMU) SetRegularMode(){
+func (mmu *MMU) SetRegularMode() {
 	mmu.BootMode = false
 }
 
+func (mmu *MMU) LoadBootRom(bootrom []byte) {
+	mmu.SetBootMode()
+	for i := 0; i < len(bootrom); i++ {
+		mmu.Write(uint16(i), bootrom[i])
+	}
+	mmu.SetRegularMode()
+}
 
+func (mmu *MMU) LoadBankRom0(rom []byte) {
+	mmu.SetRegularMode()
+	for i := 0; i < len(rom); i++ {
+		mmu.Write(uint16(i), rom[i])
+	}
+}

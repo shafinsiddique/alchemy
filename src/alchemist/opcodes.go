@@ -18,7 +18,7 @@ func (cpu *CPU) XOR_A() int {
 func (cpu *CPU) LD_HL_A_DEC() int {
 	// LD_HL_A_DEC
 	a := cpu.Registers.A.Get()
-	cpu.Write(cpu.Registers.HL.Get(), a)
+	cpu.MMU.Write(cpu.Registers.HL.Get(), a)
 	cpu.Registers.HL.Decrement()
 	return 8
 }
@@ -79,7 +79,7 @@ func (cpu *CPU) LD_LOC_C_A() int {
 	// store the contents of register A in the internal ram, ad the range 0xff00-0xffff specified by register c.
 	// disassembly in boot rom : LD (0xFF00 + C), A
 	addr := 0xff00 + uint16(cpu.Registers.C.Get())
-	cpu.Write(addr, cpu.Registers.A.Get())
+	cpu.MMU.Write(addr, cpu.Registers.A.Get())
 	return 8
 }
 
@@ -90,7 +90,7 @@ func (cpu *CPU) INC_C() int {
 
 func (cpu *CPU) LD_LOC_HL_A() int {
 	// store the contents of register a in the memory location specified by HL
-	cpu.Write(cpu.Registers.HL.Get(), cpu.Registers.A.Get())
+	cpu.MMU.Write(cpu.Registers.HL.Get(), cpu.Registers.A.Get())
 	return 8
 }
 
@@ -98,7 +98,7 @@ func (cpu *CPU) LD_LOC_A8_A() int {
 	// store the contents of register A in the range 0xFF00-0xFFf specified by immediarte
 	// operand a8.
 	addr := 0xff00 + uint16(cpu.FetchAndIncrement())
-	cpu.Write(addr, cpu.Registers.A.Get())
+	cpu.MMU.Write(addr, cpu.Registers.A.Get())
 	return 12
 }
 
@@ -113,7 +113,7 @@ func (cpu *CPU) LD_DE_D16() int {
 
 func (cpu *CPU) LD_A_LOC_DE() int {
 	// store the 8 bit contents in the memory location of the value of DE into register A.
-	cpu.Registers.A.Set(cpu.Read(cpu.Registers.DE.Get()))
+	cpu.Registers.A.Set(cpu.MMU.Read(cpu.Registers.DE.Get()))
 	return 8
 }
 
@@ -124,9 +124,9 @@ func (cpu *CPU) CALL_A16() int {
 	sp := &cpu.SP
 	*sp -= 1
 	bytes := SplitInt16ToBytes(uint16(cpu.PC + 2)) // + 2 because current PC = Position of Call + 1
-	cpu.Write(*sp, bytes[0])                       // high byte placed at the top.
+	cpu.MMU.Write(*sp, bytes[0])                   // high byte placed at the top.
 	*sp -= 1
-	cpu.Write(*sp, bytes[1]) // low byte placed bottom , i guess the name makes sense?
+	cpu.MMU.Write(*sp, bytes[1]) // low byte placed bottom , i guess the name makes sense?
 
 	// part ii load 16 bit immediate operand.
 	low := cpu.FetchAndIncrement()
@@ -181,7 +181,7 @@ func (cpu *CPU) DEC_B() int {
 func (cpu *CPU) LD_LOC_HL_A_INC() int {
 	// store the element in memory loc HL into register A.
 	// also increment HL.
-	cpu.Write(cpu.Registers.HL.Get(), cpu.Registers.A.Get())
+	cpu.MMU.Write(cpu.Registers.HL.Get(), cpu.Registers.A.Get())
 	cpu.Registers.HL.Increment()
 	return 12
 }
@@ -231,7 +231,7 @@ func (cpu *CPU) LD_LOC_A16_A() int {
 	// store the contents of register A in the internal ram specified by the 16 bit immeidate operand a16.
 	low := cpu.FetchAndIncrement()
 	high := cpu.FetchAndIncrement()
-	cpu.Write(MergeBytes(high, low), cpu.Registers.A.Get())
+	cpu.MMU.Write(MergeBytes(high, low), cpu.Registers.A.Get())
 	return LD_SIXTEEN_BIT_CYCLE
 }
 
@@ -262,7 +262,7 @@ func (cpu *CPU) LD_E_D8() int {
 
 func (cpu *CPU) LD_A_LOC_A8() int {
 	addr := 0xff00 + uint16(cpu.FetchAndIncrement())
-	cpu.Registers.A.Set(cpu.Read(addr))
+	cpu.Registers.A.Set(cpu.MMU.Read(addr))
 	return 12
 }
 

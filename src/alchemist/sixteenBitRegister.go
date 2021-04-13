@@ -1,36 +1,36 @@
 package main
 
 type SixteenBitRegister struct {
-	Low *EightBitRegister
+	Low  *EightBitRegister
 	High *EightBitRegister
 }
 
-func NewSixteenBitRegister(high *EightBitRegister, low *EightBitRegister,)*SixteenBitRegister {
+func NewSixteenBitRegister(high *EightBitRegister, low *EightBitRegister) *SixteenBitRegister {
 	return &SixteenBitRegister{Low: low, High: high}
 }
 
-func (register *SixteenBitRegister) Get()uint16 {
+func (register *SixteenBitRegister) Get() uint16 {
 	high := uint16(register.High.Value)
 	low := uint16(register.Low.Value)
 
-	return high << 8 | low
+	return high<<8 | low
 }
 
 func (register *SixteenBitRegister) Decrement() int {
 	val := register.Get()
-	decremented := val-1
+	decremented := val - 1
 	bytes := SplitInt16ToBytes(decremented)
 	return register.High.Set(bytes[0]) + register.Low.Set(bytes[1])
 }
 
 func (register *SixteenBitRegister) Increment() int {
 	val := register.Get()
-	incremented := val+1
+	incremented := val + 1
 	bytes := SplitInt16ToBytes(incremented)
 	return register.High.Set(bytes[0]) + register.Low.Set(bytes[1])
 }
 
-func (register *SixteenBitRegister) GetHigh() byte{
+func (register *SixteenBitRegister) GetHigh() byte {
 	return register.High.Get()
 }
 

@@ -1,14 +1,14 @@
 package main
 
 func (cpu *CPU) Oxcb() int {
-	switch opcode := cpu.FetchAndIncrement() ; opcode {
+	switch opcode := cpu.FetchAndIncrement(); opcode {
 	case 0x7c:
 		return cpu.BIT_7H()
 	case 0x11:
 		return cpu.RL_C()
 	}
 
-	return 0
+	return 8
 
 }
 
@@ -21,7 +21,7 @@ func (cpu *CPU) BIT_7H() int {
 	return 4
 }
 
-func (cpu *CPU) RL_C() int{
+func (cpu *CPU) RL_C() int {
 	cpu.CheckAndSetZeroFlag(cpu.Registers.C.Get())
 	cpu.Registers.F.SetBit(0, NEGATIVE_FLAG)
 	cpu.Registers.F.SetBit(0, HALF_CARRY_FLAG)
@@ -30,7 +30,5 @@ func (cpu *CPU) RL_C() int{
 }
 
 func (cpu *CPU) SUB_B() int {
-	return cpu.Registers.A.Set(cpu.Registers.A.Get()-cpu.Registers.B.Get())
+	return cpu.Registers.A.Set(cpu.Registers.A.Get() - cpu.Registers.B.Get())
 }
-
-

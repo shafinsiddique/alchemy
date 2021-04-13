@@ -4,14 +4,14 @@ import (
 	"encoding/binary"
 )
 
-func MergeBytes(high byte, low byte) uint16{
+func MergeBytes(high byte, low byte) uint16 {
 	high_16 := uint16(high)
 	low_16 := uint16(low)
 
-	return high_16 << 8 | low_16
+	return high_16<<8 | low_16
 }
 
-func SplitInt16ToBytes(num uint16)[]byte {
+func SplitInt16ToBytes(num uint16) []byte {
 	output := make([]byte, 2)
 	binary.BigEndian.PutUint16(output, num)
 	return output
@@ -37,7 +37,7 @@ func SetBit(value byte, bit byte, index int) byte {
 	return newVal
 }
 
-func GetTwosComplement(value byte) (byte, bool){ // using bool to indicate whether a number is negative.
+func GetTwosComplement(value byte) (byte, bool) { // using bool to indicate whether a number is negative.
 	// probably a better way to do this but i don't want the program counter to be a SIGNED int.
 	sign := GetBit(value, 7)
 	val := value
@@ -48,4 +48,3 @@ func GetTwosComplement(value byte) (byte, bool){ // using bool to indicate wheth
 	}
 	return val, false
 }
-

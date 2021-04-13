@@ -5,8 +5,34 @@ import (
 	"os"
 )
 
+func RunBootSequence(cpu *CPU, mmu *MMU) {
+	debug := false
+	mmu.SetBootMode()
+	for cpu.PC < 256 {
+		cycles := cpu.FetchDecodeExecute()
+		//if cpu.PC == 0x0064 {
+		//	debug = true
+		//}
+
+		if cpu.PC == 0x0c {
+			debug = true
+		}
+		if debug {
+			fmt.Println(fmt.Sprintf("AF : %x", cpu.Registers.AF.Get()))
+			fmt.Println(fmt.Sprintf("BC : %x", cpu.Registers.BC.Get()))
+			fmt.Println(fmt.Sprintf("DE : %x", cpu.Registers.DE.Get()))
+			fmt.Println(fmt.Sprintf("HL : %x", cpu.Registers.HL.Get()))
+			fmt.Println(fmt.Sprintf("SP : %x", cpu.SP))
+			fmt.Println(fmt.Sprintf("PC : %x", cpu.PC))
+			fmt.Println(fmt.Sprintf("Cycles : %x", cycles))
+			fmt.Println("END.")
+		}
+	}
+}
+
 func main() {
-	cpu := NewCPU()
+	mmu := NewMMU()
+	cpu := &CPU{MMU: mmu, Registers: InitializeRegisters()}
 	p, _ := os.Getwd()
 	f, _ := os.Open(p + "/bootstrap.gb")
 	f2, _ := os.Open(p + "/tetris.gb")
@@ -16,8 +42,8 @@ func main() {
 	romRead, _ := f2.Read(rom)
 	fmt.Println("Bytes Read", read)
 	fmt.Println("Rom Bytes Read", romRead)
-	cpu.LoadBootRom(bootrom)
-	cpu.LoadRomBank0(rom)
-	cpu.RunBootSequence()
+	mmu.LoadBootRom(bootrom)
+	mmu.LoadBankRom0(rom)
+	RunBootSequence(cpu, mmu)
 
 }

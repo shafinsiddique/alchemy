@@ -17,7 +17,7 @@ func (register *EightBitRegister) Get() byte { // takes 0 cpu cycles to get regi
 	return register.Value
 }
 
-func (register *EightBitRegister) GetBit(index int) byte{
+func (register *EightBitRegister) GetBit(index int) byte {
 	/* index range 0-7. counting from right to left, weird idk. */
 	val := register.Get()
 	return GetBit(val, index)
@@ -28,7 +28,7 @@ func (register *EightBitRegister) SetBit(bit byte, index int) {
 	register.Set(SetBit(current, bit, index))
 }
 
-func (register *EightBitRegister) Increment() int{
+func (register *EightBitRegister) Increment() int {
 	register.Value += 1
 	return 4
 }
