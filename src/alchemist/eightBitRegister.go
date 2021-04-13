@@ -13,7 +13,7 @@ func (register *EightBitRegister) Set(value byte) int {
 	return 4
 }
 
-func (register *EightBitRegister) Get() byte { // takes 0 cpu cycles to get regifster val.
+func (register *EightBitRegister) Get() byte { // takes 0 cpu Cycles to get regifster val.
 	return register.Value
 }
 

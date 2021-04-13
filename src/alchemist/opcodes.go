@@ -35,7 +35,7 @@ func (cpu *CPU) LD_HL_D16() int {
 func (cpu *CPU) JR_COMMON_S8(flag byte) int { // not actual instreuction, code reuse.
 	zFlag := cpu.Registers.F.GetBit(Z_FLAG)
 	nextByte := cpu.FetchAndIncrement()
-	cycles := 8 // cycles without branch,
+	cycles := 8 // Cycles without branch,
 	if zFlag == flag {
 		steps, isNegative := GetTwosComplement(nextByte)
 		if isNegative {
