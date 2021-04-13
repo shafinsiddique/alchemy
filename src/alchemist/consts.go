@@ -9,4 +9,6 @@ const (
 	LD_CYCLE              = 4
 	LD_SIXTEEN_BIT_CYCLE  = 16
 	SCANLINE_CYCLES = 456
+	LY_INDEX = 0xFF44
+	LCDC_INDEX = 0xFF40
 )

@@ -12,13 +12,15 @@ func (ppu *PPU) StartScanline(){
 	// Drawing
 	// H-Blank
 	// V-Blank.
+
+
+	ppu.Registers.LY.Increment()
 }
+
 func (ppu *PPU) UpdateGraphics(cycles int) {
 	if ppu.LCDEnabled() {
-		currentCycles := ppu.Cycles - cycles
-
-		if currentCycles <= 0 { // new scanline.
-			ppu.Registers.LY.Increment()
+		ppu.Cycles -= cycles
+		if ppu.Cycles <= 0 { // new scanline.
 			ppu.StartScanline()
 		}
 	}
