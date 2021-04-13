@@ -11,12 +11,13 @@ type CPU struct {
 	PC            uint16
 	SP            uint16
 	bootMode      bool
+	MMU *MMU
 	debug bool
 }
 
 func NewCPU() *CPU {
 	return &CPU{Registers: InitializeRegisters(), BootRomMemory: make([]byte, 256),
-		Memory: make([]byte, 0x10000)}
+		Memory: make([]byte, 0x10000), MMU: NewMMU()}
 }
 
 func (cpu *CPU) Read(addr uint16) byte {
@@ -34,7 +35,7 @@ func (cpu *CPU) Write(addr uint16, val byte) int {
 
 func (cpu *CPU) LoadBootRom(bootrom []byte) {
 	for i := 0; i < len(bootrom); i++ {
-		cpu.BootRomMemory[i] = bootrom[i]
+		cpu.MMU.Write(uint16(i), bootrom[i])
 	}
 }
 
@@ -83,102 +84,104 @@ func (cpu *CPU) DecrementRegister8Bit(register *EightBitRegister) int {
 	return cycles
 }
 
-func (cpu *CPU) FetchDecodeExecute() {
+func (cpu *CPU) FetchDecodeExecute() int {
 	opcode := cpu.FetchAndIncrement()
 	fmt.Println(fmt.Sprintf("Executing Instruction 0x %x", opcode))
+	cycles := 4 // fetch and increment is a 4.
 	switch opcode {
 	case 0x31:
-		cpu.LD_SP_D16()
+		cycles = cpu.LD_SP_D16()
 	case 0xaf:
-		cpu.XOR_A()
+		cycles = cpu.XOR_A()
 	case 0x21:
-		cpu.LD_HL_D16()
+		cycles = cpu.LD_HL_D16()
 	case 0x32:
-		cpu.LD_HL_A_DEC()
+		cycles = cpu.LD_HL_A_DEC()
 	case 0xcb:
-		cpu.Oxcb()
+		cycles = cpu.Oxcb()
 	case 0x20:
-		cpu.JR_NZ_S8() // s8 stands for signed 8 bit.
+		cycles = cpu.JR_NZ_S8() // s8 stands for signed 8 bit.
 	case 0x0E:
-		cpu.LD_C_D8()
+		cycles = cpu.LD_C_D8()
 	case 0x3e:
-		cpu.LD_A_D8()
+		cycles = cpu.LD_A_D8()
 	case 0xe2:
-		cpu.LD_LOC_C_A()
+		cycles = cpu.LD_LOC_C_A()
 	case 0xcd:
-		cpu.CALL_A16()
+		cycles = cpu.CALL_A16()
 	case 0x0c:
-		cpu.INC_C()
+		cycles = cpu.INC_C()
 	case 0x77:
-		cpu.LD_LOC_HL_A()
+		cycles = cpu.LD_LOC_HL_A()
 	case 0xe0:
-		cpu.LD_LOC_A8_A()
+		cycles = cpu.LD_LOC_A8_A()
 	case 0x11:
-		cpu.LD_DE_D16()
+		cycles = cpu.LD_DE_D16()
 	case 0x1a:
-		cpu.LD_A_LOC_DE()
+		cycles = cpu.LD_A_LOC_DE()
 	case 0x4f:
-		cpu.LD_C_A()
+		cycles = cpu.LD_C_A()
 	case 0x06:
-		cpu.LD_B_D8()
+		cycles = cpu.LD_B_D8()
 	case 0xc5:
-		cpu.PUSH_BC()
+		cycles = cpu.PUSH_BC()
 	case 0x17:
-		cpu.RL_A()
+		cycles = cpu.RL_A()
 	case 0xc1:
-		cpu.POP_BC()
+		cycles = cpu.POP_BC()
 	case 0x5:
-		cpu.DEC_B()
+		cycles = cpu.DEC_B()
 	case 0x22:
-		cpu.LD_LOC_HL_A_INC()
+		cycles = cpu.LD_LOC_HL_A_INC()
 	case 0x23:
-		cpu.INC_HL()
+		cycles = cpu.INC_HL()
 	case 0xc9:
-		cpu.RET()
+		cycles = cpu.RET()
 	case 0x13:
-		cpu.INC_DE()
+		cycles = cpu.INC_DE()
 	case 0x7b:
-		cpu.LD_A_E()
+		cycles = cpu.LD_A_E()
 	case 0xfe:
-		cpu.CP_D8()
+		cycles = cpu.CP_D8()
 	case 0xea:
-		cpu.LD_LOC_A16_A()
+		cycles = cpu.LD_LOC_A16_A()
 	case 0x3d:
-		cpu.DEC_A()
+		cycles = cpu.DEC_A()
 	case 0x28:
-		cpu.JR_Z_S8()
+		cycles = cpu.JR_Z_S8()
 	case 0x67:
-		cpu.LD_H_A()
+		cycles = cpu.LD_H_A()
 	case 0x57:
-		cpu.LD_D_A()
+		cycles = cpu.LD_D_A()
 	case 0x4:
-		cpu.INC_B()
+		cycles = cpu.INC_B()
 	case 0x1e:
-		cpu.LD_E_D8()
+		cycles = cpu.LD_E_D8()
 	case 0xf0:
-		cpu.LD_A_LOC_A8()
+		cycles = cpu.LD_A_LOC_A8()
 	case 0xd:
-		cpu.DEC_C()
+		cycles = cpu.DEC_C()
 	case 0x1d:
-		cpu.DEC_E()
+		cycles = cpu.DEC_E()
 	case 0x15:
-		cpu.DEC_D()
+		cycles = cpu.DEC_D()
 	case 0x16:
-		cpu.LD_D_D8()
+		cycles = cpu.LD_D_D8()
 	case 0x24:
-		cpu.INC_H()
+		cycles = cpu.INC_H()
 	case 0x7c:
-		cpu.LD_A_H()
+		cycles = cpu.LD_A_H()
 	case 0x90:
-		cpu.SUB_B()
+		cycles = cpu.SUB_B()
 	case 0x18:
-		cpu.JR_S8()
+		cycles = cpu.JR_S8()
 	case 0x2e:
-		cpu.LD_L_D8()
+		cycles = cpu.LD_L_D8()
 	default:
 		hex := fmt.Sprintf("0x%x %d", opcode, cpu.PC-1)
 		fmt.Println(hex)
 	}
+	return cycles
 }
 
 func (cpu *CPU) RunBootSequence() {

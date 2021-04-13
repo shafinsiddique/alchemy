@@ -19,7 +19,11 @@ func (mmu *MMU) Read(addr uint16) byte {
 }
 
 func (mmu *MMU) Write(addr uint16, val byte) {
-	mmu.Memory[addr] = val
+	if mmu.BootMode && addr < 256 {
+		mmu.BootRomMemory[addr] = val
+	} else {
+		mmu.Memory[addr] = val
+	}
 }
 
 func (mmu *MMU) SetBootMode(){
