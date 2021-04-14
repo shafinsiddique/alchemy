@@ -11,7 +11,7 @@ func RunBootSequence(cpu *CPU, mmu *MMU, ppu *PPU) {
 	for cpu.PC < 256 {
 		cycles := cpu.FetchDecodeExecute()
 		ppu.UpdateGraphics(cycles)
-		if cpu.PC == 0x006A {
+		if cpu.PC == 0x0076 {
 			debug = true
 		}
 
@@ -23,7 +23,6 @@ func RunBootSequence(cpu *CPU, mmu *MMU, ppu *PPU) {
 			fmt.Println(fmt.Sprintf("SP : %x", cpu.SP))
 			fmt.Println(fmt.Sprintf("PC : %x", cpu.PC))
 			fmt.Println(fmt.Sprintf("LY : %x", ppu.Registers.LY.Get()))
-			fmt.Println(fmt.Sprintf("Cycles : %x", cycles))
 			fmt.Println("END.")
 		}
 	}

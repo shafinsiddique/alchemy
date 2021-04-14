@@ -213,17 +213,16 @@ func (cpu *CPU) LD_A_E() int {
 func (cpu *CPU) CP_D8() int {
 	// compare the contents of reigster A with immediate 8 bit operand d8. set z flag if they are
 	// equal.
-	i := cpu.FetchAndIncrement()
-	val := cpu.Registers.A.Get()
+	d8 := cpu.FetchAndIncrement()
+	a := cpu.Registers.A.Get()
 
-	if !cpu.CheckAndSetOverflowFlag(val, i, true) {
-		cpu.CheckAndSetZeroFlag(val - i)
-		cpu.CheckAndSetHCFlag(cpu.Registers.A.Get(), i, true)
-	} else { // since the val is definitely not zero and definitely not gonna have a half carry.
+	if !cpu.CheckAndSetOverflowFlag(a, d8, true) {
+		cpu.CheckAndSetZeroFlag(a - d8)
+	} else { // since the a is definitely not zero/
 		cpu.ClearZeroFlag()
-		cpu.ClearHCFlag()
 	}
 	cpu.SetNegativeFlag()
+	cpu.CheckAndSetHCFlag(a, d8, true)
 	return 8
 }
 
