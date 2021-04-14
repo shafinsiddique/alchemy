@@ -6,6 +6,13 @@ type PPU struct {
 	Cycles    int
 }
 
+func (ppu *PPU) IncrementScanline() {
+	ppu.Registers.LY.Increment()
+	if ppu.Registers.LY.Get() == 154 {
+		ppu.Registers.LY.Set(0)
+	}
+}
+
 func (ppu *PPU) StartScanline(){
 	ppu.Cycles = SCANLINE_CYCLES
 	// OAM Search.
@@ -14,7 +21,7 @@ func (ppu *PPU) StartScanline(){
 	// V-Blank.
 
 
-	ppu.Registers.LY.Increment()
+	ppu.IncrementScanline()
 }
 
 func (ppu *PPU) UpdateGraphics(cycles int) {
