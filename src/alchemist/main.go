@@ -11,7 +11,7 @@ func RunBootSequence(cpu *CPU, mmu *MMU, ppu *PPU) {
 	for cpu.PC < 256 {
 		cycles := cpu.FetchDecodeExecute()
 		ppu.UpdateGraphics(cycles)
-		if cpu.PC == 0x0076 {
+		if cpu.PC == 0x0089 {
 			debug = true
 		}
 
