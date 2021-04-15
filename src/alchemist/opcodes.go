@@ -1,5 +1,7 @@
 package main
 
+import "github.com/sirupsen/logrus"
+
 func (cpu *CPU) LD_SP_D16() int {
 	// 0x31
 	low := cpu.FetchAndIncrement()
@@ -274,6 +276,7 @@ func (cpu *CPU) DEC_E() int {
 }
 
 func (cpu *CPU) DEC_D() int {
+	logger.WithFields(logrus.Fields{"D":cpu.Registers.D.Get()}).Info("On DEC D")
 	return cpu.DecrementRegister8Bit(cpu.Registers.D)
 }
 

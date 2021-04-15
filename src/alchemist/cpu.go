@@ -64,7 +64,8 @@ func (cpu *CPU) DecrementRegister8Bit(register *EightBitRegister) int {
 
 func (cpu *CPU) FetchDecodeExecute() int {
 	opcode := cpu.FetchAndIncrement()
-	fmt.Println(fmt.Sprintf("Executing Instruction 0x %x", opcode))
+	fmt.Println(fmt.Sprintf("Executing Instruction 0x %x At PC %d", opcode, cpu.PC-1))
+	//logger.Info(fmt.Sprintf("Executing Instruction 0x %x At PC %x", opcode, cpu.PC-1))
 	cycles := 4 // fetch and increment is a 4.
 	switch opcode {
 	case 0x31:
