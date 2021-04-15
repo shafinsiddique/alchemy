@@ -37,6 +37,7 @@ func (cpu *CPU) SUB_B() int {
 		diff := a-b
 		cpu.Registers.A.Set(diff)
 		cpu.CheckAndSetZeroFlag(diff)
+
 	} else { // since it cant be
 		cpu.ClearZeroFlag()
 	}

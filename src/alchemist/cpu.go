@@ -44,12 +44,22 @@ func (cpu *CPU) IncrementRegister8Bit(register *EightBitRegister) int {
 
 func (cpu *CPU) DecrementRegister8Bit(register *EightBitRegister) int {
 	initial := register.Get()
-	cycles := register.Decrement()
-	current := register.Get()
+	if initial == 0 {
+		cpu.ClearHCFlag()
+		cpu.ClearZeroFlag()
+	} else {
+		register.Decrement()
+
+		if initial == 1 {
+			cpu.SetZeroFlag()
+		} else {
+			cpu.ClearZeroFlag()
+		}
+
+		cpu.CheckAndSetHCFlag(initial, 1, true)
+	}
 	cpu.Registers.F.SetBit(1, NEGATIVE_FLAG)
-	cpu.CheckAndSetZeroFlag(current)
-	cpu.CheckAndSetHCFlag(initial, 1, true)
-	return cycles
+	return 4
 }
 
 func (cpu *CPU) FetchDecodeExecute() int {
