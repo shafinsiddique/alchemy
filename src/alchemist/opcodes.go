@@ -213,17 +213,7 @@ func (cpu *CPU) LD_A_E() int {
 func (cpu *CPU) CP_D8() int {
 	// compare the contents of reigster A with immediate 8 bit operand d8. set z flag if they are
 	// equal.
-	d8 := cpu.FetchAndIncrement()
-	a := cpu.Registers.A.Get()
-
-	if !cpu.CheckAndSetOverflowFlag(a, d8, true) {
-		cpu.CheckAndSetZeroFlag(a - d8)
-	} else { // since the a is definitely not zero/
-		cpu.ClearZeroFlag()
-	}
-	cpu.SetNegativeFlag()
-	cpu.CheckAndSetHCFlag(a, d8, true)
-	return 8
+	return cpu.CP(cpu.FetchAndIncrement())
 }
 
 func (cpu *CPU) LD_LOC_A16_A() int {
@@ -305,5 +295,47 @@ func (cpu *CPU) JR_S8() int {
 
 func (cpu *CPU) LD_L_D8() int {
 	cpu.Registers.L.Set(cpu.FetchAndIncrement())
+	return 8
+}
+
+func (cpu *CPU) CP(val byte) int {
+	// compare the contents of register A with Val by calculating A-(HL)
+	a := cpu.Registers.A.Get()
+	if !cpu.CheckAndSetOverflowFlag(a, val, true) {
+		cpu.CheckAndSetZeroFlag(a-val)
+	} else { // since the a is definitely not zero/
+		cpu.ClearZeroFlag()
+	}
+	cpu.SetNegativeFlag()
+	cpu.CheckAndSetHCFlag(a, val, true)
+	return 8
+}
+
+func (cpu *CPU) CP_LOC_HL() int {
+	return cpu.CP(cpu.MMU.Read(cpu.Registers.HL.Get()))
+}
+
+func (cpu *CPU) LD_A_L() int {
+	cpu.Registers.A.Set(cpu.Registers.L.Get())
+	return 4
+}
+
+func (cpu *CPU) LD_A_B() int {
+	cpu.Registers.A.Set(cpu.Registers.B.Get())
+	return 4
+}
+
+func (cpu *CPU) ADD_AND_STORE(register *EightBitRegister, val2 byte) {
+	val1 := register.Get()
+	sum := val1 + val2
+	register.Set(sum)
+	cpu.CheckAndSetZeroFlag(sum)
+	cpu.ClearNegativeFlag()
+	cpu.CheckAndSetHCFlag(val1, val2, false)
+	cpu.CheckAndSetOverflowFlag(val1, val2, false)
+}
+
+func (cpu *CPU) ADD_A_LOC_HL() int {
+	cpu.ADD_AND_STORE(cpu.Registers.A, cpu.MMU.Read(cpu.Registers.HL.Get()))
 	return 8
 }

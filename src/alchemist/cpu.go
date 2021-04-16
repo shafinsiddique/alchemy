@@ -36,7 +36,7 @@ func (cpu *CPU) FetchAndIncrement() byte {
 func (cpu *CPU) IncrementRegister8Bit(register *EightBitRegister) int {
 	initial := register.Get()
 	cycles := register.Increment()
-	cpu.CheckAndSetZeroFlag(register.Get())
+	cpu.CheckAndSetZeroFlag(register.Get()) // problematic; TODO: fix.
 	cpu.CheckAndSetHCFlag(initial, 1, false)
 	cpu.Registers.F.SetBit(0, NEGATIVE_FLAG)
 	return cycles
@@ -44,19 +44,12 @@ func (cpu *CPU) IncrementRegister8Bit(register *EightBitRegister) int {
 
 func (cpu *CPU) DecrementRegister8Bit(register *EightBitRegister) int {
 	initial := register.Get()
-
-	if initial == 0 {
-		cpu.ClearZeroFlag()
+	register.Decrement()
+	if initial == 1 {
+		cpu.SetZeroFlag()
 	} else {
-		register.Decrement()
-
-		if initial == 1 {
-			cpu.SetZeroFlag()
-		} else {
-			cpu.ClearZeroFlag()
-		}
+		cpu.ClearZeroFlag()
 	}
-
 	cpu.CheckAndSetHCFlag(initial, 1, true)
 	cpu.SetNegativeFlag()
 	return 4
@@ -155,6 +148,14 @@ func (cpu *CPU) FetchDecodeExecute() int {
 		cycles = cpu.JR_S8()
 	case 0x2e:
 		cycles = cpu.LD_L_D8()
+	case 0xbe:
+		cycles = cpu.CP_LOC_HL()
+	case 0x7d:
+		cycles = cpu.LD_A_L()
+	case 0x78:
+		cycles = cpu.LD_A_B()
+	case 0x86:
+		cycles = cpu.ADD_A_LOC_HL()
 	default:
 		hex := fmt.Sprintf("0x%x %d", opcode, cpu.PC-1)
 		fmt.Println(hex)
