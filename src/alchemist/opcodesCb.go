@@ -33,8 +33,8 @@ func (cpu *CPU) SUB_B() int {
 	a := cpu.Registers.A.Get()
 	b := cpu.Registers.B.Get()
 
-	if !cpu.CheckAndSetOverflowFlag(a, b, true)  {
-		diff := a-b
+	if !cpu.CheckAndSetOverflowFlag(a, b, true) {
+		diff := a - b
 		cpu.Registers.A.Set(diff)
 		cpu.CheckAndSetZeroFlag(diff)
 

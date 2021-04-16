@@ -44,8 +44,8 @@ func (cpu *CPU) IncrementRegister8Bit(register *EightBitRegister) int {
 
 func (cpu *CPU) DecrementRegister8Bit(register *EightBitRegister) int {
 	initial := register.Get()
+
 	if initial == 0 {
-		cpu.ClearHCFlag()
 		cpu.ClearZeroFlag()
 	} else {
 		register.Decrement()
@@ -55,17 +55,16 @@ func (cpu *CPU) DecrementRegister8Bit(register *EightBitRegister) int {
 		} else {
 			cpu.ClearZeroFlag()
 		}
-
-		cpu.CheckAndSetHCFlag(initial, 1, true)
 	}
-	cpu.Registers.F.SetBit(1, NEGATIVE_FLAG)
+
+	cpu.CheckAndSetHCFlag(initial, 1, true)
+	cpu.SetNegativeFlag()
 	return 4
 }
 
 func (cpu *CPU) FetchDecodeExecute() int {
 	opcode := cpu.FetchAndIncrement()
 	fmt.Println(fmt.Sprintf("Executing Instruction 0x %x At PC %d", opcode, cpu.PC-1))
-	//logger.Info(fmt.Sprintf("Executing Instruction 0x %x At PC %x", opcode, cpu.PC-1))
 	cycles := 4 // fetch and increment is a 4.
 	switch opcode {
 	case 0x31:
@@ -162,5 +161,3 @@ func (cpu *CPU) FetchDecodeExecute() int {
 	}
 	return cycles
 }
-
-

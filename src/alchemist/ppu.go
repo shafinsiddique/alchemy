@@ -13,13 +13,12 @@ func (ppu *PPU) IncrementScanline() {
 	}
 }
 
-func (ppu *PPU) StartScanline(){
+func (ppu *PPU) StartScanline() {
 	ppu.Cycles = SCANLINE_CYCLES
 	// OAM Search.
 	// Drawing
 	// H-Blank
 	// V-Blank.
-
 
 	ppu.IncrementScanline()
 }
@@ -38,6 +37,3 @@ func (ppu *PPU) UpdateGraphics(cycles int) {
 func (ppu *PPU) LCDEnabled() bool {
 	return ppu.Registers.LCDC.GetBit(7) == 1
 }
-
-
-
