@@ -21,28 +21,10 @@ func initLogger() {
 }
 
 func RunBootSequence(cpu *CPU, mmu *MMU, ppu *PPU) {
-	debug := false
 	mmu.SetBootMode()
 	for cpu.PC < 256 {
 		cycles := cpu.FetchDecodeExecute()
 		ppu.UpdateGraphics(cycles)
-		if cpu.PC == 0x00f5 {
-			debug = true
-		} else {
-			debug = false
-		}
-
-		if debug {
-			fmt.Println(fmt.Sprintf("AF : %x", cpu.Registers.AF.Get()))
-			fmt.Println(fmt.Sprintf("BC : %x", cpu.Registers.BC.Get()))
-			fmt.Println(fmt.Sprintf("DE : %x", cpu.Registers.DE.Get()))
-			fmt.Println(fmt.Sprintf("HL : %x", cpu.Registers.HL.Get()))
-			fmt.Println(fmt.Sprintf("SP : %x", cpu.SP))
-			fmt.Println(fmt.Sprintf("PC : %x", cpu.PC))
-			fmt.Println(fmt.Sprintf("LY : %x", ppu.Registers.LY.Get()))
-			fmt.Println("END.")
-			panic("end of prog.")
-		}
 	}
 }
 
