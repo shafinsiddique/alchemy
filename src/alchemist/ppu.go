@@ -44,21 +44,38 @@ func (ppu *PPU) FetchPixels(){
 	// pixels := mmu.Read[tile + scanline % 8] => merge with second bytes.
 	// get pixels back.
 	// do we need to truncate?
-	tileAddr := ppu.getFirstTileAddr()
+	tileId := ppu.MMU.Read(ppu.getFirstTileIdAddr())
 
 	for i := 0; i < NUMBER_OF_TILES_IN_SCANLINE ; i++ {
-		pixels := ppu.getHorizontalPixelsFromTile(tileAddr)
+		pixels := ppu.getHorizontalPixelsFromTile(tileId)
 	}
 
 
 
 }
 
-func (ppu *PPU) getHorizontalPixelsFromTile(addr uint16) {
-	// fetch tile.
+func (ppu *PPU) getHorizontalPixelsFromTile(tileId byte) {
+	addr := ppu.getTileAddr(tileId)
+	lineNumber := uint16(ppu.Registers.LY.Get() % 8)
+	lineStartingIndex := addr + (lineNumber * 2)
+	low := ppu.MMU.Read(lineStartingIndex)
+	high := ppu.MMU.Read(lineStartingIndex + 1)
+
+
+
 }
 
-func (ppu *PPU) getFirstTileAddr() uint16 {
+func (ppu *PPU) getTileAddr(tileId byte) uint16  {
+	base := uint16(0x8000)
+
+	if ppu.Registers.LCDC.GetBit(4) == 0 {
+		base = 0x9000
+	}
+
+	return base + uint16(tileId*16)
+}
+
+func (ppu *PPU) getFirstTileIdAddr() uint16 {
 	tileBlockStartingIndex := (math.Floor(float64(ppu.Registers.SCY.Get() / 32)) * 32) +
 		float64(ppu.getBackgroundMapAddr()) // the section in background map where the tile is.
 
