@@ -11,4 +11,6 @@ const (
 	SCANLINE_CYCLES       = 456
 	LY_INDEX              = 0xFF44
 	LCDC_INDEX            = 0xFF40
+	SCX_INDEX = 0xFF43
+	SCY_INDEX = 0xFF42
 )
