@@ -233,11 +233,13 @@ func (cpu *CPU) JR_Z_S8() int {
 }
 
 func (cpu *CPU) LD_H_A() int {
-	return cpu.Registers.H.Set(cpu.Registers.A.Get())
+	cpu.Registers.H.Set(cpu.Registers.A.Get())
+	return 4
 }
 
 func (cpu *CPU) LD_D_A() int {
-	return cpu.Registers.D.Set(cpu.Registers.A.Get())
+	cpu.Registers.D.Set(cpu.Registers.A.Get())
+	return 4
 }
 
 func (cpu *CPU) INC_B() int {
@@ -277,7 +279,8 @@ func (cpu *CPU) INC_H() int {
 }
 
 func (cpu *CPU) LD_A_H() int {
-	return cpu.Registers.A.Set(cpu.Registers.H.Get())
+	cpu.Registers.A.Set(cpu.Registers.H.Get())
+	return 4
 }
 
 func (cpu *CPU) JR_S8() int {

@@ -26,6 +26,7 @@ func RunBootSequence(cpu *CPU, mmu *MMU, ppu *PPU) {
 		cycles := cpu.FetchDecodeExecute()
 		ppu.UpdateGraphics(cycles)
 	}
+	mmu.SetRegularMode()
 }
 
 func main() {

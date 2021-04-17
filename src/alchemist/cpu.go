@@ -35,11 +35,11 @@ func (cpu *CPU) FetchAndIncrement() byte {
 
 func (cpu *CPU) IncrementRegister8Bit(register *EightBitRegister) int {
 	initial := register.Get()
-	cycles := register.Increment()
+	register.Increment()
 	cpu.CheckAndSetZeroFlag(register.Get()) // problematic; TODO: fix.
 	cpu.CheckAndSetHCFlag(initial, 1, false)
 	cpu.Registers.F.SetBit(0, NEGATIVE_FLAG)
-	return cycles
+	return 4
 }
 
 func (cpu *CPU) DecrementRegister8Bit(register *EightBitRegister) int {
