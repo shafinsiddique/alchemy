@@ -1,5 +1,7 @@
 package main
 
+import "math"
+
 type PPU struct {
 	MMU       *MMU
 	Registers *PPURegisters
@@ -42,8 +44,32 @@ func (ppu *PPU) FetchPixels(){
 	// pixels := mmu.Read[tile + scanline % 8] => merge with second bytes.
 	// get pixels back.
 	// do we need to truncate?
+	tileAddr := ppu.getFirstTileAddr()
+
+	for i := 0; i < NUMBER_OF_TILES_IN_SCANLINE ; i++ {
+		pixels := ppu.getHorizontalPixelsFromTile(tileAddr)
+	}
 
 
+
+}
+
+func (ppu *PPU) getHorizontalPixelsFromTile(addr uint16) {
+	// fetch tile.
+}
+
+func (ppu *PPU) getFirstTileAddr() uint16 {
+	tileBlockStartingIndex := (math.Floor(float64(ppu.Registers.SCY.Get() / 32)) * 32) +
+		float64(ppu.getBackgroundMapAddr()) // the section in background map where the tile is.
+
+	tileBlockOffset := math.Floor((float64(ppu.Registers.SCX.Get())) / 8) // how many tiles we have to skip
+	// horizontally.
+
+	return uint16(tileBlockStartingIndex + tileBlockOffset)
+}
+
+func (ppu *PPU) getBackgroundMapAddr() uint16 {
+	return 0x9800 // need to determine based on register.
 }
 
 func (ppu *PPU) StartScanline() {
