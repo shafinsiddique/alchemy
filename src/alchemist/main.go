@@ -33,7 +33,7 @@ func main() {
 	initLogger()
 	mmu := NewMMU()
 	cpu := &CPU{MMU: mmu, Registers: InitializeRegisters()}
-	ppu := &PPU{Registers: InitializePPURegisters(mmu.Memory), Cycles: SCANLINE_CYCLES}
+	ppu := &PPU{Registers: InitializePPURegisters(mmu.Memory), Cycles: SCANLINE_CYCLES, MMU: mmu}
 	p, _ := os.Getwd()
 	f, _ := os.Open(p + "/bootstrap.gb")
 	f2, _ := os.Open(p + "/tetris.gb")
