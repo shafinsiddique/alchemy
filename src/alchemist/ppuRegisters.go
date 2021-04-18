@@ -5,6 +5,7 @@ type PPURegisters struct {
 	LY   *PPURegister
 	SCY  *PPURegister
 	SCX  *PPURegister
+	BGP *PPURegister
 }
 
 func InitializePPURegisters(memory []byte) *PPURegisters {
@@ -12,5 +13,6 @@ func InitializePPURegisters(memory []byte) *PPURegisters {
 	lcdc := &PPURegister{&memory[LCDC_INDEX]}
 	scy := &PPURegister{&memory[SCY_INDEX]}
 	scx := &PPURegister{&memory[SCX_INDEX]}
-	return &PPURegisters{LY: ly, LCDC: lcdc, SCY: scy, SCX: scx}
+	bgp := &PPURegister{&memory[BGP_INDEX]}
+	return &PPURegisters{LY: ly, LCDC: lcdc, SCY: scy, SCX: scx, BGP: bgp}
 }

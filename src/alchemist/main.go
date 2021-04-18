@@ -1,8 +1,8 @@
 package main
 
 import (
-	"fmt"
 	"github.com/sirupsen/logrus"
+	"github.com/veandco/go-sdl2/sdl"
 	"io"
 	"os"
 )
@@ -30,21 +30,56 @@ func RunBootSequence(cpu *CPU, mmu *MMU, ppu *PPU) {
 }
 
 func main() {
-	initLogger()
-	mmu := NewMMU()
-	cpu := &CPU{MMU: mmu, Registers: InitializeRegisters()}
-	ppu := &PPU{Registers: InitializePPURegisters(mmu.Memory), Cycles: SCANLINE_CYCLES, MMU: mmu}
-	p, _ := os.Getwd()
-	f, _ := os.Open(p + "/bootstrap.gb")
-	f2, _ := os.Open(p + "/tetris.gb")
-	bootrom := make([]byte, 256)
-	rom := make([]byte, 0x10000)
-	read, _ := f.Read(bootrom)
-	romRead, _ := f2.Read(rom)
-	fmt.Println("Bytes Read", read)
-	fmt.Println("Rom Bytes Read", romRead)
-	mmu.LoadBootRom(bootrom)
-	mmu.LoadBankRom0(rom)
-	RunBootSequence(cpu, mmu, ppu)
+	//initLogger()
+	//mmu := NewMMU()
+	//cpu := &CPU{MMU: mmu, Registers: InitializeRegisters()}
+	//ppu := &PPU{Registers: InitializePPURegisters(mmu.Memory), Cycles: SCANLINE_CYCLES, MMU: mmu}
+	//p, _ := os.Getwd()
+	//f, _ := os.Open(p + "/bootstrap.gb")
+	//f2, _ := os.Open(p + "/tetris.gb")
+	//bootrom := make([]byte, 256)
+	//rom := make([]byte, 0x10000)
+	//read, _ := f.Read(bootrom)
+	//romRead, _ := f2.Read(rom)
+	//fmt.Println("Bytes Read", read)
+	//fmt.Println("Rom Bytes Read", romRead)
+	//mmu.LoadBootRom(bootrom)
+	//mmu.LoadBankRom0(rom)
+	//RunBootSequence(cpu, mmu, ppu)
+	if err := sdl.Init(sdl.INIT_EVERYTHING); err != nil {
+		panic(err)
+	}
+	//defer sdl.Quit()
+
+	window, err := sdl.CreateWindow("Alchemist : A Gameboy Emulator",
+		sdl.WINDOWPOS_UNDEFINED, sdl.WINDOWPOS_UNDEFINED,
+		160, 144, sdl.WINDOW_SHOWN)
+	if err != nil {
+		panic(err)
+	}
+	//defer window.Destroy()
+
+	//surface, err := window.GetSurface()
+	//if err != nil {
+	//	panic(err)
+	//}
+	renderer, _ := sdl.CreateRenderer(window, -1, sdl.RENDERER_ACCELERATED)
+	defer renderer.Destroy()
+	//renderer.DrawPointF()
+	//surface.FillRect(nil, 0)
+	//surface.
+	//window.UpdateSurface()
+
+	//running := true
+	//for running {
+	//	for event := sdl.PollEvent(); event != nil; event = sdl.PollEvent() {
+	//		switch event.(type) {
+	//		case *sdl.QuitEvent:
+	//			println("Quit")
+	//			running = false
+	//			break
+	//		}
+	//	}
+	//}
 
 }
