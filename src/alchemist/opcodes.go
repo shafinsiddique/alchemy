@@ -305,7 +305,7 @@ func (cpu *CPU) CP(val byte) int {
 	// compare the contents of register A with Val by calculating A-(HL)
 	a := cpu.Registers.A.Get()
 	if !cpu.CheckAndSetOverflowFlag(a, val, true) {
-		cpu.CheckAndSetZeroFlag(a-val)
+		cpu.CheckAndSetZeroFlag(a - val)
 	} else { // since the a is definitely not zero/
 		cpu.ClearZeroFlag()
 	}

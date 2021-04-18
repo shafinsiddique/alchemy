@@ -3,11 +3,11 @@ package main
 // pixels in the gameboy are stored in the format 2BPP -> 2 Bits Per Pixel.
 
 type Pixel struct {
-	low byte
+	low  byte
 	high byte
 }
 
-func GetPixels(high byte, low byte)[]*Pixel  {
+func GetPixels(high byte, low byte) []*Pixel {
 	pixels := make([]*Pixel, 8)
 	for i := 0; i < 8; i++ {
 		highBit := GetBit(high, 7-i)
@@ -24,5 +24,3 @@ func (pixel *Pixel) GetHigh() byte {
 func (pixel *Pixel) GetLow() byte {
 	return pixel.low
 }
-
-

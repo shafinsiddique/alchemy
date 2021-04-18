@@ -1,6 +1,9 @@
 package main
 
-import "math"
+import (
+	"fmt"
+	"math"
+)
 
 type PPU struct {
 	MMU       *MMU
@@ -16,28 +19,30 @@ func (ppu *PPU) IncrementScanline() {
 }
 
 func (ppu *PPU) FetchPixels() []*Pixel {
-	tileId := ppu.MMU.Read(ppu.getFirstTileIdAddr())
+	firstTileAddr := ppu.getFirstTileIdAddr()
+	tileId := ppu.MMU.Read(firstTileAddr)
 	row := make([]*Pixel, NUMBER_OF_PIXELS_IN_SCANLINE)
-	offset := ppu.getFirstOffset()// we need an offset for the first one and then zero everytime afterwards.
+	offset := ppu.getFirstOffset() // we need an offset for the first one and then zero everytime afterwards.
 	pixelCount := 0
-	for i := 0; i < NUMBER_OF_TILES_IN_SCANLINE ; i++ {
+	for i := 0; i < NUMBER_OF_TILES_IN_SCANLINE; i++ {
 		pixels := ppu.getHorizontalPixelsFromTile(tileId)
 		for offset < 7 && pixelCount < NUMBER_OF_PIXELS_IN_SCANLINE {
 			row[pixelCount] = pixels[offset]
 			pixelCount += 1
 		}
+		offset = 0
 	}
 
 	return row
 
 }
 
-func (ppu *PPU) getFirstOffset() int  {
+func (ppu *PPU) getFirstOffset() int {
 	sx := int(ppu.Registers.SCX.Get())
-	return sx - int(math.Floor(float64(sx/8)) * 8)
+	return sx - int(math.Floor(float64(sx/8))*8)
 }
 
-func (ppu *PPU) getHorizontalPixelsFromTile(tileId byte)[]*Pixel {
+func (ppu *PPU) getHorizontalPixelsFromTile(tileId byte) []*Pixel {
 	addr := ppu.getTileAddr(tileId)
 	lineNumber := uint16(ppu.Registers.LY.Get() % 8)
 	lineStartingIndex := addr + (lineNumber * 2)
@@ -46,18 +51,25 @@ func (ppu *PPU) getHorizontalPixelsFromTile(tileId byte)[]*Pixel {
 	return GetPixels(high, low)
 }
 
-func (ppu *PPU) getTileAddr(tileId byte) uint16  {
-	base := uint16(0x8000)
-
-	if ppu.Registers.LCDC.GetBit(4) == 0 {
-		base = 0x9000
+func (ppu *PPU) getTileAddr(tileId byte) uint16 {
+	var addr uint16
+	if ppu.Registers.LCDC.GetBit(4) == 1 {
+		addr = 0x8000 + uint16(tileId*16)
+	} else {
+		complement, isNegative := GetTwosComplement(tileId)
+		offset := uint16(complement)*16
+		if isNegative {
+			addr -= offset
+		} else {
+			addr += offset
+		}
 	}
 
-	return base + uint16(tileId*16)
+	return addr
 }
 
 func (ppu *PPU) getFirstTileIdAddr() uint16 {
-	tileBlockStartingIndex := (math.Floor(float64(ppu.Registers.SCY.Get() / 32)) * 32) +
+	tileBlockStartingIndex := (math.Floor(float64(ppu.Registers.SCY.Get()/32)) * 32) +
 		float64(ppu.getBackgroundMapAddr()) // the section in background map where the tile is.
 
 	tileBlockOffset := math.Floor((float64(ppu.Registers.SCX.Get())) / 8) // how many tiles we have to skip
@@ -74,7 +86,8 @@ func (ppu *PPU) StartScanline() {
 	ppu.Cycles = SCANLINE_CYCLES
 	// OAM Search.
 	// Drawing
-	ppu.FetchPixels()
+	pixels := ppu.FetchPixels()
+	fmt.Println(pixels)
 	// H-Blank
 	// V-Blank.
 

@@ -3,8 +3,8 @@ package main
 type PPURegisters struct {
 	LCDC *PPURegister
 	LY   *PPURegister
-	SCY *PPURegister
-	SCX *PPURegister
+	SCY  *PPURegister
+	SCX  *PPURegister
 }
 
 func InitializePPURegisters(memory []byte) *PPURegisters {
