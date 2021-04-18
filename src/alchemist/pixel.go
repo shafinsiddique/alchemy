@@ -7,6 +7,16 @@ type Pixel struct {
 	high byte
 }
 
+func GetPixels(high byte, low byte)[]*Pixel  {
+	pixels := make([]*Pixel, 8)
+	for i := 0; i < 8; i++ {
+		highBit := GetBit(high, 7-i)
+		lowBit := GetBit(low, 7-i)
+		pixels[i] = &Pixel{low: lowBit, high: highBit}
+	}
+	return pixels
+}
+
 func (pixel *Pixel) GetHigh() byte {
 	return pixel.high
 }
