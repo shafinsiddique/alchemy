@@ -22,6 +22,7 @@ const (
 	TITLE                        = "Alchemist : A Game Boy Emulator"
 	WINDOW_WIDTH                 = 160
 	WINDOW_HEIGHT                = 144
+	MAX_CYCLES                   = 69905
 )
 
 var COLOR_MAP = map[byte]color.RGBA{

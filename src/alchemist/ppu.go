@@ -86,8 +86,8 @@ func (ppu *PPU) runScanline() {
 	// OAM Search.
 	// Drawing
 	if ppu.Registers.LY.Get() <= 143 {
-		//pixels := ppu.FetchPixels()
-
+		pixels := ppu.FetchPixels()
+		ppu.Display.UpdateScanline(pixels, ppu.Registers.BGP.Get(), int(ppu.Registers.LY.Get()))
 	} // else it is in H_BLANK.
 
 	// H-Blank

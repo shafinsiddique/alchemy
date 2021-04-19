@@ -76,6 +76,7 @@ func (display SDLDisplay) UpdateScanline(pixels []*Pixel, palette byte, y int) {
 	for x := 0; x < len(pixels); x++ {
 		surface.Set(x, y, getColorFromPixel(pixels[x], palette))
 	}
+	_ = display.UpdateGraphics()
 }
 
 func (display SDLDisplay) HandleEvent() bool {

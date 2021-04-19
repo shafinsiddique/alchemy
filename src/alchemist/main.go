@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/sirupsen/logrus"
 	"io"
 	"os"
@@ -20,34 +21,34 @@ func initLogger() {
 }
 
 func RunBootSequence(cpu *CPU, mmu *MMU, ppu *PPU) {
-	mmu.SetBootMode()
-	for cpu.PC < 256 {
+	cyclesThisUpdate := 0
+	for cyclesThisUpdate < MAX_CYCLES && cpu.PC < 256 {
 		cycles := cpu.FetchDecodeExecute()
 		ppu.UpdateGraphics(cycles)
+		cyclesThisUpdate += cycles
 	}
-	mmu.SetRegularMode()
 }
 
 func main() {
-	//initLogger()
-	//mmu := NewMMU()
-	//cpu := &CPU{MMU: mmu, Registers: InitializeRegisters()}
-	//ppu := &PPU{Registers: InitializePPURegisters(mmu.Memory), Cycles: SCANLINE_CYCLES, MMU: mmu}
-	//p, _ := os.Getwd()
-	//f, _ := os.Open(p + "/bootstrap.gb")
-	//f2, _ := os.Open(p + "/tetris.gb")
-	//bootrom := make([]byte, 256)
-	//rom := make([]byte, 0x10000)
-	//read, _ := f.Read(bootrom)
-	//romRead, _ := f2.Read(rom)
-	//fmt.Println("Bytes Read", read)
-	//fmt.Println("Rom Bytes Read", romRead)
-	//mmu.LoadBootRom(bootrom)
-	//mmu.LoadBankRom0(rom)
-	//RunBootSequence(cpu, mmu, ppu)
+	initLogger()
+	mmu := NewMMU()
+	cpu := &CPU{MMU: mmu, Registers: InitializeRegisters()}
 
+	p, _ := os.Getwd()
+	f, _ := os.Open(p + "/bootstrap.gb")
+	f2, _ := os.Open(p + "/tetris.gb")
+	bootrom := make([]byte, 256)
+	rom := make([]byte, 0x10000)
+	read, _ := f.Read(bootrom)
+	romRead, _ := f2.Read(rom)
+	fmt.Println("Bytes Read", read)
+	fmt.Println("Rom Bytes Read", romRead)
+	mmu.LoadBootRom(bootrom)
+	mmu.LoadBankRom0(rom)
+	mmu.SetBootMode()
 	dis, _ := NewSDLDisplay()
+	ppu := &PPU{Registers: InitializePPURegisters(mmu.Memory), Cycles: SCANLINE_CYCLES, MMU: mmu, Display: dis}
 	for dis.HandleEvent() {
-
+		RunBootSequence(cpu, mmu, ppu)
 	}
 }
