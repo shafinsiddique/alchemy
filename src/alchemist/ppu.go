@@ -38,6 +38,7 @@ func (ppu *PPU) FetchPixels() []*Pixel {
 
 }
 
+
 func (ppu *PPU) getFirstOffset() int {
 	sx := int(ppu.Registers.SCX.Get())
 	return sx%8

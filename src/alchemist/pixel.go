@@ -24,3 +24,24 @@ func (pixel *Pixel) GetHigh() byte {
 func (pixel *Pixel) GetLow() byte {
 	return pixel.low
 }
+
+func (pixel *Pixel) Get() byte{
+	high := pixel.high
+	low := pixel.low
+	switch high {
+	case 1:
+		switch low {
+		case 1:
+			return 3
+		default:
+			return 2
+		}
+	default:
+		switch low {
+		case 1:
+			return 1
+		default:
+			return 0
+		}
+	}
+}
