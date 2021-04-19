@@ -6,7 +6,7 @@ import (
 )
 
 type SDLDisplay struct {
-	Window sdl.Window
+	Window *sdl.Window
 }
 
 func getColor(first byte, second byte) color.RGBA {
@@ -37,7 +37,7 @@ func getColorFromPixel(pixel *Pixel, palette byte) color.RGBA {
 
 }
 
-func clearBackground(window sdl.Window) error {
+func clearBackground(window *sdl.Window) error {
 	surface, err := window.GetSurface()
 	if err != nil {
 		return err
@@ -47,10 +47,14 @@ func clearBackground(window sdl.Window) error {
 			surface.Set(x, y, COLOR_MAP[0])
 		}
 	}
-	return nil
+	err = window.UpdateSurface()
+	return err
 }
 
 func NewSDLDisplay() (*SDLDisplay, error) {
+	if err := sdl.Init(sdl.INIT_EVERYTHING); err != nil {
+		panic(err)
+	}
 	window, err := sdl.CreateWindow(TITLE,
 		sdl.WINDOWPOS_UNDEFINED, sdl.WINDOWPOS_UNDEFINED,
 		WINDOW_WIDTH, WINDOW_HEIGHT, sdl.WINDOW_SHOWN)
@@ -63,8 +67,6 @@ func NewSDLDisplay() (*SDLDisplay, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	defer window.Destroy()
 
 	return &SDLDisplay{Window: window}, nil
 }
@@ -85,6 +87,7 @@ func (display SDLDisplay) HandleEvent() bool {
 	}
 	return true
 }
+
 
 func (display SDLDisplay) UpdateGraphics() error {
 	return display.Window.UpdateSurface()
