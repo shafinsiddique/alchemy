@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"github.com/sirupsen/logrus"
 	"github.com/veandco/go-sdl2/sdl"
 	"image/color"
@@ -65,24 +64,22 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	c := color.RGBA{R:255, G:255, B:255}
-	for y := 0; y<144; y++ {
-		for x := 0; x<160; x++ {
+	c := color.RGBA{R: 255, G: 255, B: 255}
+	for y := 0; y < 144; y++ {
+		for x := 0; x < 160; x++ {
 			surface.Set(x, y, c)
 		}
 	}
 	window.UpdateSurface()
 
-	//running := true
-	//for running {
-	//	for event := sdl.PollEvent(); event != nil; event = sdl.PollEvent() {
-	//		switch event.(type) {
-	//		case *sdl.QuitEvent:
-	//			running = false
-	//			break
-	//		}
-	//	}
-	//}
-	fmt.Println(MergeBytes(1,1))
-
+	running := true
+	for running {
+		for event := sdl.PollEvent(); event != nil; event = sdl.PollEvent() {
+			switch event.(type) {
+			case *sdl.QuitEvent:
+				running = false
+				break
+			}
+		}
+	}
 }

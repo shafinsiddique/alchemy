@@ -8,6 +8,7 @@ type PPU struct {
 	MMU       *MMU
 	Registers *PPURegisters
 	Cycles    int
+	Display   IDisplay
 }
 
 func (ppu *PPU) IncrementScanline() {
@@ -23,7 +24,7 @@ func (ppu *PPU) FetchPixels() []*Pixel {
 	offset := ppu.getFirstOffset() // we need an offset for the first one and then zero everytime afterwards.
 	pixelCount := 0
 	for i := 0; i < NUMBER_OF_TILES_IN_SCANLINE; i++ {
-		tileId := ppu.MMU.Read(firstTileAddr+uint16(i))
+		tileId := ppu.MMU.Read(firstTileAddr + uint16(i))
 
 		pixels := ppu.getHorizontalPixelsFromTile(tileId)
 		for offset < NUMBER_OF_PIXELS_IN_TILE && pixelCount < NUMBER_OF_PIXELS_IN_SCANLINE {
@@ -38,10 +39,9 @@ func (ppu *PPU) FetchPixels() []*Pixel {
 
 }
 
-
 func (ppu *PPU) getFirstOffset() int {
 	sx := int(ppu.Registers.SCX.Get())
-	return sx%8
+	return sx % 8
 }
 
 func (ppu *PPU) getHorizontalPixelsFromTile(tileId byte) []*Pixel {
@@ -59,7 +59,7 @@ func (ppu *PPU) getTileAddr(tileId byte) uint16 {
 		addr = 0x8000 + uint16(tileId*16)
 	} else {
 		complement, isNegative := GetTwosComplement(tileId)
-		offset := uint16(complement)*16
+		offset := uint16(complement) * 16
 		if isNegative {
 			addr -= offset
 		} else {
@@ -71,8 +71,8 @@ func (ppu *PPU) getTileAddr(tileId byte) uint16 {
 }
 
 func (ppu *PPU) getFirstTileIdAddr() uint16 {
-	tileBlockStartingAddr := float64(ppu.getBackgroundMapAddr()) + (math.Floor(float64(ppu.Registers.SCY.Get()/8))*32)
-	tileBlockOffsetY := tileBlockStartingAddr + (math.Floor(float64(ppu.Registers.LY.Get()/8))*32)
+	tileBlockStartingAddr := float64(ppu.getBackgroundMapAddr()) + (math.Floor(float64(ppu.Registers.SCY.Get()/8)) * 32)
+	tileBlockOffsetY := tileBlockStartingAddr + (math.Floor(float64(ppu.Registers.LY.Get()/8)) * 32)
 	tileBlockOffsetX := math.Floor(float64(ppu.Registers.SCX.Get() / 8))
 	return uint16(tileBlockOffsetY + tileBlockOffsetX)
 }

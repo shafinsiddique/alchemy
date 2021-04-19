@@ -25,7 +25,7 @@ func (pixel *Pixel) GetLow() byte {
 	return pixel.low
 }
 
-func (pixel *Pixel) Get() byte{
+func (pixel *Pixel) Get() byte {
 	high := pixel.high
 	low := pixel.low
 	switch high {

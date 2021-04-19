@@ -5,12 +5,11 @@ import (
 	"image/color"
 )
 
-type Display struct {
+type SDLDisplay struct {
 	Window sdl.Window
 }
 
-
-func getColor(first byte, second byte) color.RGBA{
+func getColor(first byte, second byte) color.RGBA {
 	switch first {
 	case 1:
 		switch second {
@@ -24,9 +23,8 @@ func getColor(first byte, second byte) color.RGBA{
 	}
 }
 
-
-func getColorFromPixel(pixel *Pixel, palette byte) color.RGBA{
-	switch current := pixel.Get() ; current {
+func getColorFromPixel(pixel *Pixel, palette byte) color.RGBA {
+	switch current := pixel.Get(); current {
 	case 0:
 		return getColor(GetBit(palette, 0), GetBit(palette, 1))
 	case 1:
@@ -39,9 +37,55 @@ func getColorFromPixel(pixel *Pixel, palette byte) color.RGBA{
 
 }
 
-func (display *Display) UpdateScanline(pixels []*Pixel, palette byte, y int) {
+func clearBackground(window sdl.Window) error {
+	surface, err := window.GetSurface()
+	if err != nil {
+		return err
+	}
+	for x := 0; x < WINDOW_WIDTH; x++ {
+		for y := 0; y < WINDOW_HEIGHT; y++ {
+			surface.Set(x, y, COLOR_MAP[0])
+		}
+	}
+	return nil
+}
+
+func NewSDLDisplay() (*SDLDisplay, error) {
+	window, err := sdl.CreateWindow(TITLE,
+		sdl.WINDOWPOS_UNDEFINED, sdl.WINDOWPOS_UNDEFINED,
+		WINDOW_WIDTH, WINDOW_HEIGHT, sdl.WINDOW_SHOWN)
+	if err != nil {
+		return nil, err
+	}
+
+	err = clearBackground(window)
+
+	if err != nil {
+		return nil, err
+	}
+
+	defer window.Destroy()
+
+	return &SDLDisplay{Window: window}, nil
+}
+
+func (display SDLDisplay) UpdateScanline(pixels []*Pixel, palette byte, y int) {
 	surface, _ := display.Window.GetSurface()
-	for x := 0; x < len(pixels) ; x++ {
+	for x := 0; x < len(pixels); x++ {
 		surface.Set(x, y, getColorFromPixel(pixels[x], palette))
 	}
+}
+
+func (display SDLDisplay) HandleEvent() bool {
+	for event := sdl.PollEvent(); event != nil; event = sdl.PollEvent() {
+		switch event.(type) {
+		case *sdl.QuitEvent:
+			return false
+		}
+	}
+	return true
+}
+
+func (display SDLDisplay) UpdateGraphics() error {
+	return display.Window.UpdateSurface()
 }

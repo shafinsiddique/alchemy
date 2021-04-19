@@ -5,7 +5,7 @@ type PPURegisters struct {
 	LY   *PPURegister
 	SCY  *PPURegister
 	SCX  *PPURegister
-	BGP *PPURegister
+	BGP  *PPURegister
 }
 
 func InitializePPURegisters(memory []byte) *PPURegisters {
