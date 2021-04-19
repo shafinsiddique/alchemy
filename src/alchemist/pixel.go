@@ -37,11 +37,6 @@ func (pixel *Pixel) Get() byte{
 			return 2
 		}
 	default:
-		switch low {
-		case 1:
-			return 1
-		default:
-			return 0
-		}
+		return low
 	}
 }
