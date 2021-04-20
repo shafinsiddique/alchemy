@@ -1,9 +1,5 @@
 package main
 
-import (
-	"fmt"
-)
-
 type CPU struct {
 	Registers     *Registers
 	BootRomMemory []byte
@@ -57,7 +53,7 @@ func (cpu *CPU) DecrementRegister8Bit(register *EightBitRegister) int {
 
 func (cpu *CPU) FetchDecodeExecute() int {
 	opcode := cpu.FetchAndIncrement()
-	fmt.Println(fmt.Sprintf("Executing Instruction 0x %x At PC %d", opcode, cpu.PC-1))
+	//fmt.Println(fmt.Sprintf("Executing Instruction 0x %x At PC %d", opcode, cpu.PC-1))
 	cycles := 4 // fetch and increment is a 4.
 	switch opcode {
 	case 0x31:
@@ -157,8 +153,8 @@ func (cpu *CPU) FetchDecodeExecute() int {
 	case 0x86:
 		cycles = cpu.ADD_A_LOC_HL()
 	default:
-		hex := fmt.Sprintf("0x%x %d", opcode, cpu.PC-1)
-		fmt.Println(hex)
+		//hex := fmt.Sprintf("0x%x %d", opcode, cpu.PC-1)
+		//fmt.Println(hex)
 	}
 	return cycles
 }

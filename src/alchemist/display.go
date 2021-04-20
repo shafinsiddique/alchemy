@@ -1,14 +1,17 @@
 package main
 
 import (
+	"fmt"
 	"github.com/veandco/go-sdl2/sdl"
 	"image/color"
 )
 
 type SDLDisplay struct {
 	Window *sdl.Window
+	count int
 }
 
+var count = 0
 func getColor(first byte, second byte) color.RGBA {
 	switch first {
 	case 1:
@@ -55,6 +58,8 @@ func NewSDLDisplay() (*SDLDisplay, error) {
 	if err := sdl.Init(sdl.INIT_EVERYTHING); err != nil {
 		panic(err)
 	}
+	_ = sdl.GLSetSwapInterval(0)
+
 	window, err := sdl.CreateWindow(TITLE,
 		sdl.WINDOWPOS_UNDEFINED, sdl.WINDOWPOS_UNDEFINED,
 		WINDOW_WIDTH, WINDOW_HEIGHT, sdl.WINDOW_SHOWN)
@@ -72,11 +77,15 @@ func NewSDLDisplay() (*SDLDisplay, error) {
 }
 
 func (display SDLDisplay) UpdateScanline(pixels []*Pixel, palette byte, y int) {
+	count += 1
 	surface, _ := display.Window.GetSurface()
+	s := ""
 	for x := 0; x < len(pixels); x++ {
-		surface.Set(x, y, getColorFromPixel(pixels[x], palette))
+		s += fmt.Sprintf("%d, ", pixels[x].Get())
+		surface.Set(x, y,  getColorFromPixel(pixels[x], palette))
 	}
-	_ = display.UpdateGraphics()
+	fmt.Println(s)
+	//_ = display.UpdateGraphics()
 }
 
 func (display SDLDisplay) HandleEvent() bool {
@@ -84,7 +93,11 @@ func (display SDLDisplay) HandleEvent() bool {
 		switch event.(type) {
 		case *sdl.QuitEvent:
 			return false
+		case *sdl.MouseButtonEvent:
+			ev := event.(*sdl.MouseButtonEvent)
+			fmt.Println(fmt.Sprintf("%d %d", ev.X, ev.Y))
 		}
+
 	}
 	return true
 }
