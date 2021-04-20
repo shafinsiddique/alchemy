@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"math"
 )
 
@@ -28,14 +27,7 @@ func (ppu *PPU) FetchPixels() []*Pixel {
 
 	//found := false
 	for i := 0; i < NUMBER_OF_TILES_IN_SCANLINE; i++ {
-
 		tileId := ppu.MMU.Read(firstTileAddr + uint16(i))
-		if ppu.Registers.SCY.Get() == 0 && ppu.Registers.LY.Get() == 72 && i == 0x08 {
-			fmt.Println("here")
-		}
-		//if ppu.Registers.LY.Get() == 8 && i == 4 && tileId != 0{
-		//	fmt.Println("here")
-		//}
 		pixels := ppu.getHorizontalPixelsFromTile(tileId, lineNumber)
 		for offset < NUMBER_OF_PIXELS_IN_TILE && pixelCount < NUMBER_OF_PIXELS_IN_SCANLINE {
 			row[pixelCount] = pixels[offset]

@@ -4,6 +4,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"io"
 	"os"
+	"time"
 )
 
 var logger *logrus.Logger
@@ -54,6 +55,7 @@ func main() {
 			//panic("end of prog.")
 		} else {
 			dis.UpdateGraphics()
+			time.Sleep(1*time.Millisecond)
 			//time.Sleep(2*time.Millisecond)
 		}
 	}
