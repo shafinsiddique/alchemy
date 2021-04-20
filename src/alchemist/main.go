@@ -55,7 +55,7 @@ func main() {
 			//panic("end of prog.")
 		} else {
 			dis.UpdateGraphics()
-			time.Sleep(1*time.Millisecond)
+			time.Sleep(3*time.Millisecond)
 			//time.Sleep(2*time.Millisecond)
 		}
 	}

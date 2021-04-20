@@ -19,7 +19,7 @@ const (
 	NUMBER_OF_PIXELS_IN_SCANLINE = 160
 	NUMBER_OF_PIXELS_IN_TILE     = 8
 	BGP_INDEX                    = 0xFF47
-	TITLE                        = "Alchemist : A Game Boy Emulator"
+	TITLE                        = "alchemist"
 	WINDOW_WIDTH                 = 160
 	WINDOW_HEIGHT                = 144
 	MAX_CYCLES                   = 69905
