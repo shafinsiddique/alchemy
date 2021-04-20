@@ -30,7 +30,7 @@ func (ppu *PPU) FetchPixels() []*Pixel {
 	for i := 0; i < NUMBER_OF_TILES_IN_SCANLINE; i++ {
 
 		tileId := ppu.MMU.Read(firstTileAddr + uint16(i))
-		if ppu.Registers.SCY.Get() == 0 && ppu.Registers.LY.Get() == 72 && i == 0x0C {
+		if ppu.Registers.SCY.Get() == 0 && ppu.Registers.LY.Get() == 72 && i == 0x08 {
 			fmt.Println("here")
 		}
 		//if ppu.Registers.LY.Get() == 8 && i == 4 && tileId != 0{
@@ -64,8 +64,9 @@ func (ppu *PPU) getHorizontalPixelsFromTile(tileId byte, lineNumber uint16) []*P
 
 func (ppu *PPU) getTileAddr(tileId byte) uint16 {
 	var addr uint16
+	tileNo := uint16(tileId)
 	if ppu.Registers.LCDC.GetBit(4) == 1 {
-		addr = 0x8000 + uint16(tileId*16)
+		addr = 0x8000 + (tileNo*16)
 	} else {
 		complement, isNegative := GetTwosComplement(tileId)
 		offset := uint16(complement) * 16

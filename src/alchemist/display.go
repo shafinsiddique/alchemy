@@ -79,12 +79,9 @@ func NewSDLDisplay() (*SDLDisplay, error) {
 func (display SDLDisplay) UpdateScanline(pixels []*Pixel, palette byte, y int) {
 	count += 1
 	surface, _ := display.Window.GetSurface()
-	s := ""
 	for x := 0; x < len(pixels); x++ {
-		s += fmt.Sprintf("%d, ", pixels[x].Get())
 		surface.Set(x, y,  getColorFromPixel(pixels[x], palette))
 	}
-	fmt.Println(s)
 	//_ = display.UpdateGraphics()
 }
 
