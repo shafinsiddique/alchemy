@@ -552,6 +552,54 @@ func (cpu *CPU) LD_E_LOC_HL() int {
 	return cpu.ld_dst_loc_src(cpu.Registers.E, cpu.Registers.HL)
 }
 
+func (cpu *CPU) LD_B_C() int {
+	return cpu.ld_dst_src(cpu.Registers.B, cpu.Registers.C)
+}
+
+func (cpu *CPU) LD_B_D() int {
+	return cpu.ld_dst_src(cpu.Registers.B, cpu.Registers.D)
+}
+
+func (cpu *CPU) LD_B_E() int {
+	return cpu.ld_dst_src(cpu.Registers.B, cpu.Registers.E)
+}
+
+func (cpu *CPU) LD_B_H() int {
+	return cpu.ld_dst_src(cpu.Registers.B, cpu.Registers.H)
+}
+
+func (cpu *CPU) LD_B_L() int {
+	return cpu.ld_dst_src(cpu.Registers.B, cpu.Registers.L)
+}
+
+func (cpu *CPU) LD_B_A() int {
+	return cpu.ld_dst_src(cpu.Registers.B, cpu.Registers.A)
+}
+
+func (cpu *CPU) LD_C_B() int {
+	return cpu.ld_dst_src(cpu.Registers.C, cpu.Registers.B)
+}
+
+func (cpu *CPU) LD_C_C() int {
+	return cpu.ld_dst_src(cpu.Registers.C, cpu.Registers.C)
+}
+
+func (cpu *CPU) LD_C_D() int {
+	return cpu.ld_dst_src(cpu.Registers.C, cpu.Registers.D)
+}
+
+func (cpu *CPU) LD_C_E() int {
+	return cpu.ld_dst_src(cpu.Registers.C, cpu.Registers.E)
+}
+
+func (cpu *CPU) LD_C_H() int {
+	return cpu.ld_dst_src(cpu.Registers.C, cpu.Registers.H)
+}
+
+func (cpu *CPU) LD_C_L() int {
+	return cpu.ld_dst_src(cpu.Registers.C, cpu.Registers.L)
+}
+
 
 
 
