@@ -660,6 +660,90 @@ func (cpu *CPU) LD_A_LOC_A16() int {
 	return 16
 }
 
+func (cpu *CPU) inc_register(register *EightBitRegister) int {
+	register.Increment()
+	return 4
+}
+
+func (cpu *CPU) dec_register(register *EightBitRegister) int {
+	register.Decrement()
+	return 4
+}
+
+func (cpu *CPU) inc_register_sixteen(register *SixteenBitRegister) int {
+	register.Increment()
+	return 4
+}
+
+func (cpu *CPU) dec_register_sixteen(register *SixteenBitRegister) int {
+	register.Decrement()
+	return 4
+}
+
+func (cpu *CPU) INC_D() int {
+	return cpu.inc_register(cpu.Registers.D)
+}
+
+func (cpu *CPU) INC_E() int {
+	return cpu.inc_register(cpu.Registers.E)
+}
+
+func (cpu *CPU) INC_L() int {
+	return cpu.inc_register(cpu.Registers.L)
+}
+
+func (cpu *CPU) INC_A() int {
+	return cpu.inc_register(cpu.Registers.A)
+}
+
+func (cpu *CPU) INC_BC() int {
+	return cpu.inc_register_sixteen(cpu.Registers.BC)
+}
+
+func (cpu *CPU) INC_SP() int {
+	cpu.SP += 1
+	return 4
+}
+
+func (cpu *CPU) DEC_H() int {
+	return cpu.dec_register(cpu.Registers.H)
+}
+
+func (cpu *CPU) DEC_L() int {
+	return cpu.dec_register(cpu.Registers.L)
+}
+
+func (cpu *CPU) DEC_SP() int {
+	cpu.SP -= 1
+	return 4
+}
+
+func (cpu *CPU) DEC_BC() int {
+	return cpu.dec_register_sixteen(cpu.Registers.BC)
+}
+
+func (cpu *CPU) DEC_DE() int {
+	return cpu.dec_register_sixteen(cpu.Registers.DE)
+}
+
+func (cpu *CPU) DEC_HL() int {
+	return cpu.dec_register_sixteen(cpu.Registers.HL)
+}
+
+func (cpu *CPU) INC_LOC_HL() int {
+	hl := cpu.Registers.HL.Get()
+	current := cpu.MMU.Read(hl)
+	cpu.MMU.Write(hl, current+1)
+	return 12
+}
+
+func (cpu *CPU) DEC_LOC_HL() int {
+	hl := cpu.Registers.HL.Get()
+	current := cpu.MMU.Read(hl)
+	cpu.MMU.Write(hl, current-1)
+	return 12
+}
+
 
 
 
