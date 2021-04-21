@@ -742,3 +742,37 @@ func (cpu *CPU) DEC_LOC_HL() int {
 	cpu.MMU.Write(hl, current-1)
 	return 12
 }
+
+func (cpu *CPU) add_dst_src_sixteen(dst *SixteenBitRegister, src *SixteenBitRegister) int {
+	first, second := dst.Get(), src.Get()
+	sum := first + second
+	bytes := SplitInt16ToBytes(sum)
+	dst.Set(bytes[0], bytes[1])
+	cpu.CheckAndSetOverflowFlagSixteenBit(first,second, false)
+	cpu.ClearNegativeFlag()
+	cpu.CheckAndSetHCFlagSixteenBit(first,second, false)
+	return 8
+}
+
+func (cpu *CPU) ADD_HL_BC() int {
+	return cpu.add_dst_src_sixteen(cpu.Registers.HL, cpu.Registers.BC)
+}
+
+func (cpu *CPU) ADD_HL_DE() int {
+	return cpu.add_dst_src_sixteen(cpu.Registers.HL, cpu.Registers.DE)
+}
+
+func (cpu *CPU) ADD_HL_HL() int {
+	return cpu.add_dst_src_sixteen(cpu.Registers.HL, cpu.Registers.HL)
+}
+
+func (cpu *CPU) ADD_HL_SP() int {
+	first, second := cpu.Registers.HL.Get(), cpu.SP
+	sum := first + second
+	bytes := SplitInt16ToBytes(sum)
+	cpu.Registers.HL.Set(bytes[0], bytes[1])
+	cpu.CheckAndSetOverflowFlagSixteenBit(first,second, false)
+	cpu.ClearNegativeFlag()
+	cpu.CheckAndSetHCFlagSixteenBit(first,second, false)
+	return 8
+}
