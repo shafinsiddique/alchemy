@@ -600,6 +600,70 @@ func (cpu *CPU) LD_C_L() int {
 	return cpu.ld_dst_src(cpu.Registers.C, cpu.Registers.L)
 }
 
+func (cpu *CPU) LD_B_LOC_HL() int {
+	return cpu.ld_dst_loc_src(cpu.Registers.B, cpu.Registers.HL)
+}
+
+func (cpu *CPU) LD_C_LOC_HL() int {
+	return cpu.ld_dst_loc_src(cpu.Registers.C, cpu.Registers.HL)
+}
+
+func (cpu *CPU) LD_A_LOC_BC() int {
+	return cpu.ld_dst_loc_src(cpu.Registers.A, cpu.Registers.BC)
+}
+
+func (cpu *CPU) ld_dst_d8(register *EightBitRegister) int {
+	register.Set(cpu.FetchAndIncrement())
+	return 8
+}
+
+func (cpu *CPU) LD_H_D8() int {
+	return cpu.ld_dst_d8(cpu.Registers.H)
+}
+
+func (cpu *CPU) LD_A_LOC_HL_INC()int {
+	cpu.Registers.A.Set(cpu.MMU.Read(cpu.Registers.HL.Get()))
+	cpu.Registers.HL.Increment()
+	return 8
+}
+
+func (cpu *CPU) LD_A_LOC_HL_DEC()int {
+	cpu.Registers.A.Set(cpu.MMU.Read(cpu.Registers.HL.Get()))
+	cpu.Registers.HL.Decrement()
+	return 8
+}
+
+func (cpu *CPU) LD_LOC_HL_D8() int {
+	cpu.MMU.Write(cpu.Registers.HL.Get(), cpu.FetchAndIncrement())
+	return 12
+}
+
+func (cpu *CPU) LD_A8_A() int {
+	cpu.MMU.Write(0xFF00 + uint16(cpu.FetchAndIncrement()), cpu.Registers.A.Get())
+	return 12
+}
+
+func (cpu *CPU) LD_A_A8() int {
+	cpu.Registers.A.Set(cpu.MMU.Read(0xFF00 + uint16(cpu.FetchAndIncrement())))
+	return 12
+}
+
+func (cpu *CPU) LD_A_LOC_C() int {
+	cpu.Registers.A.Set(cpu.MMU.Read(0xFF00 + uint16(cpu.Registers.C.Get())))
+	return 8
+}
+
+func (cpu *CPU) LD_A_LOC_A16() int {
+	low := cpu.FetchAndIncrement()
+	high := cpu.FetchAndIncrement()
+	cpu.Registers.A.Set(cpu.MMU.Read(MergeBytes(high, low)))
+	return 16
+}
+
+
+
+
+
 
 
 
