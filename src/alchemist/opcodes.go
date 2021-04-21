@@ -380,7 +380,7 @@ func (cpu *CPU) LD_LOC_HL_C() int {
 	return 8
 }
 
-func (cpu *CPU) LD_LOC_HL_D() int  {
+func (cpu *CPU) LD_LOC_HL_D() int {
 	cpu.MMU.Write(cpu.Registers.HL.Get(), cpu.Registers.D.Get())
 	return 8
 }
@@ -490,7 +490,6 @@ func (cpu *CPU) LD_H_D() int {
 func (cpu *CPU) LD_H_C() int {
 	return cpu.ld_dst_src(cpu.Registers.H, cpu.Registers.C)
 }
-
 
 func (cpu *CPU) LD_D_C() int {
 	return cpu.ld_dst_src(cpu.Registers.D, cpu.Registers.C)
@@ -621,13 +620,13 @@ func (cpu *CPU) LD_H_D8() int {
 	return cpu.ld_dst_d8(cpu.Registers.H)
 }
 
-func (cpu *CPU) LD_A_LOC_HL_INC()int {
+func (cpu *CPU) LD_A_LOC_HL_INC() int {
 	cpu.Registers.A.Set(cpu.MMU.Read(cpu.Registers.HL.Get()))
 	cpu.Registers.HL.Increment()
 	return 8
 }
 
-func (cpu *CPU) LD_A_LOC_HL_DEC()int {
+func (cpu *CPU) LD_A_LOC_HL_DEC() int {
 	cpu.Registers.A.Set(cpu.MMU.Read(cpu.Registers.HL.Get()))
 	cpu.Registers.HL.Decrement()
 	return 8
@@ -639,7 +638,7 @@ func (cpu *CPU) LD_LOC_HL_D8() int {
 }
 
 func (cpu *CPU) LD_A8_A() int {
-	cpu.MMU.Write(0xFF00 + uint16(cpu.FetchAndIncrement()), cpu.Registers.A.Get())
+	cpu.MMU.Write(0xFF00+uint16(cpu.FetchAndIncrement()), cpu.Registers.A.Get())
 	return 12
 }
 
@@ -743,20 +742,3 @@ func (cpu *CPU) DEC_LOC_HL() int {
 	cpu.MMU.Write(hl, current-1)
 	return 12
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
