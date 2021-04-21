@@ -15,8 +15,8 @@ func (cpu *CPU) XOR_A() int {
 	return 4
 }
 
-func (cpu *CPU) LD_HL_A_DEC() int {
-	// LD_HL_A_DEC
+func (cpu *CPU) LD_LOC_HL_A_DEC() int {
+	// LD_LOC_HL_A_DEC
 	a := cpu.Registers.A.Get()
 	cpu.MMU.Write(cpu.Registers.HL.Get(), a)
 	cpu.Registers.HL.Decrement()
@@ -237,11 +237,6 @@ func (cpu *CPU) LD_H_A() int {
 	return 4
 }
 
-func (cpu *CPU) LD_D_A() int {
-	cpu.Registers.D.Set(cpu.Registers.A.Get())
-	return 4
-}
-
 func (cpu *CPU) INC_B() int {
 	return cpu.IncrementRegister8Bit(cpu.Registers.B)
 }
@@ -342,3 +337,230 @@ func (cpu *CPU) ADD_A_LOC_HL() int {
 	cpu.ADD_AND_STORE(cpu.Registers.A, cpu.MMU.Read(cpu.Registers.HL.Get()))
 	return 8
 }
+
+func (cpu *CPU) LD_BC_D16() int {
+	low := cpu.FetchAndIncrement()
+	high := cpu.FetchAndIncrement()
+	cpu.Registers.BC.Set(high, low)
+	return 12
+}
+
+func (cpu *CPU) LD_LOC_BC_A() int {
+	cpu.MMU.Write(cpu.Registers.BC.Get(), cpu.Registers.A.Get())
+	return 8
+}
+
+func (cpu *CPU) LD_LOC_DE_A() int {
+	cpu.MMU.Write(cpu.Registers.DE.Get(), cpu.Registers.A.Get())
+	return 8
+}
+
+func (cpu *CPU) LD_B_B() int {
+	cpu.Registers.B.Set(cpu.Registers.B.Get())
+	return 4
+}
+
+func (cpu *CPU) LD_D_B() int {
+	cpu.Registers.D.Set(cpu.Registers.B.Get())
+	return 4
+}
+
+func (cpu *CPU) LD_H_B() int {
+	cpu.Registers.H.Set(cpu.Registers.B.Get())
+	return 4
+}
+
+func (cpu *CPU) LD_LOC_HL_B() int {
+	cpu.MMU.Write(cpu.Registers.HL.Get(), cpu.Registers.B.Get())
+	return 8
+}
+
+func (cpu *CPU) LD_LOC_HL_C() int {
+	cpu.MMU.Write(cpu.Registers.HL.Get(), cpu.Registers.C.Get())
+	return 8
+}
+
+func (cpu *CPU) LD_LOC_HL_D() int  {
+	cpu.MMU.Write(cpu.Registers.HL.Get(), cpu.Registers.D.Get())
+	return 8
+}
+
+func (cpu *CPU) LD_LOC_HL_E() int {
+	cpu.MMU.Write(cpu.Registers.HL.Get(), cpu.Registers.E.Get())
+	return 8
+}
+
+func (cpu *CPU) LD_LOC_HL_H() int {
+	cpu.MMU.Write(cpu.Registers.HL.Get(), cpu.Registers.H.Get())
+	return 8
+}
+
+func (cpu *CPU) LD_LOC_HL_L() int {
+	cpu.MMU.Write(cpu.Registers.HL.Get(), cpu.Registers.L.Get())
+	return 8
+}
+
+func (cpu *CPU) LD_A_C() int {
+	cpu.Registers.A.Set(cpu.Registers.C.Get())
+	return 4
+}
+
+func (cpu *CPU) LD_A_D() int {
+	cpu.Registers.A.Set(cpu.Registers.D.Get())
+	return 4
+}
+
+func (cpu *CPU) LD_A_LOC_HL() int {
+	cpu.Registers.A.Set(cpu.MMU.Read(cpu.Registers.HL.Get()))
+	return 8
+}
+
+func (cpu *CPU) LD_A_A() int {
+	cpu.Registers.A.Set(cpu.Registers.A.Get())
+	return 4
+}
+
+func (cpu *CPU) LD_L_A() int {
+	cpu.Registers.L.Set(cpu.Registers.A.Get())
+	return 4
+}
+
+func (cpu *CPU) LD_L_LOC_HL() int {
+	cpu.Registers.L.Set(cpu.MMU.Read(cpu.Registers.HL.Get()))
+	return 8
+}
+
+func (cpu *CPU) LD_L_L() int {
+	cpu.Registers.L.Set(cpu.Registers.L.Get())
+	return 4
+}
+
+func (cpu *CPU) LD_L_H() int {
+	cpu.Registers.L.Set(cpu.Registers.H.Get())
+	return 4
+}
+
+func (cpu *CPU) LD_L_E() int {
+	cpu.Registers.L.Set(cpu.Registers.E.Get())
+	return 4
+}
+
+func (CPU *CPU) ld_dst_src(dst *EightBitRegister, src *EightBitRegister) int {
+	dst.Set(src.Get())
+	return 4
+}
+
+func (cpu *CPU) ld_dst_loc_src(dst *EightBitRegister, src *SixteenBitRegister) int {
+	dst.Set(cpu.MMU.Read(src.Get()))
+	return 8
+}
+
+func (cpu *CPU) LD_L_D() int {
+	return cpu.ld_dst_src(cpu.Registers.L, cpu.Registers.D)
+}
+
+func (cpu *CPU) LD_L_C() int {
+	return cpu.ld_dst_src(cpu.Registers.L, cpu.Registers.C)
+}
+
+func (cpu *CPU) LD_L_B() int {
+	return cpu.ld_dst_src(cpu.Registers.L, cpu.Registers.B)
+}
+
+func (cpu *CPU) LD_H_LOC_HL() int {
+	return cpu.ld_dst_loc_src(cpu.Registers.H, cpu.Registers.HL)
+}
+
+func (cpu *CPU) LD_H_L() int {
+	return cpu.ld_dst_src(cpu.Registers.H, cpu.Registers.L)
+}
+
+func (cpu *CPU) LD_H_H() int {
+	return cpu.ld_dst_src(cpu.Registers.H, cpu.Registers.H)
+}
+
+func (cpu *CPU) LD_H_E() int {
+	return cpu.ld_dst_src(cpu.Registers.H, cpu.Registers.E)
+}
+
+func (cpu *CPU) LD_H_D() int {
+	return cpu.ld_dst_src(cpu.Registers.H, cpu.Registers.D)
+}
+
+func (cpu *CPU) LD_H_C() int {
+	return cpu.ld_dst_src(cpu.Registers.H, cpu.Registers.C)
+}
+
+
+func (cpu *CPU) LD_D_C() int {
+	return cpu.ld_dst_src(cpu.Registers.D, cpu.Registers.C)
+}
+
+func (cpu *CPU) LD_D_D() int {
+	return cpu.ld_dst_src(cpu.Registers.D, cpu.Registers.D)
+}
+
+func (cpu *CPU) LD_D_E() int {
+	return cpu.ld_dst_src(cpu.Registers.D, cpu.Registers.E)
+}
+
+func (cpu *CPU) LD_D_H() int {
+	return cpu.ld_dst_src(cpu.Registers.D, cpu.Registers.H)
+}
+
+func (cpu *CPU) LD_D_L() int {
+	return cpu.ld_dst_src(cpu.Registers.D, cpu.Registers.L)
+}
+
+func (cpu *CPU) LD_D_LOC_HL() int {
+	return cpu.ld_dst_loc_src(cpu.Registers.D, cpu.Registers.HL)
+}
+
+func (cpu *CPU) LD_D_A() int {
+	return cpu.ld_dst_src(cpu.Registers.D, cpu.Registers.A)
+}
+
+func (cpu *CPU) LD_E_B() int {
+	return cpu.ld_dst_src(cpu.Registers.E, cpu.Registers.B)
+}
+
+func (cpu *CPU) LD_E_C() int {
+	return cpu.ld_dst_src(cpu.Registers.E, cpu.Registers.C)
+}
+
+func (cpu *CPU) LD_E_D() int {
+	return cpu.ld_dst_src(cpu.Registers.E, cpu.Registers.D)
+}
+
+func (cpu *CPU) LD_E_E() int {
+	return cpu.ld_dst_src(cpu.Registers.E, cpu.Registers.E)
+}
+
+func (cpu *CPU) LD_E_H() int {
+	return cpu.ld_dst_src(cpu.Registers.E, cpu.Registers.H)
+}
+
+func (cpu *CPU) LD_E_L() int {
+	return cpu.ld_dst_src(cpu.Registers.E, cpu.Registers.L)
+}
+
+func (cpu *CPU) LD_E_A() int {
+	return cpu.ld_dst_src(cpu.Registers.E, cpu.Registers.A)
+}
+
+func (cpu *CPU) LD_E_LOC_HL() int {
+	return cpu.ld_dst_loc_src(cpu.Registers.E, cpu.Registers.HL)
+}
+
+
+
+
+
+
+
+
+
+
+
+
+

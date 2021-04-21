@@ -73,9 +73,6 @@ func (ppu *PPU) getTileAddr(tileId byte) uint16 {
 }
 
 func (ppu *PPU) getFirstTileIdAddr() (uint16, uint16) {
-	//tileBlockStartingAddr := ppu.getBackgroundMapAddr() + uint16(32 * ppu.Registers.SCY.Get())
-	//tileBlockOffsetY := tileBlockStartingAddr + (uint16(math.Floor(float64(ppu.Registers.LY.Get()/8)))*32)
-	//tileBlockOffsetX := uint16(math.Floor(float64(ppu.Registers.SCX.Get() / 8)))
 	totalYOffsetInPixels := ppu.Registers.SCY.Get() + ppu.Registers.LY.Get()
 	tileBlockStartingAddr :=  ppu.getBackgroundMapAddr() + (uint16(math.Floor(float64(totalYOffsetInPixels)/8)*32))
 	scanlineOffset := uint16(totalYOffsetInPixels % 8)
@@ -106,7 +103,6 @@ func (ppu *PPU) UpdateGraphics(cycles int) {
 	if !ppu.LCDEnabled() {
 		return
 	}
-
 	ppu.Cycles -= cycles
 	if ppu.Cycles <= 0 { // new scanline.
 		ppu.runScanline()

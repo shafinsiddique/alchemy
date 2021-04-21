@@ -63,7 +63,7 @@ func (cpu *CPU) FetchDecodeExecute() int {
 	case 0x21:
 		cycles = cpu.LD_HL_D16()
 	case 0x32:
-		cycles = cpu.LD_HL_A_DEC()
+		cycles = cpu.LD_LOC_HL_A_DEC()
 	case 0xcb:
 		cycles = cpu.Oxcb()
 	case 0x20:

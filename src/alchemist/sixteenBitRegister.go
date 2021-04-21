@@ -16,6 +16,11 @@ func (register *SixteenBitRegister) Get() uint16 {
 	return high<<8 | low
 }
 
+func (register *SixteenBitRegister) Set(high byte, low byte) {
+	register.Low.Set(high)
+	register.High.Set(low)
+}
+
 func (register *SixteenBitRegister) Decrement() int {
 	val := register.Get()
 	decremented := val - 1
