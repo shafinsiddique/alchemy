@@ -1057,6 +1057,11 @@ func (cpu *CPU) XOR_LOC_HL() int {
 	return 8
 }
 
+func (cpu *CPU) XOR_D8() int {
+	cpu.xor(cpu.FetchAndIncrement())
+	return 8
+}
+
 func (cpu *CPU) CP_B() int {
 	return cpu.cp(cpu.Registers.B.Get())
 }
@@ -1219,6 +1224,16 @@ func (cpu *CPU) SBC_A_LOC_HL() int {
 	return 8
 }
 
+func (cpu *CPU) SBC_A_D8() int {
+	cpu.sbc(cpu.FetchAndIncrement())
+	return 8
+}
+
+func (cpu *CPU) ADC_A_D8() int {
+	cpu.adc(cpu.FetchAndIncrement())
+	return 8
+}
+
 func (cpu *CPU) JR_NC_S8() int {
 	return cpu.jr_s8(CARRY_FLAG, 0)
 }
@@ -1298,4 +1313,33 @@ func (cpu *CPU) RST_6() int {
 
 func (cpu *CPU) RST_7() int {
 	return cpu.rst(7)
+}
+
+func (cpu *CPU) jp(flagIndex int, flagValue byte) int  {
+	flag := cpu.Registers.F.GetBit(flagIndex)
+	low := cpu.FetchAndIncrement()
+	high := cpu.FetchAndIncrement()
+	cycles := 12
+	if flag == flagValue  {
+		cpu.PC = MergeBytes(high, low)
+		cycles = 16
+	}
+
+	return cycles
+}
+
+func (cpu *CPU) JP_NZ_A16() int {
+	return cpu.jp(Z_FLAG, 0)
+}
+
+func (cpu *CPU) JP_Z_A16() int {
+	return cpu.jp(Z_FLAG, 1)
+}
+
+func (cpu *CPU) JP_NC_A16() int {
+	return cpu.jp(CARRY_FLAG, 0)
+}
+
+func (cpu *CPU) JP_C_A16() int {
+	return cpu.jp(CARRY_FLAG, 1)
 }
