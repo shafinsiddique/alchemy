@@ -8,13 +8,6 @@ func (cpu *CPU) LD_SP_D16() int {
 	return 12
 }
 
-func (cpu *CPU) XOR_A() int {
-	// xor A
-	cpu.Registers.A.Set(cpu.Registers.A.Value ^ cpu.Registers.A.Value)
-	cpu.CheckAndSetZeroFlag(cpu.Registers.A.Get())
-	return 4
-}
-
 func (cpu *CPU) LD_LOC_HL_A_DEC() int {
 	// LD_LOC_HL_A_DEC
 	a := cpu.Registers.A.Get()
@@ -213,7 +206,8 @@ func (cpu *CPU) LD_A_E() int {
 func (cpu *CPU) CP_D8() int {
 	// compare the contents of reigster A with immediate 8 bit operand d8. set z flag if they are
 	// equal.
-	return cpu.CP(cpu.FetchAndIncrement())
+	cpu.cp(cpu.FetchAndIncrement())
+	return 8
 }
 
 func (cpu *CPU) LD_LOC_A16_A() int {
@@ -296,21 +290,18 @@ func (cpu *CPU) LD_L_D8() int {
 	return 8
 }
 
-func (cpu *CPU) CP(val byte) int {
+func (cpu *CPU) cp(val byte) int {
 	// compare the contents of register A with Val by calculating A-(HL)
 	a := cpu.Registers.A.Get()
-	if !cpu.CheckAndSetOverflowFlag(a, val, true) {
-		cpu.CheckAndSetZeroFlag(a - val)
-	} else { // since the a is definitely not zero/
-		cpu.ClearZeroFlag()
-	}
+	cpu.CheckAndSetZeroFlag(a-val)
+	cpu.CheckAndSetOverflowFlag(a, val, true)
 	cpu.SetNegativeFlag()
 	cpu.CheckAndSetHCFlag(a, val, true)
-	return 8
+	return 4
 }
 
 func (cpu *CPU) CP_LOC_HL() int {
-	return cpu.CP(cpu.MMU.Read(cpu.Registers.HL.Get()))
+	return cpu.cp(cpu.MMU.Read(cpu.Registers.HL.Get()))
 }
 
 func (cpu *CPU) LD_A_L() int {
@@ -321,21 +312,6 @@ func (cpu *CPU) LD_A_L() int {
 func (cpu *CPU) LD_A_B() int {
 	cpu.Registers.A.Set(cpu.Registers.B.Get())
 	return 4
-}
-
-func (cpu *CPU) ADD_AND_STORE(register *EightBitRegister, val2 byte) {
-	val1 := register.Get()
-	sum := val1 + val2
-	register.Set(sum)
-	cpu.CheckAndSetZeroFlag(sum)
-	cpu.ClearNegativeFlag()
-	cpu.CheckAndSetHCFlag(val1, val2, false)
-	cpu.CheckAndSetOverflowFlag(val1, val2, false)
-}
-
-func (cpu *CPU) ADD_A_LOC_HL() int {
-	cpu.ADD_AND_STORE(cpu.Registers.A, cpu.MMU.Read(cpu.Registers.HL.Get()))
-	return 8
 }
 
 func (cpu *CPU) LD_BC_D16() int {
@@ -781,9 +757,9 @@ func (cpu *CPU) add_dst_src(dst *EightBitRegister, src byte) int {
 	return 4
 }
 
-func (cpu *CPU) sub(register *EightBitRegister) int {
+func (cpu *CPU) sub(val byte) int {
 	a := cpu.Registers.A.Get()
-	b := register.Get()
+	b := val
 	diff := a-b
 	cpu.Registers.A.Set(diff)
 	cpu.SetNegativeFlag()
@@ -822,35 +798,35 @@ func (cpu *CPU) ADD_A_A() int {
 }
 
 func (cpu *CPU) SUB_B() int {
-	return cpu.sub(cpu.Registers.B)
+	return cpu.sub(cpu.Registers.B.Get())
 }
 
 func (cpu *CPU) SUB_C() int {
-	return cpu.sub(cpu.Registers.C)
+	return cpu.sub(cpu.Registers.C.Get())
 }
 
 func (cpu *CPU) SUB_D() int {
-	return cpu.sub(cpu.Registers.D)
+	return cpu.sub(cpu.Registers.D.Get())
 }
 
 func (cpu *CPU) SUB_E() int {
-	return cpu.sub(cpu.Registers.E)
+	return cpu.sub(cpu.Registers.E.Get())
 }
 
 func (cpu *CPU) SUB_H() int {
-	return cpu.sub(cpu.Registers.H)
+	return cpu.sub(cpu.Registers.H.Get())
 }
 
 func (cpu *CPU) SUB_L() int {
-	return cpu.sub(cpu.Registers.L)
+	return cpu.sub(cpu.Registers.L.Get())
 }
 
 func (cpu *CPU) SUB_A() int {
-	return cpu.sub(cpu.Registers.A)
+	return cpu.sub(cpu.Registers.A.Get())
 }
 
-func (cpu *CPU) and(register *EightBitRegister) int {
-	result := cpu.Registers.A.Get() & register.Get()
+func (cpu *CPU) and(val byte) int {
+	result := cpu.Registers.A.Get() & val
 	cpu.Registers.A.Set(result)
 	cpu.CheckAndSetZeroFlag(result)
 	cpu.ClearNegativeFlag()
@@ -860,35 +836,35 @@ func (cpu *CPU) and(register *EightBitRegister) int {
 }
 
 func (cpu *CPU) AND_B() int {
-	return cpu.and(cpu.Registers.B)
+	return cpu.and(cpu.Registers.B.Get())
 }
 
 func (cpu *CPU) AND_C() int {
-	return cpu.and(cpu.Registers.C)
+	return cpu.and(cpu.Registers.C.Get())
 }
 
 func (cpu *CPU) AND_D() int {
-	return cpu.and(cpu.Registers.D)
+	return cpu.and(cpu.Registers.D.Get())
 }
 
 func (cpu *CPU) AND_E() int {
-	return cpu.and(cpu.Registers.E)
+	return cpu.and(cpu.Registers.E.Get())
 }
 
 func (cpu *CPU) AND_H() int {
-	return cpu.and(cpu.Registers.H)
+	return cpu.and(cpu.Registers.H.Get())
 }
 
 func (cpu *CPU) AND_L() int {
-	return cpu.and(cpu.Registers.L)
+	return cpu.and(cpu.Registers.L.Get())
 }
 
 func (cpu *CPU) AND_A() int {
-	return cpu.and(cpu.Registers.A)
+	return cpu.and(cpu.Registers.A.Get())
 }
 
-func (cpu *CPU) or(register *EightBitRegister) int {
-	result := cpu.Registers.A.Get() | register.Get()
+func (cpu *CPU) or(val byte) int {
+	result := cpu.Registers.A.Get() | val
 	cpu.Registers.A.Set(result)
 	cpu.CheckAndSetZeroFlag(result)
 	cpu.ClearNegativeFlag()
@@ -898,31 +874,134 @@ func (cpu *CPU) or(register *EightBitRegister) int {
 }
 
 func (cpu *CPU) OR_B() int {
-	return cpu.or(cpu.Registers.B)
+	return cpu.or(cpu.Registers.B.Get())
 }
 
 func (cpu *CPU) OR_C() int {
-	return cpu.or(cpu.Registers.C)
+	return cpu.or(cpu.Registers.C.Get())
 }
 
 func (cpu *CPU) OR_D() int {
-	return cpu.or(cpu.Registers.D)
+	return cpu.or(cpu.Registers.D.Get())
 }
 
 func (cpu *CPU) OR_E() int {
-	return cpu.or(cpu.Registers.E)
+	return cpu.or(cpu.Registers.E.Get())
 }
 
 func (cpu *CPU) OR_H() int {
-	return cpu.or(cpu.Registers.H)
+	return cpu.or(cpu.Registers.H.Get())
 }
 
 func (cpu *CPU) OR_L() int {
-	return cpu.or(cpu.Registers.L)
+	return cpu.or(cpu.Registers.L.Get())
 }
 
 func (cpu *CPU) OR_A() int {
-	return cpu.or(cpu.Registers.A)
+	return cpu.or(cpu.Registers.A.Get())
 }
 
+func (cpu *CPU) ADD_A_LOC_HL() int {
+	cpu.and(cpu.MMU.Read(cpu.Registers.HL.Get()))
+	return 8
+}
 
+func (cpu *CPU) SUB_A_LOC_HL() int {
+	cpu.sub(cpu.MMU.Read(cpu.Registers.HL.Get()))
+	return 8
+}
+
+func (cpu *CPU) AND_LOC_HL() int {
+	cpu.and(cpu.MMU.Read(cpu.Registers.HL.Get()))
+	return 8
+}
+
+func (cpu *CPU) OR_LOC_HL() int {
+	cpu.or(cpu.MMU.Read(cpu.Registers.HL.Get()))
+	return 8
+}
+
+func (cpu *CPU) ADD_A_D8() int {
+	cpu.add_dst_src(cpu.Registers.A, cpu.FetchAndIncrement())
+	return 8
+}
+
+func (cpu *CPU) SUB_D8() int {
+	cpu.sub(cpu.FetchAndIncrement())
+	return 8
+}
+
+func (cpu *CPU) AND_D8() int {
+	cpu.and(cpu.FetchAndIncrement())
+	return 8
+}
+
+func (cpu *CPU) OR_D8() int {
+	cpu.or(cpu.FetchAndIncrement())
+	return 8
+}
+
+func (cpu *CPU) xor(val byte) int {
+	cpu.Registers.A.Set(val ^ val)
+	cpu.CheckAndSetZeroFlag(cpu.Registers.A.Get())
+	cpu.ClearNegativeFlag()
+	cpu.ClearHCFlag()
+	cpu.ClearOverflowFlag()
+	return 4
+}
+
+func (cpu *CPU) XOR_A() int {
+	return cpu.xor(cpu.Registers.A.Get())
+}
+
+func (cpu *CPU) XOR_B() int {
+	return cpu.xor(cpu.Registers.B.Get())
+}
+
+func (cpu *CPU) XOR_C() int {
+	return cpu.xor(cpu.Registers.C.Get())
+}
+
+func (cpu *CPU) XOR_D() int {
+	return cpu.xor(cpu.Registers.D.Get())
+}
+
+func (cpu *CPU) XOR_E() int {
+	return cpu.xor(cpu.Registers.E.Get())
+}
+
+func (cpu *CPU) XOR_H() int {
+	return cpu.xor(cpu.Registers.H.Get())
+}
+
+func (cpu *CPU) XOR_L() int {
+	return cpu.xor(cpu.Registers.L.Get())
+}
+
+func (cpu *CPU) XOR_LOC_HL() int {
+	return cpu.xor(cpu.MMU.Read(cpu.Registers.HL.Get()))
+}
+
+func (cpu *CPU) CP_B() int {
+	return cpu.cp(cpu.Registers.B.Get())
+}
+
+func (cpu *CPU) CP_C() int {
+	return cpu.cp(cpu.Registers.C.Get())
+}
+
+func (cpu *CPU) CP_D() int {
+	return cpu.cp(cpu.Registers.D.Get())
+}
+
+func (cpu *CPU) CP_E() int {
+	return cpu.cp(cpu.Registers.E.Get())
+}
+
+func (cpu *CPU) CP_H() int {
+	return cpu.cp(cpu.Registers.H.Get())
+}
+
+func (cpu *CPU) CP_L() int {
+	return cpu.cp(cpu.Registers.L.Get())
+}
