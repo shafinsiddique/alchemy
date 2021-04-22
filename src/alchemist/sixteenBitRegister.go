@@ -42,3 +42,10 @@ func (register *SixteenBitRegister) GetHigh() byte {
 func (register *SixteenBitRegister) GetLow() byte {
 	return register.Low.Get()
 }
+
+func (register *SixteenBitRegister) SetV2(val uint16) {
+	bytes := SplitInt16ToBytes(val)
+	high := bytes[0]
+	low := bytes[1]
+	register.Set(high, low)
+}

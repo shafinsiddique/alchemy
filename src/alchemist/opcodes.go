@@ -52,6 +52,56 @@ func (cpu *CPU) RL(register *EightBitRegister) int {
 	return 4
 }
 
+func (cpu *CPU) RLCA() int {
+	cpu.Registers.F.SetBit(cpu.Registers.A.GetBit(7), CARRY_FLAG) // set value of bit 7 to carry flag so we
+	// can set bit 0 to it.
+
+	for i := 0; i <= 7; i++ {
+		bit := cpu.Registers.A.GetBit(i)
+		replace := cpu.Registers.F.GetBit(CARRY_FLAG)
+		cpu.Registers.A.SetBit(replace, i)
+		cpu.Registers.F.SetBit(bit, CARRY_FLAG)
+	}
+
+	cpu.ClearOverflowFlag()
+	cpu.ClearNegativeFlag()
+	cpu.ClearHCFlag()
+
+	return 4
+}
+
+func (cpu *CPU) RRA() int {
+	for i := 7; i>=0; i-- {
+		bit := cpu.Registers.A.GetBit(i)
+		replace := cpu.Registers.F.GetBit(CARRY_FLAG)
+		cpu.Registers.A.SetBit(replace, i)
+		cpu.Registers.F.SetBit(bit, CARRY_FLAG)
+	}
+	cpu.ClearOverflowFlag()
+	cpu.ClearNegativeFlag()
+	cpu.ClearHCFlag()
+	return 4
+}
+
+func (cpu *CPU) RRCA() int {
+	cpu.Registers.F.SetBit(cpu.Registers.A.GetBit(0), CARRY_FLAG) // set value of bit 0 to carry flag so we
+	// can set bit 7 to it.
+
+	for i := 7; i >= 0; i-- {
+		bit := cpu.Registers.A.GetBit(i)
+		replace := cpu.Registers.F.GetBit(CARRY_FLAG)
+		cpu.Registers.A.SetBit(replace, i)
+		cpu.Registers.F.SetBit(bit, CARRY_FLAG)
+	}
+
+	cpu.ClearOverflowFlag()
+	cpu.ClearNegativeFlag()
+	cpu.ClearHCFlag()
+
+	return 4
+
+}
+
 func (cpu *CPU) JR_NZ_S8() int {
 	return cpu.JR_COMMON_S8(0)
 }
@@ -141,11 +191,27 @@ func (cpu *CPU) LD_B_D8() int {
 	return 8
 }
 
+func (cpu *CPU) push(register *SixteenBitRegister) int {
+	cpu.PushToStack(register.GetHigh())
+	cpu.PushToStack(register.GetLow())
+	return 16
+}
+
 func (cpu *CPU) PUSH_BC() int {
 	// push contents of bc into stack.
-	cpu.PushToStack(cpu.Registers.BC.GetHigh())
-	cpu.PushToStack(cpu.Registers.BC.GetLow())
-	return 16
+	return cpu.push(cpu.Registers.BC)
+}
+
+func (cpu *CPU) PUSH_DE() int {
+	return cpu.push(cpu.Registers.DE)
+}
+
+func (cpu *CPU) PUSH_HL() int {
+	return cpu.push(cpu.Registers.HL)
+}
+
+func (cpu *CPU) PUSH_AF() int {
+	return cpu.push(cpu.Registers.AF)
 }
 
 func (cpu *CPU) RL_A() int {
@@ -158,13 +224,16 @@ func (cpu *CPU) RL_A() int {
 
 }
 
-func (cpu *CPU) POP_BC() int {
-	// pop the contents from the memory stack into BC.
+func (cpu *CPU) pop(register *SixteenBitRegister) int {
 	low := cpu.PopFromStack()
 	high := cpu.PopFromStack()
-	cpu.Registers.B.Set(high)
-	cpu.Registers.C.Set(low)
+	register.Set(high, low)
 	return 12
+}
+
+func (cpu *CPU) POP_BC() int {
+	// pop the contents from the memory stack into BC.
+	return cpu.pop(cpu.Registers.BC)
 }
 
 func (cpu *CPU) DEC_B() int {
@@ -301,7 +370,8 @@ func (cpu *CPU) cp(val byte) int {
 }
 
 func (cpu *CPU) CP_LOC_HL() int {
-	return cpu.cp(cpu.MMU.Read(cpu.Registers.HL.Get()))
+	cpu.cp(cpu.MMU.Read(cpu.Registers.HL.Get()))
+	return 8
 }
 
 func (cpu *CPU) LD_A_L() int {
@@ -979,7 +1049,8 @@ func (cpu *CPU) XOR_L() int {
 }
 
 func (cpu *CPU) XOR_LOC_HL() int {
-	return cpu.xor(cpu.MMU.Read(cpu.Registers.HL.Get()))
+	cpu.xor(cpu.MMU.Read(cpu.Registers.HL.Get()))
+	return 8
 }
 
 func (cpu *CPU) CP_B() int {
@@ -1005,3 +1076,34 @@ func (cpu *CPU) CP_H() int {
 func (cpu *CPU) CP_L() int {
 	return cpu.cp(cpu.Registers.L.Get())
 }
+
+func (cpu *CPU) POP_DE() int {
+	return cpu.pop(cpu.Registers.DE)
+}
+
+func (cpu *CPU) POP_HL() int {
+	return cpu.pop(cpu.Registers.HL)
+}
+
+func (cpu *CPU) POP_AF() int {
+	return cpu.pop(cpu.Registers.AF)
+}
+
+func (cpu *CPU) LD_HL_SP_S8() int {
+	s8, isNegative := GetTwosComplement(cpu.FetchAndIncrement())
+	val := cpu.SP
+	if isNegative {
+		val -= uint16(s8)
+	} else {
+		val += uint16(s8)
+	}
+
+	cpu.Registers.HL.SetV2(val)
+	return 12
+}
+
+func (cpu *CPU) LD_SP_HL() int {
+	cpu.SP = cpu.Registers.HL.Get()
+	return 8
+}
+
