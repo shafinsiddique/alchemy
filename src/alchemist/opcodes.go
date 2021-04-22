@@ -769,3 +769,82 @@ func (cpu *CPU) ADD_HL_HL() int {
 func (cpu *CPU) ADD_HL_SP() int {
 	return cpu.add_dst_src_sixteen(cpu.Registers.HL, cpu.SP)
 }
+
+func (cpu *CPU) add_dst_src(dst *EightBitRegister, src byte) int {
+	first, second := dst.Get(), src
+	sum := first + second
+	dst.Set(sum)
+	cpu.CheckAndSetOverflowFlag(first, second, false)
+	cpu.CheckAndSetZeroFlag(sum)
+	cpu.ClearNegativeFlag()
+	cpu.CheckAndSetHCFlag(first, second, false)
+	return 4
+}
+
+func (cpu *CPU) sub_a_src(register *EightBitRegister) int {
+	a := cpu.Registers.A.Get()
+	b := register.Get()
+	diff := a-b
+	cpu.Registers.A.Set(diff)
+	cpu.SetNegativeFlag()
+	cpu.CheckAndSetZeroFlag(diff)
+	cpu.CheckAndSetHCFlag(a, b, true)
+	cpu.CheckAndSetOverflowFlag(a, b, true)
+	return 4
+}
+
+func (cpu *CPU) ADD_A_B() int {
+	return cpu.add_dst_src(cpu.Registers.A, cpu.Registers.B.Get())
+}
+
+func (cpu *CPU) ADD_A_C() int {
+	return cpu.add_dst_src(cpu.Registers.A, cpu.Registers.C.Get())
+}
+
+func (cpu *CPU) ADD_A_D() int {
+	return cpu.add_dst_src(cpu.Registers.A, cpu.Registers.D.Get())
+}
+
+func (cpu *CPU) ADD_A_E() int {
+	return cpu.add_dst_src(cpu.Registers.A, cpu.Registers.E.Get())
+}
+
+func (cpu *CPU) ADD_A_H() int {
+	return cpu.add_dst_src(cpu.Registers.A, cpu.Registers.H.Get())
+}
+
+func (cpu *CPU) ADD_A_L() int {
+	return cpu.add_dst_src(cpu.Registers.A, cpu.Registers.L.Get())
+}
+
+func (cpu *CPU) ADD_A_A() int {
+	return cpu.add_dst_src(cpu.Registers.A, cpu.Registers.A.Get())
+}
+
+func (cpu *CPU) SUB_B() int {
+	return cpu.sub_a_src(cpu.Registers.B)
+}
+
+func (cpu *CPU) SUB_C() int {
+	return cpu.sub_a_src(cpu.Registers.C)
+}
+
+func (cpu *CPU) SUB_D() int {
+	return cpu.sub_a_src(cpu.Registers.D)
+}
+
+func (cpu *CPU) SUB_E() int {
+	return cpu.sub_a_src(cpu.Registers.E)
+}
+
+func (cpu *CPU) SUB_H() int {
+	return cpu.sub_a_src(cpu.Registers.H)
+}
+
+func (cpu *CPU) SUB_L() int {
+	return cpu.sub_a_src(cpu.Registers.L)
+}
+
+func (cpu *CPU) SUB_A() int {
+	return cpu.sub_a_src(cpu.Registers.A)
+}
