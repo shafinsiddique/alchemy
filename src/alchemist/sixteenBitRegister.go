@@ -17,8 +17,8 @@ func (register *SixteenBitRegister) Get() uint16 {
 }
 
 func (register *SixteenBitRegister) Set(high byte, low byte) {
-	register.Low.Set(high)
-	register.High.Set(low)
+	register.High.Set(high)
+	register.Low.Set(low)
 }
 
 func (register *SixteenBitRegister) Decrement() int {

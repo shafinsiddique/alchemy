@@ -25,7 +25,7 @@ func (cpu *CPU) LD_HL_D16() int {
 	return 12
 }
 
-func (cpu *CPU) JR_COMMON_S8(bitIndex int, flag byte) int { // not actual instreuction, code reuse.
+func (cpu *CPU) jr_s8(bitIndex int, flag byte) int { // not actual instreuction, code reuse.
 	zFlag := cpu.Registers.F.GetBit(bitIndex)
 	nextByte := cpu.FetchAndIncrement()
 	cycles := 8 // Cycles without branch,
@@ -103,7 +103,7 @@ func (cpu *CPU) RRCA() int {
 }
 
 func (cpu *CPU) JR_NZ_S8() int {
-	return cpu.JR_COMMON_S8(Z_FLAG, 0)
+	return cpu.jr_s8(Z_FLAG, 0)
 }
 
 func (cpu *CPU) LD_C_D8() int {
@@ -231,6 +231,13 @@ func (cpu *CPU) pop(register *SixteenBitRegister) int {
 	return 12
 }
 
+func (cpu *CPU) pop_pc() int  { // not instruction
+	low := cpu.PopFromStack()
+	high := cpu.PopFromStack()
+	cpu.PC = MergeBytes(high, low)
+	return 16
+}
+
 func (cpu *CPU) POP_BC() int {
 	// pop the contents from the memory stack into BC.
 	return cpu.pop(cpu.Registers.BC)
@@ -255,10 +262,7 @@ func (cpu *CPU) INC_HL() int {
 
 func (cpu *CPU) RET() int {
 	// pop from the stack the PC value pushed when subroutine was called.
-	low := cpu.PopFromStack()
-	high := cpu.PopFromStack()
-	cpu.PC = MergeBytes(high, low)
-	return 16
+	return cpu.pop_pc()
 }
 
 func (cpu *CPU) INC_DE() int {
@@ -292,7 +296,7 @@ func (cpu *CPU) DEC_A() int {
 }
 
 func (cpu *CPU) JR_Z_S8() int {
-	return cpu.JR_COMMON_S8(Z_FLAG,1)
+	return cpu.jr_s8(Z_FLAG,1)
 }
 
 func (cpu *CPU) LD_H_A() int {
@@ -972,7 +976,7 @@ func (cpu *CPU) OR_A() int {
 }
 
 func (cpu *CPU) ADD_A_LOC_HL() int {
-	cpu.and(cpu.MMU.Read(cpu.Registers.HL.Get()))
+	cpu.add_dst_src(cpu.Registers.A, cpu.MMU.Read(cpu.Registers.HL.Get()))
 	return 8
 }
 
@@ -1216,11 +1220,39 @@ func (cpu *CPU) SBC_A_LOC_HL() int {
 }
 
 func (cpu *CPU) JR_NC_S8() int {
-	return cpu.JR_COMMON_S8(CARRY_FLAG, 0)
+	return cpu.jr_s8(CARRY_FLAG, 0)
 }
 
 func (cpu *CPU) JR_C_S8() int {
-	return cpu.JR_COMMON_S8(CARRY_FLAG, 1)
+	return cpu.jr_s8(CARRY_FLAG, 1)
 }
 
+func (cpu *CPU) ret_flag(flagIndex int, bit byte) int {
+	flag := cpu.Registers.F.GetBit(flagIndex)
+	if flag == bit {
+		cpu.pop_pc()
+		return 20
+	}
+	return 8
+}
+
+func (cpu *CPU) RET_NZ() int {
+	return cpu.ret_flag(Z_FLAG, 0)
+}
+
+func (cpu *CPU) RET_NC() int {
+	return cpu.ret_flag(CARRY_FLAG, 0)
+}
+
+func (cpu *CPU) RET_Z() int {
+	return cpu.ret_flag(Z_FLAG, 1)
+}
+
+func (cpu *CPU) RET_C() int {
+	return cpu.ret_flag(CARRY_FLAG, 1)
+}
+
+func (cpu *CPU) RET_I() int {
+	return cpu.RET()
+}
 
