@@ -1315,7 +1315,7 @@ func (cpu *CPU) RST_7() int {
 	return cpu.rst(7)
 }
 
-func (cpu *CPU) jp(flagIndex int, flagValue byte) int  {
+func (cpu *CPU) jp_a16(flagIndex int, flagValue byte) int  {
 	flag := cpu.Registers.F.GetBit(flagIndex)
 	low := cpu.FetchAndIncrement()
 	high := cpu.FetchAndIncrement()
@@ -1329,17 +1329,45 @@ func (cpu *CPU) jp(flagIndex int, flagValue byte) int  {
 }
 
 func (cpu *CPU) JP_NZ_A16() int {
-	return cpu.jp(Z_FLAG, 0)
+	return cpu.jp_a16(Z_FLAG, 0)
 }
 
 func (cpu *CPU) JP_Z_A16() int {
-	return cpu.jp(Z_FLAG, 1)
+	return cpu.jp_a16(Z_FLAG, 1)
 }
 
 func (cpu *CPU) JP_NC_A16() int {
-	return cpu.jp(CARRY_FLAG, 0)
+	return cpu.jp_a16(CARRY_FLAG, 0)
 }
 
 func (cpu *CPU) JP_C_A16() int {
-	return cpu.jp(CARRY_FLAG, 1)
+	return cpu.jp_a16(CARRY_FLAG, 1)
+}
+
+func (cpu *CPU) call_a16(flagIndex int, flagValue byte) int {
+	flag := cpu.Registers.F.GetBit(flagIndex)
+	low, high := cpu.FetchAndIncrement(), cpu.FetchAndIncrement()
+	cycles := 12
+	if flag == flagValue {
+		cpu.PUSH_16(cpu.PC)
+		cpu.PC = MergeBytes(high, low)
+		cycles = 24
+	}
+	return cycles
+}
+
+func (cpu *CPU) CALL_NZ_A16() int {
+	return cpu.call_a16(Z_FLAG, 0)
+}
+
+func (cpu *CPU) CALL_Z_A16() int {
+	return cpu.call_a16(Z_FLAG, 1)
+}
+
+func (cpu *CPU) CALL_NC_A16() int {
+	return cpu.call_a16(CARRY_FLAG, 0)
+}
+
+func (cpu *CPU) CALL_NC_A16() int {
+	return cpu.call_a16(CARRY_FLAG, 1)
 }
