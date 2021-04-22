@@ -25,8 +25,8 @@ func (cpu *CPU) LD_HL_D16() int {
 	return 12
 }
 
-func (cpu *CPU) JR_COMMON_S8(flag byte) int { // not actual instreuction, code reuse.
-	zFlag := cpu.Registers.F.GetBit(Z_FLAG)
+func (cpu *CPU) JR_COMMON_S8(bitIndex int, flag byte) int { // not actual instreuction, code reuse.
+	zFlag := cpu.Registers.F.GetBit(bitIndex)
 	nextByte := cpu.FetchAndIncrement()
 	cycles := 8 // Cycles without branch,
 	if zFlag == flag {
@@ -103,7 +103,7 @@ func (cpu *CPU) RRCA() int {
 }
 
 func (cpu *CPU) JR_NZ_S8() int {
-	return cpu.JR_COMMON_S8(0)
+	return cpu.JR_COMMON_S8(Z_FLAG, 0)
 }
 
 func (cpu *CPU) LD_C_D8() int {
@@ -292,7 +292,7 @@ func (cpu *CPU) DEC_A() int {
 }
 
 func (cpu *CPU) JR_Z_S8() int {
-	return cpu.JR_COMMON_S8(1)
+	return cpu.JR_COMMON_S8(Z_FLAG,1)
 }
 
 func (cpu *CPU) LD_H_A() int {
@@ -1213,6 +1213,14 @@ func (cpu *CPU) SBC_A_A() int {
 func (cpu *CPU) SBC_A_LOC_HL() int {
 	cpu.sbc(cpu.MMU.Read(cpu.Registers.HL.Get()))
 	return 8
+}
+
+func (cpu *CPU) JR_NC_S8() int {
+	return cpu.JR_COMMON_S8(CARRY_FLAG, 0)
+}
+
+func (cpu *CPU) JR_C_S8() int {
+	return cpu.JR_COMMON_S8(CARRY_FLAG, 1)
 }
 
 
