@@ -1256,3 +1256,46 @@ func (cpu *CPU) RET_I() int {
 	return cpu.RET()
 }
 
+func (cpu *CPU) PUSH_16(val uint16)  {
+	bytes := SplitInt16ToBytes(val)
+	cpu.PushToStack(bytes[0])
+	cpu.PushToStack(bytes[1])
+}
+
+func (cpu *CPU) rst(index uint16) int {
+	cpu.PUSH_16(cpu.PC)
+	cpu.PC = 0x0000 + (8*index)
+	return 16
+}
+
+func (cpu *CPU) RST_0() int {
+	return cpu.rst(0)
+}
+
+func (cpu *CPU) RST_1() int {
+	return cpu.rst(1)
+}
+
+func (cpu *CPU) RST_2() int {
+	return cpu.rst(2)
+}
+
+func (cpu *CPU) RST_3() int {
+	return cpu.rst(3)
+}
+
+func (cpu *CPU) RST_4() int {
+	return cpu.rst(4)
+}
+
+func (cpu *CPU) RST_5() int {
+	return cpu.rst(5)
+}
+
+func (cpu *CPU) RST_6() int {
+	return cpu.rst(6)
+}
+
+func (cpu *CPU) RST_7() int {
+	return cpu.rst(7)
+}
