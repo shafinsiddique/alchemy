@@ -781,7 +781,7 @@ func (cpu *CPU) add_dst_src(dst *EightBitRegister, src byte) int {
 	return 4
 }
 
-func (cpu *CPU) sub_a_src(register *EightBitRegister) int {
+func (cpu *CPU) sub(register *EightBitRegister) int {
 	a := cpu.Registers.A.Get()
 	b := register.Get()
 	diff := a-b
@@ -822,29 +822,107 @@ func (cpu *CPU) ADD_A_A() int {
 }
 
 func (cpu *CPU) SUB_B() int {
-	return cpu.sub_a_src(cpu.Registers.B)
+	return cpu.sub(cpu.Registers.B)
 }
 
 func (cpu *CPU) SUB_C() int {
-	return cpu.sub_a_src(cpu.Registers.C)
+	return cpu.sub(cpu.Registers.C)
 }
 
 func (cpu *CPU) SUB_D() int {
-	return cpu.sub_a_src(cpu.Registers.D)
+	return cpu.sub(cpu.Registers.D)
 }
 
 func (cpu *CPU) SUB_E() int {
-	return cpu.sub_a_src(cpu.Registers.E)
+	return cpu.sub(cpu.Registers.E)
 }
 
 func (cpu *CPU) SUB_H() int {
-	return cpu.sub_a_src(cpu.Registers.H)
+	return cpu.sub(cpu.Registers.H)
 }
 
 func (cpu *CPU) SUB_L() int {
-	return cpu.sub_a_src(cpu.Registers.L)
+	return cpu.sub(cpu.Registers.L)
 }
 
 func (cpu *CPU) SUB_A() int {
-	return cpu.sub_a_src(cpu.Registers.A)
+	return cpu.sub(cpu.Registers.A)
 }
+
+func (cpu *CPU) and(register *EightBitRegister) int {
+	result := cpu.Registers.A.Get() & register.Get()
+	cpu.Registers.A.Set(result)
+	cpu.CheckAndSetZeroFlag(result)
+	cpu.ClearNegativeFlag()
+	cpu.SetHCFlag()
+	cpu.ClearOverflowFlag()
+	return 4
+}
+
+func (cpu *CPU) AND_B() int {
+	return cpu.and(cpu.Registers.B)
+}
+
+func (cpu *CPU) AND_C() int {
+	return cpu.and(cpu.Registers.C)
+}
+
+func (cpu *CPU) AND_D() int {
+	return cpu.and(cpu.Registers.D)
+}
+
+func (cpu *CPU) AND_E() int {
+	return cpu.and(cpu.Registers.E)
+}
+
+func (cpu *CPU) AND_H() int {
+	return cpu.and(cpu.Registers.H)
+}
+
+func (cpu *CPU) AND_L() int {
+	return cpu.and(cpu.Registers.L)
+}
+
+func (cpu *CPU) AND_A() int {
+	return cpu.and(cpu.Registers.A)
+}
+
+func (cpu *CPU) or(register *EightBitRegister) int {
+	result := cpu.Registers.A.Get() | register.Get()
+	cpu.Registers.A.Set(result)
+	cpu.CheckAndSetZeroFlag(result)
+	cpu.ClearNegativeFlag()
+	cpu.ClearHCFlag()
+	cpu.ClearOverflowFlag()
+	return 4
+}
+
+func (cpu *CPU) OR_B() int {
+	return cpu.or(cpu.Registers.B)
+}
+
+func (cpu *CPU) OR_C() int {
+	return cpu.or(cpu.Registers.C)
+}
+
+func (cpu *CPU) OR_D() int {
+	return cpu.or(cpu.Registers.D)
+}
+
+func (cpu *CPU) OR_E() int {
+	return cpu.or(cpu.Registers.E)
+}
+
+func (cpu *CPU) OR_H() int {
+	return cpu.or(cpu.Registers.H)
+}
+
+func (cpu *CPU) OR_L() int {
+	return cpu.or(cpu.Registers.L)
+}
+
+func (cpu *CPU) OR_A() int {
+	return cpu.or(cpu.Registers.A)
+}
+
+

@@ -104,3 +104,7 @@ func (cpu *CPU) SetHCFlag() {
 func (cpu *CPU) ClearHCFlag() {
 	cpu.Registers.F.SetBit(0, HALF_CARRY_FLAG)
 }
+
+func (cpu *CPU) ClearOverflowFlag() {
+	cpu.Registers.F.SetBit(1, CARRY_FLAG)
+}
