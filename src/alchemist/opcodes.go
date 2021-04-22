@@ -1107,3 +1107,112 @@ func (cpu *CPU) LD_SP_HL() int {
 	return 8
 }
 
+func (cpu *CPU) ADD_SP_S8() int {
+	current := cpu.SP
+	val, isNegative := GetTwosComplement(cpu.FetchAndIncrement())
+	val16 := uint16(val)
+	if isNegative {
+		current -= val16
+	} else {
+		current += val16
+	}
+
+	cpu.SP = current
+	cpu.ClearZeroFlag()
+	cpu.ClearNegativeFlag()
+	cpu.CheckAndSetHCFlagSixteenBit(current, val16, isNegative)
+	cpu.CheckAndSetOverflowFlagSixteenBit(current, val16, isNegative)
+	return 16
+}
+
+func (cpu *CPU) adc(val byte) int {
+	cy := cpu.Registers.F.GetBit(CARRY_FLAG)
+	initial := cpu.Registers.A.Get()
+	sum := val + cy + initial
+	cpu.Registers.A.Set(sum)
+	cpu.CheckAndSetZeroFlag(sum)
+	cpu.ClearNegativeFlag()
+	if !cpu.CheckAndSetOverflowFlag(val, cy, false)  {
+		cpu.CheckAndSetOverflowFlag(val+cy, initial, false)
+	}
+	cpu.CheckAndSetHCFlag(initial, val+cy, false)
+	return 8
+}
+
+func (cpu *CPU) ADC_A_B() int {
+	return cpu.adc(cpu.Registers.B.Get())
+}
+func (cpu *CPU) ADC_A_C() int {
+	return cpu.adc(cpu.Registers.C.Get())
+}
+func (cpu *CPU) ADC_A_D() int {
+	return cpu.adc(cpu.Registers.D.Get())
+}
+func (cpu *CPU) ADC_A_E() int {
+	return cpu.adc(cpu.Registers.E.Get())
+}
+func (cpu *CPU) ADC_A_H() int {
+	return cpu.adc(cpu.Registers.H.Get())
+}
+func (cpu *CPU) ADC_A_L() int {
+	return cpu.adc(cpu.Registers.L.Get())
+}
+func (cpu *CPU) ADC_A_A() int {
+	return cpu.adc(cpu.Registers.A.Get())
+}
+
+func (cpu *CPU) ADC_A_LOC_HL() int {
+	cpu.adc(cpu.MMU.Read(cpu.Registers.HL.Get()))
+	return 8
+}
+
+func (cpu *CPU) sbc(val byte) int {
+	initial := cpu.Registers.A.Get()
+	cy := cpu.Registers.F.GetBit(CARRY_FLAG)
+	sub := val + cy
+	result := initial - sub
+	cpu.Registers.A.Set(result)
+	cpu.CheckAndSetZeroFlag(result)
+	cpu.SetNegativeFlag()
+	if !cpu.CheckAndSetOverflowFlag(val, cy, false) {
+		cpu.CheckAndSetOverflowFlag(initial, sub, true)
+	}
+
+	cpu.CheckAndSetHCFlag(initial, sub, true)
+	return 4
+}
+
+func (cpu *CPU) SBC_A_B() int {
+	return cpu.sbc(cpu.Registers.B.Get())
+}
+
+func (cpu *CPU) SBC_A_C() int {
+	return cpu.sbc(cpu.Registers.C.Get())
+}
+
+func (cpu *CPU) SBC_A_D() int {
+	return cpu.sbc(cpu.Registers.D.Get())
+}
+
+func (cpu *CPU) SBC_A_E() int {
+	return cpu.sbc(cpu.Registers.E.Get())
+}
+
+func (cpu *CPU) SBC_A_H() int {
+	return cpu.sbc(cpu.Registers.H.Get())
+}
+
+func (cpu *CPU) SBC_A_L() int {
+	return cpu.sbc(cpu.Registers.L.Get())
+}
+
+func (cpu *CPU) SBC_A_A() int {
+	return cpu.sbc(cpu.Registers.A.Get())
+}
+
+func (cpu *CPU) SBC_A_LOC_HL() int {
+	cpu.sbc(cpu.MMU.Read(cpu.Registers.HL.Get()))
+	return 8
+}
+
+
