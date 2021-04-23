@@ -675,3 +675,466 @@ func (cpu *CPU) BIT_7_HL() int {
 func (cpu *CPU) BIT_7_A() int {
 	return cpu.cb_bit(7, cpu.Registers.A)
 }
+
+func (cpu *CPU) cb_res_set(index int, bit byte,  register interface{}) int {
+	cycles := 8
+	switch register.(type) {
+	case *EightBitRegister:
+		reg := register.(*EightBitRegister)
+		reg.SetBit(bit, index)
+	default:
+		reg := register.(*SixteenBitRegister)
+		loc := reg.Get()
+		cpu.MMU.Write(loc, SetBit(cpu.MMU.Read(loc), bit, index))
+		cycles = 16
+	}
+	return cycles
+}
+
+func (cpu *CPU) RES_0_B() int {
+	return cpu.cb_res_set(0, 0, cpu.Registers.B)
+}
+
+func (cpu *CPU) RES_0_C() int {
+	return cpu.cb_res_set(0, 0, cpu.Registers.C)
+}
+
+func (cpu *CPU) RES_0_D() int {
+	return cpu.cb_res_set(0, 0, cpu.Registers.D)
+}
+
+func (cpu *CPU) RES_0_E() int {
+	return cpu.cb_res_set(0, 0, cpu.Registers.E)
+}
+
+func (cpu *CPU) RES_0_H() int {
+	return cpu.cb_res_set(0, 0, cpu.Registers.H)
+}
+
+func (cpu *CPU) RES_0_HL() int {
+	return cpu.cb_res_set(0, 0, cpu.Registers.HL)
+}
+
+func (cpu *CPU) RES_0_A() int {
+	return cpu.cb_res_set(0, 0, cpu.Registers.A)
+}
+
+func (cpu *CPU) RES_1_B() int {
+	return cpu.cb_res_set(1, 0, cpu.Registers.B)
+}
+
+func (cpu *CPU) RES_1_C() int {
+	return cpu.cb_res_set(1, 0, cpu.Registers.C)
+}
+
+func (cpu *CPU) RES_1_D() int {
+	return cpu.cb_res_set(1, 0, cpu.Registers.D)
+}
+
+func (cpu *CPU) RES_1_E() int {
+	return cpu.cb_res_set(1, 0, cpu.Registers.E)
+}
+
+func (cpu *CPU) RES_1_H() int {
+	return cpu.cb_res_set(1, 0, cpu.Registers.H)
+}
+
+func (cpu *CPU) RES_1_HL() int {
+	return cpu.cb_res_set(1, 0, cpu.Registers.HL)
+}
+
+func (cpu *CPU) RES_1_A() int {
+	return cpu.cb_res_set(1, 0, cpu.Registers.A)
+}
+
+func (cpu *CPU) RES_2_B() int {
+	return cpu.cb_res_set(2, 0, cpu.Registers.B)
+}
+
+func (cpu *CPU) RES_2_C() int {
+	return cpu.cb_res_set(2, 0, cpu.Registers.C)
+}
+
+func (cpu *CPU) RES_2_D() int {
+	return cpu.cb_res_set(2, 0, cpu.Registers.D)
+}
+
+func (cpu *CPU) RES_2_E() int {
+	return cpu.cb_res_set(2, 0, cpu.Registers.E)
+}
+
+func (cpu *CPU) RES_2_H() int {
+	return cpu.cb_res_set(2, 0, cpu.Registers.H)
+}
+
+func (cpu *CPU) RES_2_HL() int {
+	return cpu.cb_res_set(2, 0, cpu.Registers.HL)
+}
+
+func (cpu *CPU) RES_2_A() int {
+	return cpu.cb_res_set(2, 0, cpu.Registers.A)
+}
+
+func (cpu *CPU) RES_3_B() int {
+	return cpu.cb_res_set(3, 0, cpu.Registers.B)
+}
+
+func (cpu *CPU) RES_3_C() int {
+	return cpu.cb_res_set(3, 0, cpu.Registers.C)
+}
+
+func (cpu *CPU) RES_3_D() int {
+	return cpu.cb_res_set(3, 0, cpu.Registers.D)
+}
+
+func (cpu *CPU) RES_3_E() int {
+	return cpu.cb_res_set(3, 0, cpu.Registers.E)
+}
+
+func (cpu *CPU) RES_3_H() int {
+	return cpu.cb_res_set(3, 0, cpu.Registers.H)
+}
+
+func (cpu *CPU) RES_3_HL() int {
+	return cpu.cb_res_set(3, 0, cpu.Registers.HL)
+}
+
+func (cpu *CPU) RES_3_A() int {
+	return cpu.cb_res_set(3, 0, cpu.Registers.A)
+}
+
+func (cpu *CPU) RES_4_B() int {
+	return cpu.cb_res_set(4, 0, cpu.Registers.B)
+}
+
+func (cpu *CPU) RES_4_C() int {
+	return cpu.cb_res_set(4, 0, cpu.Registers.C)
+}
+
+func (cpu *CPU) RES_4_D() int {
+	return cpu.cb_res_set(4, 0, cpu.Registers.D)
+}
+
+func (cpu *CPU) RES_4_E() int {
+	return cpu.cb_res_set(4, 0, cpu.Registers.E)
+}
+
+func (cpu *CPU) RES_4_H() int {
+	return cpu.cb_res_set(4, 0, cpu.Registers.H)
+}
+
+func (cpu *CPU) RES_4_HL() int {
+	return cpu.cb_res_set(4, 0, cpu.Registers.HL)
+}
+
+func (cpu *CPU) RES_4_A() int {
+	return cpu.cb_res_set(4, 0, cpu.Registers.A)
+}
+
+func (cpu *CPU) RES_5_B() int {
+	return cpu.cb_res_set(5, 0, cpu.Registers.B)
+}
+
+func (cpu *CPU) RES_5_C() int {
+	return cpu.cb_res_set(5, 0, cpu.Registers.C)
+}
+
+func (cpu *CPU) RES_5_D() int {
+	return cpu.cb_res_set(5, 0, cpu.Registers.D)
+}
+
+func (cpu *CPU) RES_5_E() int {
+	return cpu.cb_res_set(5, 0, cpu.Registers.E)
+}
+
+func (cpu *CPU) RES_5_H() int {
+	return cpu.cb_res_set(5, 0, cpu.Registers.H)
+}
+
+func (cpu *CPU) RES_5_HL() int {
+	return cpu.cb_res_set(5, 0, cpu.Registers.HL)
+}
+
+func (cpu *CPU) RES_5_A() int {
+	return cpu.cb_res_set(5, 0, cpu.Registers.A)
+}
+
+func (cpu *CPU) RES_6_B() int {
+	return cpu.cb_res_set(6, 0, cpu.Registers.B)
+}
+
+func (cpu *CPU) RES_6_C() int {
+	return cpu.cb_res_set(6, 0, cpu.Registers.C)
+}
+
+func (cpu *CPU) RES_6_D() int {
+	return cpu.cb_res_set(6, 0, cpu.Registers.D)
+}
+
+func (cpu *CPU) RES_6_E() int {
+	return cpu.cb_res_set(6, 0, cpu.Registers.E)
+}
+
+func (cpu *CPU) RES_6_H() int {
+	return cpu.cb_res_set(6, 0, cpu.Registers.H)
+}
+
+func (cpu *CPU) RES_6_HL() int {
+	return cpu.cb_res_set(6, 0, cpu.Registers.HL)
+}
+
+func (cpu *CPU) RES_6_A() int {
+	return cpu.cb_res_set(6, 0, cpu.Registers.A)
+}
+
+func (cpu *CPU) RES_7_B() int {
+	return cpu.cb_res_set(7, 0, cpu.Registers.B)
+}
+
+func (cpu *CPU) RES_7_C() int {
+	return cpu.cb_res_set(7, 0, cpu.Registers.C)
+}
+
+func (cpu *CPU) RES_7_D() int {
+	return cpu.cb_res_set(7, 0, cpu.Registers.D)
+}
+
+func (cpu *CPU) RES_7_E() int {
+	return cpu.cb_res_set(7, 0, cpu.Registers.E)
+}
+
+func (cpu *CPU) RES_7_H() int {
+	return cpu.cb_res_set(7, 0, cpu.Registers.H)
+}
+
+func (cpu *CPU) RES_7_HL() int {
+	return cpu.cb_res_set(7, 0, cpu.Registers.HL)
+}
+
+func (cpu *CPU) RES_7_A() int {
+	return cpu.cb_res_set(7, 0, cpu.Registers.A)
+}
+
+func (cpu *CPU) SET_0_B() int {
+	return cpu.cb_res_set(0, 1, cpu.Registers.B)
+}
+
+func (cpu *CPU) SET_0_C() int {
+	return cpu.cb_res_set(0, 1, cpu.Registers.C)
+}
+
+func (cpu *CPU) SET_0_D() int {
+	return cpu.cb_res_set(0, 1, cpu.Registers.D)
+}
+
+func (cpu *CPU) SET_0_E() int {
+	return cpu.cb_res_set(0, 1, cpu.Registers.E)
+}
+
+func (cpu *CPU) SET_0_H() int {
+	return cpu.cb_res_set(0, 1, cpu.Registers.H)
+}
+
+func (cpu *CPU) SET_0_HL() int {
+	return cpu.cb_res_set(0, 1, cpu.Registers.HL)
+}
+
+func (cpu *CPU) SET_0_A() int {
+	return cpu.cb_res_set(0, 1, cpu.Registers.A)
+}
+
+func (cpu *CPU) SET_1_B() int {
+	return cpu.cb_res_set(1, 1, cpu.Registers.B)
+}
+
+func (cpu *CPU) SET_1_C() int {
+	return cpu.cb_res_set(1, 1, cpu.Registers.C)
+}
+
+func (cpu *CPU) SET_1_D() int {
+	return cpu.cb_res_set(1, 1, cpu.Registers.D)
+}
+
+func (cpu *CPU) SET_1_E() int {
+	return cpu.cb_res_set(1, 1, cpu.Registers.E)
+}
+
+func (cpu *CPU) SET_1_H() int {
+	return cpu.cb_res_set(1, 1, cpu.Registers.H)
+}
+
+func (cpu *CPU) SET_1_HL() int {
+	return cpu.cb_res_set(1, 1, cpu.Registers.HL)
+}
+
+func (cpu *CPU) SET_1_A() int {
+	return cpu.cb_res_set(1, 1, cpu.Registers.A)
+}
+
+func (cpu *CPU) SET_2_B() int {
+	return cpu.cb_res_set(2, 1, cpu.Registers.B)
+}
+
+func (cpu *CPU) SET_2_C() int {
+	return cpu.cb_res_set(2, 1, cpu.Registers.C)
+}
+
+func (cpu *CPU) SET_2_D() int {
+	return cpu.cb_res_set(2, 1, cpu.Registers.D)
+}
+
+func (cpu *CPU) SET_2_E() int {
+	return cpu.cb_res_set(2, 1, cpu.Registers.E)
+}
+
+func (cpu *CPU) SET_2_H() int {
+	return cpu.cb_res_set(2, 1, cpu.Registers.H)
+}
+
+func (cpu *CPU) SET_2_HL() int {
+	return cpu.cb_res_set(2, 1, cpu.Registers.HL)
+}
+
+func (cpu *CPU) SET_2_A() int {
+	return cpu.cb_res_set(2, 1, cpu.Registers.A)
+}
+
+func (cpu *CPU) SET_3_B() int {
+	return cpu.cb_res_set(3, 1, cpu.Registers.B)
+}
+
+func (cpu *CPU) SET_3_C() int {
+	return cpu.cb_res_set(3, 1, cpu.Registers.C)
+}
+
+func (cpu *CPU) SET_3_D() int {
+	return cpu.cb_res_set(3, 1, cpu.Registers.D)
+}
+
+func (cpu *CPU) SET_3_E() int {
+	return cpu.cb_res_set(3, 1, cpu.Registers.E)
+}
+
+func (cpu *CPU) SET_3_H() int {
+	return cpu.cb_res_set(3, 1, cpu.Registers.H)
+}
+
+func (cpu *CPU) SET_3_HL() int {
+	return cpu.cb_res_set(3, 1, cpu.Registers.HL)
+}
+
+func (cpu *CPU) SET_3_A() int {
+	return cpu.cb_res_set(3, 1, cpu.Registers.A)
+}
+
+func (cpu *CPU) SET_4_B() int {
+	return cpu.cb_res_set(4, 1, cpu.Registers.B)
+}
+
+func (cpu *CPU) SET_4_C() int {
+	return cpu.cb_res_set(4, 1, cpu.Registers.C)
+}
+
+func (cpu *CPU) SET_4_D() int {
+	return cpu.cb_res_set(4, 1, cpu.Registers.D)
+}
+
+func (cpu *CPU) SET_4_E() int {
+	return cpu.cb_res_set(4, 1, cpu.Registers.E)
+}
+
+func (cpu *CPU) SET_4_H() int {
+	return cpu.cb_res_set(4, 1, cpu.Registers.H)
+}
+
+func (cpu *CPU) SET_4_HL() int {
+	return cpu.cb_res_set(4, 1, cpu.Registers.HL)
+}
+
+func (cpu *CPU) SET_4_A() int {
+	return cpu.cb_res_set(4, 1, cpu.Registers.A)
+}
+
+func (cpu *CPU) SET_5_B() int {
+	return cpu.cb_res_set(5, 1, cpu.Registers.B)
+}
+
+func (cpu *CPU) SET_5_C() int {
+	return cpu.cb_res_set(5, 1, cpu.Registers.C)
+}
+
+func (cpu *CPU) SET_5_D() int {
+	return cpu.cb_res_set(5, 1, cpu.Registers.D)
+}
+
+func (cpu *CPU) SET_5_E() int {
+	return cpu.cb_res_set(5, 1, cpu.Registers.E)
+}
+
+func (cpu *CPU) SET_5_H() int {
+	return cpu.cb_res_set(5, 1, cpu.Registers.H)
+}
+
+func (cpu *CPU) SET_5_HL() int {
+	return cpu.cb_res_set(5, 1, cpu.Registers.HL)
+}
+
+func (cpu *CPU) SET_5_A() int {
+	return cpu.cb_res_set(5, 1, cpu.Registers.A)
+}
+
+func (cpu *CPU) SET_6_B() int {
+	return cpu.cb_res_set(6, 1, cpu.Registers.B)
+}
+
+func (cpu *CPU) SET_6_C() int {
+	return cpu.cb_res_set(6, 1, cpu.Registers.C)
+}
+
+func (cpu *CPU) SET_6_D() int {
+	return cpu.cb_res_set(6, 1, cpu.Registers.D)
+}
+
+func (cpu *CPU) SET_6_E() int {
+	return cpu.cb_res_set(6, 1, cpu.Registers.E)
+}
+
+func (cpu *CPU) SET_6_H() int {
+	return cpu.cb_res_set(6, 1, cpu.Registers.H)
+}
+
+func (cpu *CPU) SET_6_HL() int {
+	return cpu.cb_res_set(6, 1, cpu.Registers.HL)
+}
+
+func (cpu *CPU) SET_6_A() int {
+	return cpu.cb_res_set(6, 1, cpu.Registers.A)
+}
+
+func (cpu *CPU) SET_7_B() int {
+	return cpu.cb_res_set(7, 1, cpu.Registers.B)
+}
+
+func (cpu *CPU) SET_7_C() int {
+	return cpu.cb_res_set(7, 1, cpu.Registers.C)
+}
+
+func (cpu *CPU) SET_7_D() int {
+	return cpu.cb_res_set(7, 1, cpu.Registers.D)
+}
+
+func (cpu *CPU) SET_7_E() int {
+	return cpu.cb_res_set(7, 1, cpu.Registers.E)
+}
+
+func (cpu *CPU) SET_7_H() int {
+	return cpu.cb_res_set(7, 1, cpu.Registers.H)
+}
+
+func (cpu *CPU) SET_7_HL() int {
+	return cpu.cb_res_set(7, 1, cpu.Registers.HL)
+}
+
+func (cpu *CPU) SET_7_A() int {
+	return cpu.cb_res_set(7, 1, cpu.Registers.A)
+}
