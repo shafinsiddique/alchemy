@@ -218,3 +218,85 @@ func (cpu *CPU) RRC_HL() int {
 func (cpu *CPU) RRC_A() int {
 	return cpu.cb_rrc8(cpu.Registers.A)
 }
+
+func (cpu *CPU) cb_sla8(register *EightBitRegister) int {
+	cpu.Registers.F.SetBit(0, CARRY_FLAG)
+	return cpu.cb_rl8(register)
+}
+
+func (cpu *CPU) cb_sla16(register *SixteenBitRegister) int {
+	cpu.Registers.F.SetBit(0, CARRY_FLAG)
+	return cpu.cb_rl16(register)
+}
+
+func (cpu *CPU) cb_sra8(register *EightBitRegister) int {
+	original := register.GetBit(7)
+	cpu.Registers.F.SetBit(original, CARRY_FLAG) // this will get passed to bit 7 ensuring bit 7 stays
+	// unchanged,
+	return cpu.cb_rr8(register)
+}
+
+func (cpu *CPU) cb_sra16(register *SixteenBitRegister) int {
+	loc := register.Get()
+	val := cpu.MMU.Read(loc)
+	original := GetBit(val, 7)
+	cpu.Registers.F.SetBit(original, CARRY_FLAG) // this will get passed to bit 7 ensuring bit 7 stays
+	// unchanged,
+	return cpu.cb_rr16(register)
+}
+
+func (cpu *CPU) SLA_B() int {
+	return cpu.cb_sla8(cpu.Registers.B)
+}
+
+func (cpu *CPU) SLA_C() int {
+	return cpu.cb_sla8(cpu.Registers.C)
+}
+
+func (cpu *CPU) SLA_D() int {
+	return cpu.cb_sla8(cpu.Registers.D)
+}
+
+func (cpu *CPU) SLA_E() int {
+	return cpu.cb_sla8(cpu.Registers.E)
+}
+
+func (cpu *CPU) SLA_H() int {
+	return cpu.cb_sla8(cpu.Registers.H)
+}
+
+func (cpu *CPU) SLA_HL() int {
+	return cpu.cb_sla16(cpu.Registers.HL)
+}
+
+func (cpu *CPU) SLA_A() int {
+	return cpu.cb_sla8(cpu.Registers.A)
+}
+
+func (cpu *CPU) SRA_B() int {
+	return cpu.cb_sra8(cpu.Registers.B)
+}
+
+func (cpu *CPU) SRA_C() int {
+	return cpu.cb_sra8(cpu.Registers.C)
+}
+
+func (cpu *CPU) SRA_D() int {
+	return cpu.cb_sra8(cpu.Registers.D)
+}
+
+func (cpu *CPU) SRA_E() int {
+	return cpu.cb_sra8(cpu.Registers.E)
+}
+
+func (cpu *CPU) SRA_H() int {
+	return cpu.cb_sra8(cpu.Registers.H)
+}
+
+func (cpu *CPU) SRA_HL() int {
+	return cpu.cb_sra16(cpu.Registers.HL)
+}
+
+func (cpu *CPU) SRA_A() int {
+	return cpu.cb_sra8(cpu.Registers.A)
+}
