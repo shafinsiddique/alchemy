@@ -93,7 +93,7 @@ func (cpu *CPU) FetchDecodeExecute() int {
 	case 0xc5:
 		cycles = cpu.PUSH_BC()
 	case 0x17:
-		cycles = cpu.RL_A()
+		cycles = cpu.RLA()
 	case 0xc1:
 		cycles = cpu.POP_BC()
 	case 0x5:

@@ -214,7 +214,7 @@ func (cpu *CPU) PUSH_AF() int {
 	return cpu.push(cpu.Registers.AF)
 }
 
-func (cpu *CPU) RL_A() int {
+func (cpu *CPU) RLA() int {
 	// rotate the contents of reigster a to the left, trhough the carry flag.
 	// i.e bit 0 -> bit 1 -> bit 2
 	cpu.Registers.F.SetBit(0, Z_FLAG)
@@ -1368,6 +1368,15 @@ func (cpu *CPU) CALL_NC_A16() int {
 	return cpu.call_a16(CARRY_FLAG, 0)
 }
 
-func (cpu *CPU) CALL_NC_A16() int {
+func (cpu *CPU) CALL_C_A16() int {
 	return cpu.call_a16(CARRY_FLAG, 1)
+}
+
+func (cpu *CPU) JP_HL() int {
+	cpu.PC = cpu.Registers.HL.Get()
+	return 4
+}
+
+func (cpu *CPU) NOP() int {
+	return 4
 }

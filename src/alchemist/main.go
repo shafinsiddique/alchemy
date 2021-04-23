@@ -22,6 +22,7 @@ func initLogger() {
 }
 
 func RunBootSequence(cpu *CPU, mmu *MMU, ppu *PPU) {
+	mmu.SetBootMode()
 	cyclesThisUpdate := 0
 	for cyclesThisUpdate < MAX_CYCLES && cpu.PC < 256 {
 		cycles := cpu.FetchDecodeExecute()
@@ -41,11 +42,8 @@ func main() {
 	rom := make([]byte, 0x10000)
 	_, _ = f.Read(bootrom)
 	_, _ = f2.Read(rom)
-	//fmt.Println("Bytes Read", read)
-	//fmt.Println("Rom Bytes Read", romRead)
 	mmu.LoadBootRom(bootrom)
 	mmu.LoadBankRom0(rom)
-	mmu.SetBootMode()
 	f.Close()
 	f2.Close()
 	dis, _ := NewSDLDisplay()
@@ -53,10 +51,12 @@ func main() {
 	for dis.HandleEvent() {
 		RunBootSequence(cpu, mmu, ppu)
 		if cpu.PC >= 256 {
-			log.Fatal("End Of Bootrom.")
+			mmu.SetRegularMode()
+			log.Fatal("end of prog.")
 		} else {
 			dis.UpdateGraphics()
 			time.Sleep(3*time.Millisecond)
 		}
 	}
+
 }
