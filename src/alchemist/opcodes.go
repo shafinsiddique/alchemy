@@ -980,7 +980,7 @@ func (cpu *CPU) ADD_A_LOC_HL() int {
 	return 8
 }
 
-func (cpu *CPU) SUB_A_LOC_HL() int {
+func (cpu *CPU) SUB_LOC_HL() int {
 	cpu.sub(cpu.MMU.Read(cpu.Registers.HL.Get()))
 	return 8
 }
@@ -1084,6 +1084,10 @@ func (cpu *CPU) CP_H() int {
 
 func (cpu *CPU) CP_L() int {
 	return cpu.cp(cpu.Registers.L.Get())
+}
+
+func (cpu *CPU) CP_A() int {
+	return cpu.cp(cpu.Registers.A.Get())
 }
 
 func (cpu *CPU) POP_DE() int {
@@ -1277,6 +1281,40 @@ func (cpu *CPU) PUSH_16(val uint16)  {
 	cpu.PushToStack(bytes[1])
 }
 
+func (cpu *CPU) LD_LOC_A16_SP() int {
+	low := cpu.FetchAndIncrement()
+	high := cpu.FetchAndIncrement()
+	bytes := SplitInt16ToBytes(cpu.SP)
+	loc := MergeBytes(high, low)
+	cpu.MMU.Write(loc, bytes[1])
+	cpu.MMU.Write(loc+1, bytes[0])
+	return 20
+}
+
+func (cpu *CPU) STOP() int {
+	return 4
+}
+
+func (cpu *CPU) DAA() int {
+	return 4
+}
+
+func (cpu *CPU) CPL() int {
+	return 4
+}
+
+func (cpu *CPU) SCF() int {
+	return 4
+}
+
+func (cpu *CPU) CCF() int {
+	return 4
+}
+
+func (cpu *CPU) HALT() int {
+	return 4
+}
+
 func (cpu *CPU) rst(index uint16) int {
 	cpu.PUSH_16(cpu.PC)
 	cpu.PC = 0x0000 + (8*index)
@@ -1315,7 +1353,7 @@ func (cpu *CPU) RST_7() int {
 	return cpu.rst(7)
 }
 
-func (cpu *CPU) jp_a16(flagIndex int, flagValue byte) int  {
+func (cpu *CPU) jp_a16_conditonal(flagIndex int, flagValue byte) int  {
 	flag := cpu.Registers.F.GetBit(flagIndex)
 	low := cpu.FetchAndIncrement()
 	high := cpu.FetchAndIncrement()
@@ -1328,20 +1366,35 @@ func (cpu *CPU) jp_a16(flagIndex int, flagValue byte) int  {
 	return cycles
 }
 
+func (cpu *CPU) JP_A16() int {
+	low := cpu.FetchAndIncrement()
+	high := cpu.FetchAndIncrement()
+	cpu.PC = MergeBytes(high, low)
+	return 16
+}
+
+func (cpu *CPU) DI() int {
+	return 4
+}
+
+func (cpu *CPU) EI() int {
+	return 4
+}
+
 func (cpu *CPU) JP_NZ_A16() int {
-	return cpu.jp_a16(Z_FLAG, 0)
+	return cpu.jp_a16_conditonal(Z_FLAG, 0)
 }
 
 func (cpu *CPU) JP_Z_A16() int {
-	return cpu.jp_a16(Z_FLAG, 1)
+	return cpu.jp_a16_conditonal(Z_FLAG, 1)
 }
 
 func (cpu *CPU) JP_NC_A16() int {
-	return cpu.jp_a16(CARRY_FLAG, 0)
+	return cpu.jp_a16_conditonal(CARRY_FLAG, 0)
 }
 
 func (cpu *CPU) JP_C_A16() int {
-	return cpu.jp_a16(CARRY_FLAG, 1)
+	return cpu.jp_a16_conditonal(CARRY_FLAG, 1)
 }
 
 func (cpu *CPU) call_a16(flagIndex int, flagValue byte) int {

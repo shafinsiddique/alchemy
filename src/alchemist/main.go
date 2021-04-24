@@ -55,7 +55,7 @@ func main() {
 			log.Fatal("end of prog.")
 		} else {
 			dis.UpdateGraphics()
-			time.Sleep(3*time.Millisecond)
+			time.Sleep(10*time.Millisecond)
 		}
 	}
 

@@ -1,29 +1,16 @@
 package main
 
 type cbFun func(byte) byte
-type r16 SixteenBitRegister
-type r8 EightBitRegister
 
 func (cpu *CPU) Oxcb() int {
 	switch opcode := cpu.FetchAndIncrement(); opcode {
 	case 0x7c:
-		return cpu.BIT_7H()
+		return cpu.BIT_7_H()
 	case 0x11:
 		return cpu.RL_C()
 	}
 
 	return 8
-}
-
-
-
-func (cpu *CPU) BIT_7H() int {
-	// copy the contents of of bit 7 in register H to the z flag of the F register.
-	bit := cpu.Registers.H.GetBit(7) ^ 1 // take complemeent of the bit in position 7.
-	cpu.Registers.F.SetBit(bit, Z_FLAG)
-	cpu.Registers.F.SetBit(1, HALF_CARRY_FLAG)
-	cpu.Registers.F.SetBit(0, NEGATIVE_FLAG)
-	return 4
 }
 
 func (cpu *CPU) get_rl(value byte) byte {
@@ -325,7 +312,7 @@ func (cpu *CPU) swap(val byte) byte {
 func (cpu *CPU) SetRegisterOrLoc(register interface{}, operation cbFun) byte {
 	var result byte
 	switch register.(type) {
-	case *r8:
+	case *EightBitRegister:
 		reg := register.(*EightBitRegister)
 		result = operation(reg.Get())
 		reg.Set(result)
@@ -357,7 +344,7 @@ func (cpu *CPU) cb_swap(register interface{}) int {
 	cpu.ClearHCFlag()
 	cpu.ClearOverflowFlag()
 	switch register.(type) {
-	case *r8:
+	case *EightBitRegister:
 		return 8
 	default:
 		return 16
@@ -399,7 +386,7 @@ func (cpu *CPU) cb_srl(register interface{}) int {
 	cpu.ClearNegativeFlag()
 	cpu.ClearHCFlag()
 	switch register.(type) {
-	case *r8:
+	case *EightBitRegister:
 		return 8
 	default:
 		return 16
@@ -437,7 +424,7 @@ func (cpu *CPU) SRL_A() int {
 func (cpu *CPU) cb_bit(index int, register interface{}) int {
 	var value byte
 	switch register.(type) {
-	case *r8:
+	case *EightBitRegister:
 		reg := register.(*EightBitRegister)
 		value = reg.Get()
 	default:
