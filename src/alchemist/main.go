@@ -6,6 +6,29 @@ import (
 	"time"
 )
 
+func initializeComponents() (*CPU, *MMU, *PPU, IDisplay) {
+	mmu := NewMMU()
+	cpu := NewCPU(mmu)
+	display, _ := NewSDLDisplay()
+	ppu := NewPPU(mmu, display)
+	return cpu, mmu, ppu, display
+}
+
+func load(bootrom string, rom string, mmu *MMU) {
+	bootromFile, err := os.Open(bootrom)
+	if err != nil {log.Fatal("Unable to load boot rom.")}
+	romFile, err := os.Open(rom)
+	if err != nil {log.Fatal("Unable to load rom.")}
+	bRomArr := make([]byte, 256)
+	romArr := make([]byte, 0x10000)
+	_ ,_ = bootromFile.Read(bRomArr)
+	_, _ = romFile.Read(romArr)
+	mmu.LoadBootRom(bRomArr[:])
+	mmu.LoadBankRom0(romArr[:])
+	_ : bootromFile.Close()
+	_ : romFile.Close()
+}
+
 func run(cpu *CPU, mmu *MMU, ppu *PPU) {
 	cyclesThisUpdate := 0
 	for cyclesThisUpdate < MAX_CYCLES {
@@ -20,27 +43,14 @@ func run(cpu *CPU, mmu *MMU, ppu *PPU) {
 }
 
 func main() {
-	mmu := NewMMU()
-	cpu := &CPU{MMU: mmu, Registers: InitializeRegisters()}
+	cpu, mmu, ppu, dis := initializeComponents()
 	p, _ := os.Getwd()
-	f, _ := os.Open(p + "/bootstrap.gb")
-	f2, _ := os.Open(p + "/tetris.gb")
-	bootrom := make([]byte, 256)
-	rom := make([]byte, 0x10000)
-	_, _ = f.Read(bootrom)
-	_, _ = f2.Read(rom)
-	mmu.LoadBootRom(bootrom)
-	mmu.LoadBankRom0(rom)
-	f.Close()
-	f2.Close()
-	dis, _ := NewSDLDisplay()
-	ppu := &PPU{Registers: InitializePPURegisters(mmu.Memory), Cycles: SCANLINE_CYCLES, MMU: mmu, Display: dis}
+	load(p + "/bootstrap.gb", p + "/tetris.gb", mmu)
 	mmu.SetBootMode()
 	for dis.HandleEvent() {
 		run(cpu, mmu, ppu)
-		dis.UpdateGraphics()
+		_ = dis.UpdateGraphics()
 		time.Sleep(10*time.Millisecond)
-
 	}
 
 }

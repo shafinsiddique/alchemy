@@ -9,6 +9,10 @@ type CPU struct {
 	MMU           *MMU
 }
 
+func NewCPU(mmu *MMU) *CPU{
+	return &CPU{MMU: mmu, Registers: InitializeRegisters()}
+}
+
 func (cpu *CPU) PushToStack(item byte) {
 	sp := &cpu.SP
 	*sp -= 1

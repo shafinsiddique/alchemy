@@ -11,6 +11,11 @@ type PPU struct {
 	Display   IDisplay
 }
 
+func NewPPU(mmu *MMU, display IDisplay) *PPU{
+	return &PPU{Registers: InitializePPURegisters(mmu.Memory), Cycles: SCANLINE_CYCLES, MMU: mmu,
+		Display: display}
+}
+
 func (ppu *PPU) IncrementScanline() {
 	ppu.Registers.LY.Increment()
 	if ppu.Registers.LY.Get() == 154 {
