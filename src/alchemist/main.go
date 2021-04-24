@@ -1,38 +1,25 @@
 package main
 
 import (
-	"github.com/sirupsen/logrus"
-	"io"
-	"log"
+	log "github.com/sirupsen/logrus"
 	"os"
 	"time"
 )
 
-var logger *logrus.Logger
-
-func initLogger() {
-	logger = logrus.New()
-	path, _ := os.Getwd()
-	logFile, err := os.OpenFile(path+"/logs/logs.txt", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0755)
-	if err == nil {
-		logger.SetOutput(io.MultiWriter(os.Stderr, logFile))
-	} else {
-		logger.Error("error trying to initialize log file.")
-	}
-}
-
-func RunBootSequence(cpu *CPU, mmu *MMU, ppu *PPU) {
-	mmu.SetBootMode()
+func run(cpu *CPU, mmu *MMU, ppu *PPU) {
 	cyclesThisUpdate := 0
-	for cyclesThisUpdate < MAX_CYCLES && cpu.PC < 256 {
+	for cyclesThisUpdate < MAX_CYCLES {
 		cycles := cpu.FetchDecodeExecute()
 		ppu.UpdateGraphics(cycles)
 		cyclesThisUpdate += cycles
+		if mmu.BootMode && cpu.PC >= 256 {
+			log.Fatal("end of prog.")
+			mmu.SetRegularMode()
+		}
 	}
 }
 
 func main() {
-	initLogger()
 	mmu := NewMMU()
 	cpu := &CPU{MMU: mmu, Registers: InitializeRegisters()}
 	p, _ := os.Getwd()
@@ -48,15 +35,12 @@ func main() {
 	f2.Close()
 	dis, _ := NewSDLDisplay()
 	ppu := &PPU{Registers: InitializePPURegisters(mmu.Memory), Cycles: SCANLINE_CYCLES, MMU: mmu, Display: dis}
+	mmu.SetBootMode()
 	for dis.HandleEvent() {
-		RunBootSequence(cpu, mmu, ppu)
-		if cpu.PC >= 256 {
-			mmu.SetRegularMode()
-			log.Fatal("end of prog.")
-		} else {
-			dis.UpdateGraphics()
-			time.Sleep(10*time.Millisecond)
-		}
+		run(cpu, mmu, ppu)
+		dis.UpdateGraphics()
+		time.Sleep(10*time.Millisecond)
+
 	}
 
 }
