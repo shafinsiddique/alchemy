@@ -29,6 +29,11 @@ func (cpu *CPU) PopFromStack() byte {
 	return item
 }
 
+func (cpu *CPU) storePcAndJump(addr uint16) {
+	cpu.PUSH_16(cpu.PC)
+	cpu.PC = addr
+}
+
 func (cpu *CPU) FetchAndIncrement() byte {
 	pc := &cpu.PC
 	item := cpu.MMU.Read(*pc)
@@ -563,3 +568,8 @@ func (cpu *CPU) FetchDecodeExecute() int {
 	}
 	return cycles
 }
+
+
+
+
+

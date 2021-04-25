@@ -21,6 +21,11 @@ func (register *ReferenceRegister) GetBit(index int) byte {
 	return GetBit(val, index)
 }
 
+func (register *ReferenceRegister) SetBit(bit byte, index int) {
+	current := register.Get()
+	*register.Element = SetBit(current, bit, index)
+}
+
 func (register *ReferenceRegister) Increment() {
 	*register.Element += 1
 }

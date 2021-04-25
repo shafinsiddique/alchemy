@@ -35,6 +35,7 @@ func run(cpu *CPU, mmu *MMU, ppu *PPU) {
 	for cyclesThisUpdate < MAX_CYCLES {
 		cycles := cpu.FetchDecodeExecute()
 		ppu.UpdateGraphics(cycles)
+		cpu.HandleInterrupts()
 		if cpu.PC == 0x2b8 {
 			debug = true
 		}
