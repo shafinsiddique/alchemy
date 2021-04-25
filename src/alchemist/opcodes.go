@@ -1374,10 +1374,12 @@ func (cpu *CPU) JP_A16() int {
 }
 
 func (cpu *CPU) DI() int {
+	cpu.IME = false
 	return 4
 }
 
 func (cpu *CPU) EI() int {
+	cpu.IME = true
 	return 4
 }
 

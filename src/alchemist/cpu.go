@@ -1,5 +1,7 @@
 package main
 
+import "fmt"
+
 type CPU struct {
 	Registers     *Registers
 	BootRomMemory []byte
@@ -7,10 +9,11 @@ type CPU struct {
 	PC            uint16
 	SP            uint16
 	MMU           *MMU
+	IME bool
 }
 
 func NewCPU(mmu *MMU) *CPU{
-	return &CPU{MMU: mmu, Registers: InitializeRegisters()}
+	return &CPU{MMU: mmu, Registers: InitializeRegisters(mmu.Memory)}
 }
 
 func (cpu *CPU) PushToStack(item byte) {
@@ -57,6 +60,7 @@ func (cpu *CPU) DecrementRegister8Bit(register *EightBitRegister) int {
 
 func (cpu *CPU) FetchDecodeExecute() int {
 	opcode := cpu.FetchAndIncrement()
+	fmt.Println(fmt.Sprintf("Executing Instruction: 0x%x",opcode))
 	//fmt.Println(fmt.Sprintf("Executing Instruction 0x %x At PC %d", opcode, cpu.PC-1))
 	cycles := 4 // fetch and increment is a 4.
 	switch opcode {

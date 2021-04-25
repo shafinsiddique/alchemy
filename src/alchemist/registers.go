@@ -13,9 +13,11 @@ type Registers struct {
 	BC *SixteenBitRegister
 	DE *SixteenBitRegister
 	HL *SixteenBitRegister
+	IE *ReferenceRegister
+	IF *ReferenceRegister
 }
 
-func InitializeRegisters() *Registers {
+func InitializeRegisters(memory []byte) *Registers {
 	a := NewEightBitRegister()
 	b := NewEightBitRegister()
 	c := NewEightBitRegister()
@@ -28,7 +30,8 @@ func InitializeRegisters() *Registers {
 	bc := NewSixteenBitRegister(b, c)
 	de := NewSixteenBitRegister(d, e)
 	hl := NewSixteenBitRegister(h, l)
-
+	ie := NewReferenceRegister(&memory[IE_INDEX])
+	_if := NewReferenceRegister(&memory[IF_INDEX])
 	return &Registers{A: a, B: b, C: c, D: d, E: e, F: f, H: h, L: l, AF: af, BC: bc, DE: de,
-		HL: hl}
+		HL: hl, IE: ie, IF: _if}
 }

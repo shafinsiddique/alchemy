@@ -1,18 +1,18 @@
 package main
 
 type PPURegisters struct {
-	LCDC *PPURegister
-	LY   *PPURegister
-	SCY  *PPURegister
-	SCX  *PPURegister
-	BGP  *PPURegister
+	LCDC *ReferenceRegister
+	LY   *ReferenceRegister
+	SCY  *ReferenceRegister
+	SCX  *ReferenceRegister
+	BGP  *ReferenceRegister
 }
 
 func InitializePPURegisters(memory []byte) *PPURegisters {
-	ly := &PPURegister{&memory[LY_INDEX]}
-	lcdc := &PPURegister{&memory[LCDC_INDEX]}
-	scy := &PPURegister{&memory[SCY_INDEX]}
-	scx := &PPURegister{&memory[SCX_INDEX]}
-	bgp := &PPURegister{&memory[BGP_INDEX]}
+	ly := &ReferenceRegister{&memory[LY_INDEX]}
+	lcdc := &ReferenceRegister{&memory[LCDC_INDEX]}
+	scy := &ReferenceRegister{&memory[SCY_INDEX]}
+	scx := &ReferenceRegister{&memory[SCX_INDEX]}
+	bgp := &ReferenceRegister{&memory[BGP_INDEX]}
 	return &PPURegisters{LY: ly, LCDC: lcdc, SCY: scy, SCX: scx, BGP: bgp}
 }
