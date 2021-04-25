@@ -1,9 +1,9 @@
 package main
 
 import (
-	"fmt"
 	log "github.com/sirupsen/logrus"
 	"os"
+	"time"
 )
 
 func initializeComponents() (*CPU, *MMU, *PPU, IDisplay) {
@@ -30,24 +30,25 @@ func load(bootrom string, rom string, mmu *MMU) {
 }
 
 func run(cpu *CPU, mmu *MMU, ppu *PPU) {
-	debug := false
+	//debug := false
 	cyclesThisUpdate := 0
 	for cyclesThisUpdate < MAX_CYCLES {
-		cycles := cpu.FetchDecodeExecute()
+		opcode := cpu.FetchAndIncrement()
+		cycles := cpu.Execute(opcode)
 		ppu.UpdateGraphics(cycles)
-		cpu.HandleInterrupts()
-		if cpu.PC == 0x2b8 {
-			debug = true
-		}
-		if !mmu.BootMode && debug {
-			fmt.Println(fmt.Sprintf("AF: %x", cpu.Registers.AF.Get()))
-			fmt.Println(fmt.Sprintf("BC: %x", cpu.Registers.BC.Get()))
-			fmt.Println(fmt.Sprintf("DE: %x", cpu.Registers.DE.Get()))
-			fmt.Println(fmt.Sprintf("HL: %x", cpu.Registers.HL.Get()))
-			fmt.Println(fmt.Sprintf("SP: %x", cpu.SP))
-			fmt.Println(fmt.Sprintf("PC: %x", cpu.PC))
-			fmt.Println("END.")
-		}
+		cpu.HandleInterrupts(opcode)
+		//if cpu.PC == 0x01DB {
+		//	debug = true
+		//}
+		//if !mmu.BootMode && debug {
+		//	fmt.Println(fmt.Sprintf("AF: %x", cpu.Registers.AF.Get()))
+		//	fmt.Println(fmt.Sprintf("BC: %x", cpu.Registers.BC.Get()))
+		//	fmt.Println(fmt.Sprintf("DE: %x", cpu.Registers.DE.Get()))
+		//	fmt.Println(fmt.Sprintf("HL: %x", cpu.Registers.HL.Get()))
+		//	fmt.Println(fmt.Sprintf("SP: %x", cpu.SP))
+		//	fmt.Println(fmt.Sprintf("PC: %x", cpu.PC))
+		//	fmt.Println("END.")
+		//}
 
 		cyclesThisUpdate += cycles
 		if mmu.BootMode && cpu.PC >= 256 {
@@ -63,8 +64,8 @@ func main() {
 	mmu.SetBootMode()
 	for dis.HandleEvent() {
 		run(cpu, mmu, ppu)
-		//_ = dis.UpdateGraphics()
-		//time.Sleep(10*time.Millisecond)
+		_ = dis.UpdateGraphics()
+		time.Sleep(10*time.Millisecond)
 	}
 
 }

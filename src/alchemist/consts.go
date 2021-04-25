@@ -38,3 +38,6 @@ var COLOR_MAP = map[byte]color.RGBA{
 	1: {R: 211, G: 211, B: 211},
 	0: {R: 255, G: 255, B: 255},
 }
+
+var INTERRUPT_INSTRUCTIONS = map[byte]bool{0x0:false,0x1:false,0x76:false,0x2f:false,0x3f:false,
+	0x27:false,0x37:false,0xf3:false,0xfb:false}

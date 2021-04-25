@@ -1,7 +1,12 @@
 package main
 
-func (cpu *CPU) HandleInterrupts() {
-	if !cpu.IME {
+func (cpu *CPU) isInterrupt(opcode byte) bool {
+	_, exists := INTERRUPT_INSTRUCTIONS[opcode]
+	return exists
+}
+
+func (cpu *CPU) HandleInterrupts(opcode byte) { // maybe there's a better signature for this?
+	if !cpu.IME || cpu.isInterrupt(opcode) {
 		return
 	}
 
