@@ -1271,7 +1271,8 @@ func (cpu *CPU) RET_C() int {
 	return cpu.ret_flag(CARRY_FLAG, 1)
 }
 
-func (cpu *CPU) RET_I() int {
+func (cpu *CPU) RETI() int {
+	cpu.IME = true
 	return cpu.RET()
 }
 

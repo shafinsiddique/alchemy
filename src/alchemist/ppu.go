@@ -18,9 +18,12 @@ func NewPPU(mmu *MMU, display IDisplay) *PPU{
 
 func (ppu *PPU) IncrementScanline() {
 	ppu.Registers.LY.Increment()
-	if ppu.Registers.LY.Get() == 154 {
+	if line := ppu.Registers.LY.Get(); line == 144 {
+		ppu.Registers.IF.SetBit(1, V_BLANK)
+	} else if line == 154 {
 		ppu.Registers.LY.Set(0)
 	}
+
 }
 
 func (ppu *PPU) FetchPixels() []*Pixel {

@@ -23,8 +23,13 @@ const (
 	WINDOW_WIDTH                 = 160
 	WINDOW_HEIGHT                = 144
 	MAX_CYCLES                   = 69905
-	IE_INDEX = 0xFFFF
-	IF_INDEX = 0xF0F
+	IE_INDEX                     = 0xFFFF
+	IF_INDEX                     = 0xF0F
+	V_BLANK                      = 0
+	LCD_STAT                     = 1
+	TIMER                        = 2
+	SERIAL                       = 3
+	JOYPAD                       = 4
 )
 
 var COLOR_MAP = map[byte]color.RGBA{

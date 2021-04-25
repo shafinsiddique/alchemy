@@ -18,15 +18,15 @@ func (cpu *CPU) HandleInterrupts() {
 func (cpu *CPU) handleInterrupt(index int) {
 	var addr uint16
 	switch index {
-	case 0:
+	case V_BLANK:
 		addr = 0x40
-	case 1:
+	case LCD_STAT:
 		addr = 0x48
-	case 2:
+	case TIMER:
 		addr = 0x50
-	case 3:
+	case SERIAL:
 		addr = 0x58
-	case 4:
+	case JOYPAD:
 		addr = 0x60
 	}
 
