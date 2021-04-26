@@ -1301,18 +1301,55 @@ func (cpu *CPU) DAA() int {
 }
 
 func (cpu *CPU) CPL() int {
+	cpu.Registers.A.Set(GetOnesComplement(cpu.Registers.A.Get()))
+	cpu.SetNegativeFlag()
+	cpu.SetHCFlag()
 	return 4
 }
 
 func (cpu *CPU) SCF() int {
+	cpu.SetOverflowFlag()
+	cpu.ClearNegativeFlag()
+	cpu.ClearHCFlag()
 	return 4
 }
 
 func (cpu *CPU) CCF() int {
+	cy := cpu.Registers.F.GetBit(CARRY_FLAG)
+	cy = 1-cy // probs could have been done with bit manipualtion.
+	cpu.Registers.F.SetBit(cy, CARRY_FLAG)
+	cpu.ClearNegativeFlag()
+	cpu.ClearHCFlag()
 	return 4
 }
 
+func (cpu *CPU) interruptExists() bool {
+	for i := 0; i < 5; i++ {
+		if cpu.Registers.IF.GetBit(i) == 1 && cpu.Registers.IE.GetBit(i) == 1 {
+			return true
+		}
+	}
+	return false
+}
+
 func (cpu *CPU) HALT() int {
+	var decrementPc bool
+	if cpu.Halted {
+		if cpu.interruptExists() {
+			cpu.Halted = false
+		} else {
+			decrementPc = true
+		}
+	} else {
+		decrementPc = true
+		cpu.Halted = true
+	}
+
+	if decrementPc {
+		pc := &cpu.PC
+		*pc -= 1
+	}
+
 	return 4
 }
 

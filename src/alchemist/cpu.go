@@ -8,6 +8,7 @@ type CPU struct {
 	SP            uint16
 	MMU           *MMU
 	IME           bool
+	Halted bool
 }
 
 func NewCPU(mmu *MMU) *CPU {
@@ -62,7 +63,7 @@ func (cpu *CPU) DecrementRegister8Bit(register *EightBitRegister) int {
 }
 
 func (cpu *CPU) Execute(opcode byte) int {
-	//fmt.Println(fmt.Sprintf("Executing Instruction: 0x%x", opcode))
+	//fmt.Println(fmt.Sprintf("Executing Instruction: 0x%x At PC %x and AF %x", opcode, cpu.PC-1, cpu.Registers.AF.Get()))
 	//fmt.Println(fmt.Sprintf("Executing Instruction 0x %x At PC %d", opcode, cpu.PC-1))
 	cycles := 4 // fetch and increment is a 4.
 	switch opcode {
@@ -212,12 +213,10 @@ func (cpu *CPU) Execute(opcode byte) int {
 		cycles = cpu.INC_L()
 	case 0x2d:
 		cycles = cpu.DEC_L()
-
 	case 0x2f:
 		cycles = cpu.CPL()
 	case 0x30:
 		cycles = cpu.JR_NC_S8()
-
 	case 0x33:
 		cycles = cpu.INC_SP()
 	case 0x34:

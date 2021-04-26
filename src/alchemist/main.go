@@ -7,7 +7,8 @@ import (
 )
 
 func initializeComponents() (*CPU, *MMU, *PPU, IDisplay) {
-	mmu := NewMMU()
+	joypad := byte(0b11111111)
+	mmu := NewMMU(&joypad)
 	cpu := NewCPU(mmu)
 	display, _ := NewSDLDisplay()
 	ppu := NewPPU(mmu, display)

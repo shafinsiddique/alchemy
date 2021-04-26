@@ -30,6 +30,7 @@ const (
 	TIMER                        = 2
 	SERIAL                       = 3
 	JOYPAD                       = 4
+	JOYPAD_INDEX = 0xFF00
 )
 
 var COLOR_MAP = map[byte]color.RGBA{

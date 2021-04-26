@@ -4,18 +4,41 @@ type MMU struct {
 	BootRomMemory []byte
 	Memory        []byte
 	BootMode      bool
+	Joypad 		*byte
 }
 
-func NewMMU() *MMU {
-	return &MMU{BootRomMemory: make([]byte, 256), Memory: make([]byte, 0x10000)}
+func NewMMU(joypad *byte) *MMU {
+	return &MMU{BootRomMemory: make([]byte, 256), Memory: make([]byte, 0x10000), Joypad: joypad}
 }
 
 func (mmu *MMU) Read(addr uint16) byte {
 	if mmu.BootMode && addr < 256 {
 		return mmu.BootRomMemory[addr]
+	} else if addr == JOYPAD_INDEX {
+		return mmu.getJoypadState()
 	}
 
 	return mmu.Memory[addr]
+}
+
+func (mmu *MMU) getJoypadState() byte {
+	val := mmu.Memory[JOYPAD_INDEX]
+	val = SetBit(val, 1, 7)
+	val = SetBit(val, 1, 6)
+
+	var starting int
+	if GetBit(val, 4) == 1 {
+		starting = 0
+	} else {
+		starting = 4
+	}
+
+	for i := 0; i<4; i++ {
+		status := GetBit(*mmu.Joypad, starting+i)
+		val = SetBit(val, status, i)
+	}
+
+	return val
 }
 
 func (mmu *MMU) Write(addr uint16, val byte) {
