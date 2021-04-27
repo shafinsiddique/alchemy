@@ -27,6 +27,17 @@ func (cpu *CPU) CheckAndSetZeroFlag(value byte) bool {
 	return zero
 }
 
+func (cpu *CPU) CheckAndSetZeroFlagSixteenBit(value uint16) bool {
+	zero := false
+	if value == 0 {
+		cpu.Registers.F.SetBit(1, Z_FLAG)
+		zero = true
+	} else {
+		cpu.Registers.F.SetBit(0, Z_FLAG)
+	}
+	return zero
+}
+
 func (cpu *CPU) CheckAndSetHCFlag(a byte, b byte, negative bool) bool {
 	var sum byte
 	carry := false

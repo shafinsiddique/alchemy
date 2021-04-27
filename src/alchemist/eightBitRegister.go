@@ -8,9 +8,8 @@ func NewEightBitRegister() *EightBitRegister {
 	return &EightBitRegister{}
 }
 
-func (register *EightBitRegister) Set(value byte) int {
+func (register *EightBitRegister) Set(value byte) {
 	register.Value = value
-	return 4
 }
 
 func (register *EightBitRegister) Get() byte { // takes 0 cpu Cycles to get regifster val.
@@ -28,14 +27,12 @@ func (register *EightBitRegister) SetBit(bit byte, index int) {
 	register.Set(SetBit(current, bit, index))
 }
 
-func (register *EightBitRegister) Increment() int {
+func (register *EightBitRegister) Increment()  {
 	register.Value += 1
-	return 4
 }
 
-func (register *EightBitRegister) Decrement() int {
+func (register *EightBitRegister) Decrement()  {
 	register.Value -= 1
-	return 4
 }
 
-// SET
+

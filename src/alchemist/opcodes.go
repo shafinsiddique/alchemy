@@ -127,8 +127,7 @@ func (cpu *CPU) LD_LOC_C_A() int {
 }
 
 func (cpu *CPU) INC_C() int {
-	cpu.IncrementRegister8Bit(cpu.Registers.C)
-	return 4
+	return cpu.incrementRegister8Bit(cpu.Registers.C)
 }
 
 func (cpu *CPU) LD_LOC_HL_A() int {
@@ -244,7 +243,7 @@ func (cpu *CPU) POP_BC() int {
 }
 
 func (cpu *CPU) DEC_B() int {
-	return cpu.DecrementRegister8Bit(cpu.Registers.B)
+	return cpu.decrementRegister(cpu.Registers.B)
 }
 
 func (cpu *CPU) LD_LOC_HL_A_INC() int {
@@ -292,7 +291,7 @@ func (cpu *CPU) LD_LOC_A16_A() int {
 }
 
 func (cpu *CPU) DEC_A() int {
-	return cpu.DecrementRegister8Bit(cpu.Registers.A)
+	return cpu.decrementRegister(cpu.Registers.A)
 }
 
 func (cpu *CPU) JR_Z_S8() int {
@@ -305,7 +304,7 @@ func (cpu *CPU) LD_H_A() int {
 }
 
 func (cpu *CPU) INC_B() int {
-	return cpu.IncrementRegister8Bit(cpu.Registers.B)
+	return cpu.incrementRegister8Bit(cpu.Registers.B)
 }
 
 func (cpu *CPU) LD_E_D8() int {
@@ -320,15 +319,15 @@ func (cpu *CPU) LD_A_LOC_A8() int {
 }
 
 func (cpu *CPU) DEC_C() int {
-	return cpu.DecrementRegister8Bit(cpu.Registers.C)
+	return cpu.decrementRegister(cpu.Registers.C)
 }
 
 func (cpu *CPU) DEC_E() int {
-	return cpu.DecrementRegister8Bit(cpu.Registers.E)
+	return cpu.decrementRegister(cpu.Registers.E)
 }
 
 func (cpu *CPU) DEC_D() int {
-	return cpu.DecrementRegister8Bit(cpu.Registers.D)
+	return cpu.decrementRegister(cpu.Registers.D)
 }
 
 func (cpu *CPU) LD_D_D8() int {
@@ -337,7 +336,7 @@ func (cpu *CPU) LD_D_D8() int {
 }
 
 func (cpu *CPU) INC_H() int {
-	return cpu.IncrementRegister8Bit(cpu.Registers.H)
+	return cpu.incrementRegister8Bit(cpu.Registers.H)
 }
 
 func (cpu *CPU) LD_A_H() int {
@@ -710,23 +709,21 @@ func (cpu *CPU) LD_A_LOC_A16() int {
 }
 
 func (cpu *CPU) inc_register(register *EightBitRegister) int {
-	register.Increment()
-	return 4
+	return cpu.incrementRegister8Bit(register)
 }
 
 func (cpu *CPU) dec_register(register *EightBitRegister) int {
-	register.Decrement()
-	return 4
+	return cpu.decrementRegister(register)
 }
 
 func (cpu *CPU) inc_register_sixteen(register *SixteenBitRegister) int {
 	register.Increment()
-	return 4
+	return 8
 }
 
 func (cpu *CPU) dec_register_sixteen(register *SixteenBitRegister) int {
 	register.Decrement()
-	return 4
+	return 8
 }
 
 func (cpu *CPU) INC_D() int {
@@ -779,18 +776,29 @@ func (cpu *CPU) DEC_HL() int {
 	return cpu.dec_register_sixteen(cpu.Registers.HL)
 }
 
-func (cpu *CPU) INC_LOC_HL() int {
-	hl := cpu.Registers.HL.Get()
-	current := cpu.MMU.Read(hl)
-	cpu.MMU.Write(hl, current+1)
+func (cpu *CPU) inc_or_dec_loc(register *SixteenBitRegister, dec bool) int {
+	loc := register.Get()
+	initial := cpu.MMU.Read(loc)
+	var val byte
+	if dec {
+		val = initial-1
+		cpu.SetNegativeFlag()
+	} else {
+		val = initial + 1
+		cpu.ClearNegativeFlag()
+	}
+	cpu.MMU.Write(loc, val)
+	cpu.CheckAndSetZeroFlag(val)
+	cpu.CheckAndSetHCFlag(initial, val, dec)
 	return 12
 }
 
+func (cpu *CPU) INC_LOC_HL() int {
+	return cpu.inc_or_dec_loc(cpu.Registers.HL, false)
+}
+
 func (cpu *CPU) DEC_LOC_HL() int {
-	hl := cpu.Registers.HL.Get()
-	current := cpu.MMU.Read(hl)
-	cpu.MMU.Write(hl, current-1)
-	return 12
+	return cpu.inc_or_dec_loc(cpu.Registers.HL, true)
 }
 
 func (cpu *CPU) add_dst_src_sixteen(dst *SixteenBitRegister, src uint16) int {

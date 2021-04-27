@@ -40,7 +40,7 @@ func (cpu *CPU) FetchAndIncrement() byte {
 	return item
 }
 
-func (cpu *CPU) IncrementRegister8Bit(register *EightBitRegister) int {
+func (cpu *CPU) incrementRegister8Bit(register *EightBitRegister) int {
 	initial := register.Get()
 	register.Increment()
 	cpu.CheckAndSetZeroFlag(register.Get()) // problematic; TODO: fix.
@@ -49,7 +49,7 @@ func (cpu *CPU) IncrementRegister8Bit(register *EightBitRegister) int {
 	return 4
 }
 
-func (cpu *CPU) DecrementRegister8Bit(register *EightBitRegister) int {
+func (cpu *CPU) decrementRegister(register *EightBitRegister) int {
 	initial := register.Get()
 	register.Decrement()
 	if initial == 1 {
