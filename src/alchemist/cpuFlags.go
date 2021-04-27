@@ -38,7 +38,7 @@ func (cpu *CPU) CheckAndSetZeroFlagSixteenBit(value uint16) bool {
 	return zero
 }
 
-func (cpu *CPU) CheckAndSetHCFlag(a byte, b byte, negative bool) bool {
+func checkHCFlag(a byte, b byte, negative bool) bool {
 	var sum byte
 	carry := false
 	if negative {
@@ -46,29 +46,31 @@ func (cpu *CPU) CheckAndSetHCFlag(a byte, b byte, negative bool) bool {
 	} else {
 		sum = (a & 0xf) + (b & 0xf)
 	}
-
 	if (sum & 0x10) == 0x10 {
-		cpu.Registers.F.SetBit(1, HALF_CARRY_FLAG)
 		carry = true
-	} else {
-		cpu.Registers.F.SetBit(0, HALF_CARRY_FLAG)
 	}
 
 	return carry
 }
 
-func (cpu *CPU) CheckAndSetHCFlagSixteenBit(a uint16, b uint16, negative bool) bool { // Code repetition, fix later.
-	var sum uint16
-	carry := false
-	if negative {
-		sum = (a & 0xf) - (b & 0xf)
-	} else {
-		sum = (a & 0xf) + (b & 0xf)
-	}
-
-	if (sum & 0x10) == 0x10 {
+func (cpu *CPU) CheckAndSetHCFlag(a byte, b byte, negative bool) bool {
+	carry := checkHCFlag(a, b, negative)
+	if carry {
 		cpu.Registers.F.SetBit(1, HALF_CARRY_FLAG)
-		carry = true
+	} else {
+		cpu.Registers.F.SetBit(0, HALF_CARRY_FLAG)
+	}
+	return carry
+}
+
+func (cpu *CPU) CheckAndSetHCFlagSixteenBit(a uint16, b uint16, negative bool) bool { // Code repetition, fix later.
+	originalBytes := SplitInt16ToBytes(a)
+	currentBytes := SplitInt16ToBytes(b)
+
+	carry := checkHCFlag(originalBytes[0], currentBytes[0], negative) // check hc on high byte.
+
+	if carry {
+		cpu.Registers.F.SetBit(1, HALF_CARRY_FLAG)
 	} else {
 		cpu.Registers.F.SetBit(0, HALF_CARRY_FLAG)
 	}
