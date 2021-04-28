@@ -1,9 +1,9 @@
 package main
 
 import (
+	"fmt"
 	log "github.com/sirupsen/logrus"
 	"os"
-	"time"
 )
 
 var screenCount int = 0
@@ -42,6 +42,10 @@ func run(cpu *CPU, mmu *MMU, ppu *PPU) {
 		cycles := cpu.Execute(opcode)
 		ppu.UpdateGraphics(cycles)
 		cpu.HandleInterrupts(opcode)
+		if !mmu.BootMode && mmu.Read(0xff02) == 0x81{
+			fmt.Println(fmt.Sprintf("%c", mmu.Read(0xff01)))
+			mmu.Memory[0xff02] = 0
+		}
 		//if cpu.PC == 0x0677 {
 		//	screenCount += 1
 		//}
@@ -65,12 +69,12 @@ func run(cpu *CPU, mmu *MMU, ppu *PPU) {
 func main() {
 	cpu, mmu, ppu, dis := initializeComponents()
 	p, _ := os.Getwd()
-	load(p + "/bootstrap.gb", p + "/tetris.gb", mmu)
+	load(p + "/bootstrap.gb", p + "/special.gb", mmu)
 	mmu.SetBootMode()
 	for dis.HandleEvent() {
 		run(cpu, mmu, ppu)
-		_ = dis.UpdateGraphics()
-		time.Sleep(10*time.Millisecond)
+		//_ = dis.UpdateGraphics()
+		//time.Sleep(10*time.Millisecond)
 	}
 
 }
