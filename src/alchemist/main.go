@@ -6,6 +6,8 @@ import (
 	"time"
 )
 
+var screenCount int = 0
+
 func initializeComponents() (*CPU, *MMU, *PPU, IDisplay) {
 	joypad := byte(0b11111111)
 	mmu := NewMMU(&joypad)
@@ -40,10 +42,10 @@ func run(cpu *CPU, mmu *MMU, ppu *PPU) {
 		cycles := cpu.Execute(opcode)
 		ppu.UpdateGraphics(cycles)
 		cpu.HandleInterrupts(opcode)
-		//if cpu.PC == 0x01DB {
-		//	debug = true
+		//if cpu.PC == 0x0677 {
+		//	screenCount += 1
 		//}
-		//if !mmu.BootMode && debug {
+		//if !mmu.BootMode && screenCount > 1 {
 		//	fmt.Println(fmt.Sprintf("AF: %x", cpu.Registers.AF.Get()))
 		//	fmt.Println(fmt.Sprintf("BC: %x", cpu.Registers.BC.Get()))
 		//	fmt.Println(fmt.Sprintf("DE: %x", cpu.Registers.DE.Get()))

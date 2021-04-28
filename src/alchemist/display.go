@@ -2,7 +2,6 @@ package main
 
 import "C"
 import (
-	"fmt"
 	"github.com/veandco/go-sdl2/sdl"
 	"image/color"
 )
@@ -113,9 +112,8 @@ func (display *SDLDisplay) handleKeyboardEvent(ev *sdl.KeyboardEvent){
 	default:
 		return
 	}
-	fmt.Println(fmt.Sprintf("%b", display.CPU.Registers.IE.Get()))
 
-	*display.Joypad = SetBit(*display.Joypad, 1, joypadIndex)
+	*display.Joypad = SetBit(*display.Joypad, 0, joypadIndex)
 	display.IF.SetBit(1, JOYPAD)
 }
 

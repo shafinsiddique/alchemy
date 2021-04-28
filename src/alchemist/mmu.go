@@ -5,6 +5,7 @@ type MMU struct {
 	Memory        []byte
 	BootMode      bool
 	Joypad 		*byte
+	Count int
 }
 
 func NewMMU(joypad *byte) *MMU {
@@ -22,6 +23,7 @@ func (mmu *MMU) Read(addr uint16) byte {
 }
 
 func (mmu *MMU) getJoypadState() byte {
+	mmu.Count += 1
 	val := mmu.Memory[JOYPAD_INDEX]
 	val = SetBit(val, 1, 7)
 	val = SetBit(val, 1, 6)
@@ -47,6 +49,14 @@ func (mmu *MMU) Write(addr uint16, val byte) {
 	} else {
 		mmu.Memory[addr] = val
 	}
+}
+
+func (mmu *MMU) writeToJoypad(val byte) {
+	for i := 0; i<4; i++ {
+		val = SetBit(val,1, i)
+	}
+
+	mmu.Memory[JOYPAD_INDEX] = val
 }
 
 func (mmu *MMU) SetBootMode() {
