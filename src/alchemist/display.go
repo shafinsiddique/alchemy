@@ -1,5 +1,6 @@
 package main
 
+import "C"
 import (
 	"fmt"
 	"github.com/veandco/go-sdl2/sdl"
@@ -8,7 +9,10 @@ import (
 
 type SDLDisplay struct {
 	Window *sdl.Window
-	count int
+	Joypad *byte
+	IF *ReferenceRegister
+	IE *ReferenceRegister
+	CPU *CPU
 }
 
 var count = 0
@@ -54,7 +58,7 @@ func clearBackground(window *sdl.Window) error {
 	return err
 }
 
-func NewSDLDisplay() (*SDLDisplay, error) {
+func NewSDLDisplay(joypad *byte, interrupt *ReferenceRegister) (*SDLDisplay, error) {
 	if err := sdl.Init(sdl.INIT_EVERYTHING); err != nil {
 		panic(err)
 	}
@@ -73,7 +77,7 @@ func NewSDLDisplay() (*SDLDisplay, error) {
 		return nil, err
 	}
 
-	return &SDLDisplay{Window: window}, nil
+	return &SDLDisplay{Window: window, Joypad: joypad, IF: interrupt}, nil
 }
 
 func (display SDLDisplay) UpdateScanline(pixels []*Pixel, palette byte, y int) {
@@ -82,7 +86,37 @@ func (display SDLDisplay) UpdateScanline(pixels []*Pixel, palette byte, y int) {
 	for x := 0; x < len(pixels); x++ {
 		surface.Set(x, y,  getColorFromPixel(pixels[x], palette))
 	}
-	//_ = display.UpdateGraphics()
+}
+
+func (display *SDLDisplay) handleKeyboardEvent(ev *sdl.KeyboardEvent){
+	if ev.State == 0 {
+		return
+	}
+	var joypadIndex int
+	switch key := ev.Keysym ; key.Sym {
+	case sdl.K_RETURN:
+		joypadIndex = SELECT_JOYPAD
+	case sdl.K_RIGHT:
+		joypadIndex = RIGHT_JOYPAD
+	case sdl.K_LEFT:
+		joypadIndex = LEFT_JOYPAD
+	case sdl.K_UP:
+		joypadIndex = UP_JOYPAD
+	case sdl.K_DOWN:
+		joypadIndex = DOWN_JOYPAD
+	case sdl.K_a:
+		joypadIndex = A_JOYPAD
+	case sdl.K_b:
+		joypadIndex = B_JOYPAD
+	case sdl.K_SPACE:
+		joypadIndex = START_JOYPAD
+	default:
+		return
+	}
+	fmt.Println(fmt.Sprintf("%b", display.CPU.Registers.IE.Get()))
+
+	*display.Joypad = SetBit(*display.Joypad, 1, joypadIndex)
+	display.IF.SetBit(1, JOYPAD)
 }
 
 func (display SDLDisplay) HandleEvent() bool {
@@ -90,9 +124,8 @@ func (display SDLDisplay) HandleEvent() bool {
 		switch event.(type) {
 		case *sdl.QuitEvent:
 			return false
-		case *sdl.MouseButtonEvent:
-			ev := event.(*sdl.MouseButtonEvent)
-			fmt.Println(fmt.Sprintf("%d %d", ev.X, ev.Y))
+		case *sdl.KeyboardEvent:
+			display.handleKeyboardEvent(event.(*sdl.KeyboardEvent))
 		}
 
 	}

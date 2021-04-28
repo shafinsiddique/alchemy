@@ -10,7 +10,9 @@ func initializeComponents() (*CPU, *MMU, *PPU, IDisplay) {
 	joypad := byte(0b11111111)
 	mmu := NewMMU(&joypad)
 	cpu := NewCPU(mmu)
-	display, _ := NewSDLDisplay()
+	display, _ := NewSDLDisplay(&joypad, cpu.Registers.IF)
+	display.IE = cpu.Registers.IE
+	display.CPU = cpu
 	ppu := NewPPU(mmu, display)
 	return cpu, mmu, ppu, display
 }
