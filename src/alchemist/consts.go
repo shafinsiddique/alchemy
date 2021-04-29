@@ -24,7 +24,7 @@ const (
 	WINDOW_HEIGHT                = 144
 	MAX_CYCLES                   = 69905
 	IE_INDEX                     = 0xFFFF
-	IF_INDEX                     = 0xF0F
+	IF_INDEX                     = 0xFF0F
 	V_BLANK                      = 0
 	LCD_STAT                     = 1
 	TIMER                        = 2

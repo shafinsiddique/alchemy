@@ -1430,6 +1430,7 @@ func (cpu *CPU) DI() int {
 
 func (cpu *CPU) EI() int {
 	cpu.IME = true
+	cpu.justEnabledIme = true
 	return 4
 }
 

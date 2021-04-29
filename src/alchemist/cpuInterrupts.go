@@ -9,6 +9,10 @@ func (cpu *CPU) HandleInterrupts(opcode byte) { // maybe there's a better signat
 	if !cpu.IME || cpu.isInterrupt(opcode) {
 		return
 	}
+	if cpu.justEnabledIme {
+		cpu.justEnabledIme = false // after ime is enabled, effects are delayed by one instruction.
+		return
+	}
 
 	for i := 0; i < 5; i++ {
 		if cpu.Registers.IF.GetBit(i) == 1 && cpu.Registers.IE.GetBit(i) == 1 {

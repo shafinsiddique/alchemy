@@ -6,8 +6,6 @@ import (
 	"os"
 )
 
-var screenCount int = 0
-
 func initializeComponents() (*CPU, *MMU, *PPU, IDisplay) {
 	joypad := byte(0b11111111)
 	mmu := NewMMU(&joypad)
@@ -46,7 +44,7 @@ func run(cpu *CPU, mmu *MMU, ppu *PPU) {
 			fmt.Println(fmt.Sprintf("%c", mmu.Read(0xff01)))
 			mmu.Memory[0xff02] = 0
 		}
-		//if !mmu.BootMode && cpu.PC == 0xc319 {
+		//if !mmu.BootMode && cpu.PC == 0xC2b6 {
 		//	debug = true
 		//}
 		//
@@ -59,12 +57,6 @@ func run(cpu *CPU, mmu *MMU, ppu *PPU) {
 		//	fmt.Println(fmt.Sprintf("PC: %x", cpu.PC))
 		//	fmt.Println("END.")
 		//}
-		//if cpu.PC == 0x0677 {
-		//	screenCount += 1
-		//}
-		//if !mmu.BootMode && screenCount > 1 {
-
-		//}
 
 		cyclesThisUpdate += cycles
 		if mmu.BootMode && cpu.PC >= 256 {
@@ -76,7 +68,7 @@ func run(cpu *CPU, mmu *MMU, ppu *PPU) {
 func main() {
 	cpu, mmu, ppu, dis := initializeComponents()
 	p, _ := os.Getwd()
-	load(p + "/bootstrap.gb", p + "/special.gb", mmu)
+	load(p + "/bootstrap.gb", p + "/op-sp-hl.gb", mmu)
 	mmu.SetBootMode()
 	for dis.HandleEvent() {
 		run(cpu, mmu, ppu)
