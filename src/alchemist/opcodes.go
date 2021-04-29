@@ -1122,8 +1122,12 @@ func (cpu *CPU) LD_HL_SP_S8() int {
 	} else {
 		val += uint16(s8)
 	}
-
+	s816 := uint16(s8)
 	cpu.Registers.HL.SetV2(val)
+	cpu.ClearZeroFlag()
+	cpu.ClearNegativeFlag()
+	cpu.CheckAndSetHCFlagSixteenBit(val, s816, isNegative)
+	cpu.CheckAndSetOverflowFlagSixteenBit(val, s816, isNegative)
 	return 12
 }
 
@@ -1430,7 +1434,6 @@ func (cpu *CPU) DI() int {
 
 func (cpu *CPU) EI() int {
 	cpu.IME = true
-	cpu.justEnabledIme = true
 	return 4
 }
 

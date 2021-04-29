@@ -9,7 +9,6 @@ type CPU struct {
 	MMU            *MMU
 	IME            bool
 	Halted         bool
-	justEnabledIme bool
 }
 
 func NewCPU(mmu *MMU) *CPU {

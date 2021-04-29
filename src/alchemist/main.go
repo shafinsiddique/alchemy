@@ -47,7 +47,7 @@ func run(cpu *CPU, mmu *MMU, ppu *PPU) {
 		//if !mmu.BootMode && cpu.PC == 0xC2b6 {
 		//	debug = true
 		//}
-		//
+
 		//if debug {
 		//	fmt.Println(fmt.Sprintf("AF: %x", cpu.Registers.AF.Get()))
 		//	fmt.Println(fmt.Sprintf("BC: %x", cpu.Registers.BC.Get()))
@@ -68,7 +68,7 @@ func run(cpu *CPU, mmu *MMU, ppu *PPU) {
 func main() {
 	cpu, mmu, ppu, dis := initializeComponents()
 	p, _ := os.Getwd()
-	load(p + "/bootstrap.gb", p + "/op-sp-hl.gb", mmu)
+	load(p + "/bootstrap.gb", p + "/interrupts.gb", mmu)
 	mmu.SetBootMode()
 	for dis.HandleEvent() {
 		run(cpu, mmu, ppu)

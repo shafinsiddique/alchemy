@@ -5,13 +5,9 @@ func (cpu *CPU) isInterrupt(opcode byte) bool {
 	return exists
 }
 
-func (cpu *CPU) HandleInterrupts(opcode byte) { // maybe there's a better signature for this?
-	if !cpu.IME || cpu.isInterrupt(opcode) {
-		return
-	}
-	if cpu.justEnabledIme {
-		cpu.justEnabledIme = false // after ime is enabled, effects are delayed by one instruction.
-		return
+func (cpu *CPU) HandleInterrupts(opcode byte) {
+	if !cpu.IME || cpu.isInterrupt(opcode) { // the isInterrupt is checked so that we have the delay.
+		return // after IME is enabled, there's a 1 instruction delay.
 	}
 
 	for i := 0; i < 5; i++ {
