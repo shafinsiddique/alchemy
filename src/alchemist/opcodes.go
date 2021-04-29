@@ -1106,8 +1106,12 @@ func (cpu *CPU) POP_HL() int {
 	return cpu.pop(cpu.Registers.HL)
 }
 
-func (cpu *CPU) POP_AF() int {
-	return cpu.pop(cpu.Registers.AF)
+func (cpu *CPU) POP_AF() int { // special pop case.
+	low := cpu.PopFromStack()
+	high := cpu.PopFromStack()
+	cpu.Registers.A.Set(high)
+	cpu.Registers.F.Set(low & 0b11110000)
+	return 12
 }
 
 func (cpu *CPU) LD_HL_SP_S8() int {

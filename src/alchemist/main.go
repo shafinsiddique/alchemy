@@ -35,30 +35,30 @@ func load(bootrom string, rom string, mmu *MMU) {
 }
 
 func run(cpu *CPU, mmu *MMU, ppu *PPU) {
-	debug := false
+	//debug := false
 	cyclesThisUpdate := 0
 	for cyclesThisUpdate < MAX_CYCLES {
 		opcode := cpu.FetchAndIncrement()
 		cycles := cpu.Execute(opcode)
 		ppu.UpdateGraphics(cycles)
 		cpu.HandleInterrupts(opcode)
-		//if !mmu.BootMode && mmu.Read(0xff02) == 0x81{
-		//	fmt.Println(fmt.Sprintf("%c", mmu.Read(0xff01)))
-		//	mmu.Memory[0xff02] = 0
+		if !mmu.BootMode && mmu.Read(0xff02) == 0x81{
+			fmt.Println(fmt.Sprintf("%c", mmu.Read(0xff01)))
+			mmu.Memory[0xff02] = 0
+		}
+		//if !mmu.BootMode && cpu.PC == 0xc319 {
+		//	debug = true
 		//}
-		if !mmu.BootMode && cpu.PC == 0xc319 {
-			debug = true
-		}
-
-		if debug {
-			fmt.Println(fmt.Sprintf("AF: %x", cpu.Registers.AF.Get()))
-			fmt.Println(fmt.Sprintf("BC: %x", cpu.Registers.BC.Get()))
-			fmt.Println(fmt.Sprintf("DE: %x", cpu.Registers.DE.Get()))
-			fmt.Println(fmt.Sprintf("HL: %x", cpu.Registers.HL.Get()))
-			fmt.Println(fmt.Sprintf("SP: %x", cpu.SP))
-			fmt.Println(fmt.Sprintf("PC: %x", cpu.PC))
-			fmt.Println("END.")
-		}
+		//
+		//if debug {
+		//	fmt.Println(fmt.Sprintf("AF: %x", cpu.Registers.AF.Get()))
+		//	fmt.Println(fmt.Sprintf("BC: %x", cpu.Registers.BC.Get()))
+		//	fmt.Println(fmt.Sprintf("DE: %x", cpu.Registers.DE.Get()))
+		//	fmt.Println(fmt.Sprintf("HL: %x", cpu.Registers.HL.Get()))
+		//	fmt.Println(fmt.Sprintf("SP: %x", cpu.SP))
+		//	fmt.Println(fmt.Sprintf("PC: %x", cpu.PC))
+		//	fmt.Println("END.")
+		//}
 		//if cpu.PC == 0x0677 {
 		//	screenCount += 1
 		//}
