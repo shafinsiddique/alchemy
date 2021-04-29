@@ -1,5 +1,7 @@
 package main
 
+import "fmt"
+
 type MMU struct {
 	BootRomMemory []byte
 	Memory        []byte
@@ -37,6 +39,9 @@ func (mmu *MMU) getJoypadState() byte {
 
 	for i := 0; i<4; i++ {
 		status := GetBit(*mmu.Joypad, starting+i)
+		if status != 1 {
+			fmt.Println("hello")
+		}
 		val = SetBit(val, status, i)
 	}
 
@@ -46,16 +51,16 @@ func (mmu *MMU) getJoypadState() byte {
 func (mmu *MMU) Write(addr uint16, val byte) {
 	if mmu.BootMode && addr < 256 {
 		mmu.BootRomMemory[addr] = val
+	} else if addr == JOYPAD_INDEX{
+		mmu.writeToJoypad(val)
 	} else {
 		mmu.Memory[addr] = val
 	}
 }
 
 func (mmu *MMU) writeToJoypad(val byte) {
-	for i := 0; i<4; i++ {
-		val = SetBit(val,1, i)
-	}
-
+	val = SetBit(val, GetBit(val, 4), 4) // we set only bit 4 and bit 5.
+	val = SetBit(val, GetBit(val, 5), 5)
 	mmu.Memory[JOYPAD_INDEX] = val
 }
 

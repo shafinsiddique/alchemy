@@ -30,15 +30,15 @@ const (
 	TIMER                        = 2
 	SERIAL                       = 3
 	JOYPAD                       = 4
-	JOYPAD_INDEX = 0xFF00
-	RIGHT_JOYPAD = 0
-	LEFT_JOYPAD = 1
-	UP_JOYPAD = 2
-	DOWN_JOYPAD = 3
-	A_JOYPAD = 4
-	B_JOYPAD = 5
-	SELECT_JOYPAD = 6
-	START_JOYPAD = 7
+	JOYPAD_INDEX                 = 0xFF00
+	RIGHT_JOYPAD                 = 0
+	LEFT_JOYPAD                  = 1
+	UP_JOYPAD                    = 2
+	DOWN_JOYPAD                  = 3
+	A_JOYPAD                     = 4
+	B_JOYPAD                     = 5
+	SELECT_JOYPAD                = 6
+	START_JOYPAD                 = 7
 )
 
 var COLOR_MAP = map[byte]color.RGBA{
@@ -48,5 +48,5 @@ var COLOR_MAP = map[byte]color.RGBA{
 	0: {R: 255, G: 255, B: 255},
 }
 
-var INTERRUPT_INSTRUCTIONS = map[byte]bool{0x0:false,0x1:false,0x76:false,0x2f:false,0x3f:false,
-	0x27:false,0x37:false,0xf3:false,0xfb:false}
+var INTERRUPT_INSTRUCTIONS = map[byte]bool{0x0: false, 0x1: false, 0x76: false, 0x2f: false, 0x3f: false,
+	0x27: false, 0x37: false, 0xf3: false, 0xfb: false}

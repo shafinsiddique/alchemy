@@ -62,20 +62,16 @@ func NewSDLDisplay(joypad *byte, interrupt *ReferenceRegister) (*SDLDisplay, err
 		panic(err)
 	}
 	_ = sdl.GLSetSwapInterval(0)
-
 	window, err := sdl.CreateWindow(TITLE,
 		sdl.WINDOWPOS_UNDEFINED, sdl.WINDOWPOS_UNDEFINED,
 		WINDOW_WIDTH, WINDOW_HEIGHT, sdl.WINDOW_SHOWN)
 	if err != nil {
 		return nil, err
 	}
-
 	err = clearBackground(window)
-
 	if err != nil {
 		return nil, err
 	}
-
 	return &SDLDisplay{Window: window, Joypad: joypad, IF: interrupt}, nil
 }
 
@@ -88,9 +84,6 @@ func (display SDLDisplay) UpdateScanline(pixels []*Pixel, palette byte, y int) {
 }
 
 func (display *SDLDisplay) handleKeyboardEvent(ev *sdl.KeyboardEvent){
-	if ev.State == 0 {
-		return
-	}
 	var joypadIndex int
 	switch key := ev.Keysym ; key.Sym {
 	case sdl.K_RETURN:
@@ -112,8 +105,8 @@ func (display *SDLDisplay) handleKeyboardEvent(ev *sdl.KeyboardEvent){
 	default:
 		return
 	}
-
-	*display.Joypad = SetBit(*display.Joypad, 0, joypadIndex)
+	*display.Joypad = SetBit(*display.Joypad, 1-ev.State, joypadIndex) // 1-ev.state to flip the state.
+	// in the gameboy, 0 = Pressed, 1 = Released.
 	display.IF.SetBit(1, JOYPAD)
 }
 

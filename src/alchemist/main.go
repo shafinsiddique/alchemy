@@ -1,9 +1,9 @@
 package main
 
 import (
-	"fmt"
 	log "github.com/sirupsen/logrus"
 	"os"
+	"time"
 )
 
 func initializeComponents() (*CPU, *MMU, *PPU, IDisplay) {
@@ -33,30 +33,57 @@ func load(bootrom string, rom string, mmu *MMU) {
 }
 
 func run(cpu *CPU, mmu *MMU, ppu *PPU) {
-	//debug := false
+	debug := false
+	debug2 := false
 	cyclesThisUpdate := 0
 	for cyclesThisUpdate < MAX_CYCLES {
 		opcode := cpu.FetchAndIncrement()
 		cycles := cpu.Execute(opcode)
 		ppu.UpdateGraphics(cycles)
 		cpu.HandleInterrupts(opcode)
-		if !mmu.BootMode && mmu.Read(0xff02) == 0x81{
-			fmt.Println(fmt.Sprintf("%c", mmu.Read(0xff01)))
-			mmu.Memory[0xff02] = 0
+		if GetBit(*mmu.Joypad, 6) == 0 {
+			debug = true
 		}
+
+		if debug {
+			if cpu.PC > 0x2f0 {
+				debug2 = true
+			}
+		}
+		//if cpu.PC == 0x40 && cpu.Registers.DE.Get() == 0x0479 {
+		//	debug = true
+		//}
+		//
+		//if debug {
+		//	if cpu.PC == 0x02ED {
+		//		debug2 = true
+		//	}
+		//}
+		//
+		//if debug2 {
+		//	if cpu.PC > 0x02F0 {
+		//		//fmt.Println(fmt.Sprintf("%x A:", cpu.Registers.A.Get()))
+		//		//fmt.Println(fmt.Sprintf("%x LY:", ppu.Registers.LY.Get()))
+		//
+		//	}
+		//}
+		//if !mmu.BootMode && mmu.Read(0xff02) == 0x81{
+		//	fmt.Println(fmt.Sprintf("%c", mmu.Read(0xff01)))
+		//	mmu.Memory[0xff02] = 0
+		//}
 		//if !mmu.BootMode && cpu.PC == 0xC2b6 {
 		//	debug = true
 		//}
 
-		//if debug {
-		//	fmt.Println(fmt.Sprintf("AF: %x", cpu.Registers.AF.Get()))
-		//	fmt.Println(fmt.Sprintf("BC: %x", cpu.Registers.BC.Get()))
-		//	fmt.Println(fmt.Sprintf("DE: %x", cpu.Registers.DE.Get()))
-		//	fmt.Println(fmt.Sprintf("HL: %x", cpu.Registers.HL.Get()))
-		//	fmt.Println(fmt.Sprintf("SP: %x", cpu.SP))
-		//	fmt.Println(fmt.Sprintf("PC: %x", cpu.PC))
-		//	fmt.Println("END.")
-		//}
+		if debug2 && debug {
+			//fmt.Println(fmt.Sprintf("AF: %x", cpu.Registers.AF.Get()))
+			//fmt.Println(fmt.Sprintf("BC: %x", cpu.Registers.BC.Get()))
+			//fmt.Println(fmt.Sprintf("DE: %x", cpu.Registers.DE.Get()))
+			//fmt.Println(fmt.Sprintf("HL: %x", cpu.Registers.HL.Get()))
+			//fmt.Println(fmt.Sprintf("SP: %x", cpu.SP))
+			//fmt.Println(fmt.Sprintf("PC: %x", cpu.PC))
+			//fmt.Println("END.")
+		}
 
 		cyclesThisUpdate += cycles
 		if mmu.BootMode && cpu.PC >= 256 {
@@ -68,12 +95,12 @@ func run(cpu *CPU, mmu *MMU, ppu *PPU) {
 func main() {
 	cpu, mmu, ppu, dis := initializeComponents()
 	p, _ := os.Getwd()
-	load(p + "/bootstrap.gb", p + "/interrupts.gb", mmu)
+	load(p + "/bootstrap.gb", p + "/tetris.gb", mmu)
 	mmu.SetBootMode()
 	for dis.HandleEvent() {
 		run(cpu, mmu, ppu)
-		//_ = dis.UpdateGraphics()
-		//time.Sleep(10*time.Millisecond)
+		_ = dis.UpdateGraphics()
+		time.Sleep(10*time.Millisecond)
 	}
 
 }
