@@ -13,6 +13,7 @@ const (
 	SCANLINE_CYCLES              = 456
 	LY_INDEX                     = 0xFF44
 	LCDC_INDEX                   = 0xFF40
+	LCD_STATUS = 				0xFF41
 	SCX_INDEX                    = 0xFF43
 	SCY_INDEX                    = 0xFF42
 	NUMBER_OF_TILES_IN_SCANLINE  = 20
@@ -39,6 +40,9 @@ const (
 	B_JOYPAD                     = 5
 	SELECT_JOYPAD                = 6
 	START_JOYPAD                 = 7
+	MODE_2_CYCLES = 80
+	MODE_3_CYCLES = 172
+
 )
 
 var COLOR_MAP = map[byte]color.RGBA{

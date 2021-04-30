@@ -27,7 +27,6 @@ func (ppu *PPU) IncrementScanline() {
 }
 
 func (ppu *PPU) FetchPixels() []*Pixel {
-
 	firstTileAddr, lineNumber := ppu.getFirstTileIdAddr()
 	row := make([]*Pixel, NUMBER_OF_PIXELS_IN_SCANLINE)
 	offset := ppu.getFirstOffset() // we need an offset for the first one and then zero everytime afterwards.
@@ -46,7 +45,6 @@ func (ppu *PPU) FetchPixels() []*Pixel {
 	}
 
 	return row
-
 }
 
 func (ppu *PPU) getFirstOffset() int {
@@ -106,15 +104,81 @@ func (ppu *PPU) runScanline() {
 
 	ppu.IncrementScanline()
 }
+func (ppu *PPU) handleDisabledLCD() {
+	ppu.Cycles = SCANLINE_CYCLES
+	ppu.Registers.LY.Set(0)
+	ppu.setModeInLCDStat(0)
+}
 
 func (ppu *PPU) UpdateGraphics(cycles int) {
 	if !ppu.LCDEnabled() {
+		ppu.handleDisabledLCD()
 		return
 	}
+	ppu.setLCDStatus()
 	ppu.Cycles -= cycles
-	if ppu.Cycles <= 0 { // new scanline.
+	if ppu.Cycles <= 0 { // new scanline. 456 Clock Cycles has past, so we have a new scanline.
 		ppu.runScanline()
 	}
+}
+
+func (ppu *PPU) setModeInLCDStat(mode byte) {
+	b1, b0 := GetBit(mode, 1), GetBit(mode, 0)
+	ppu.Registers.LCD_STAT.SetBit(b1, 1)
+	ppu.Registers.LCD_STAT.SetBit(b0, 0)
+}
+
+func  (ppu *PPU) getCurrentMode() byte {
+	var mode byte
+	lcdStat := ppu.Registers.LCD_STAT
+	mode = SetBit(mode, lcdStat.GetBit(1),1)
+	mode = SetBit(mode, lcdStat.GetBit(0), 0)
+	return mode
+}
+
+func (ppu *PPU) checkForInterrupts(oldMode byte, newMode byte) {
+	mode := int(newMode)
+	if (newMode == 0 || newMode == 1 || newMode == 2) && (oldMode != newMode) &&
+		ppu.Registers.LCD_STAT.GetBit(mode+3) == 1 {
+		ppu.requestPPUInterrupt()
+	}
+}
+
+func (ppu *PPU) requestPPUInterrupt(){
+	ppu.Registers.IF.SetBit(1, LCD_STAT)
+}
+
+func (ppu *PPU) checkForCoincidence() {
+	var bit byte = 0
+	if ppu.Registers.LY.Get() == ppu.MMU.Read(0xff45) {
+		bit = 1
+		if ppu.Registers.LCD_STAT.GetBit(6) == 1 {
+			ppu.requestPPUInterrupt()
+		}
+	}
+
+	ppu.Registers.LCD_STAT.SetBit(bit, 2)
+}
+
+func (ppu *PPU) setLCDStatus() {
+	line := ppu.Registers.LY.Get()
+	currentMode := ppu.getCurrentMode()
+	var mode byte
+	if line >= 144 {
+		mode = 1
+	} else {
+		if ppu.Cycles >= SCANLINE_CYCLES-MODE_2_CYCLES {
+			mode = 2
+		} else if ppu.Cycles >= SCANLINE_CYCLES-MODE_2_CYCLES-MODE_3_CYCLES {
+			mode = 3
+		} else {
+			mode = 0
+		}
+	}
+	ppu.setModeInLCDStat(mode)
+	ppu.checkForInterrupts(currentMode, mode)
+	ppu.checkForCoincidence()
+
 }
 
 func (ppu *PPU) LCDEnabled() bool {

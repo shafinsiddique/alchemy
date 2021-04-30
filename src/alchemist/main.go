@@ -102,5 +102,4 @@ func main() {
 		_ = dis.UpdateGraphics()
 		time.Sleep(10*time.Millisecond)
 	}
-
 }

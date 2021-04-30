@@ -1,7 +1,5 @@
 package main
 
-import "fmt"
-
 type MMU struct {
 	BootRomMemory []byte
 	Memory        []byte
@@ -39,9 +37,6 @@ func (mmu *MMU) getJoypadState() byte {
 
 	for i := 0; i<4; i++ {
 		status := GetBit(*mmu.Joypad, starting+i)
-		if status != 1 {
-			fmt.Println("hello")
-		}
 		val = SetBit(val, status, i)
 	}
 

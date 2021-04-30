@@ -7,6 +7,7 @@ type PPURegisters struct {
 	SCX  *ReferenceRegister
 	BGP  *ReferenceRegister
 	IF *ReferenceRegister
+	LCD_STAT *ReferenceRegister
 }
 
 func InitializePPURegisters(memory []byte) *PPURegisters {
@@ -16,5 +17,7 @@ func InitializePPURegisters(memory []byte) *PPURegisters {
 	scx := &ReferenceRegister{&memory[SCX_INDEX]}
 	bgp := &ReferenceRegister{&memory[BGP_INDEX]}
 	_if := &ReferenceRegister{&memory[IF_INDEX]}
-	return &PPURegisters{LY: ly, LCDC: lcdc, SCY: scy, SCX: scx, BGP: bgp, IF:_if}
+	lcdStat := &ReferenceRegister{&memory[LCD_STATUS]}
+	return &PPURegisters{LY: ly, LCDC: lcdc, SCY: scy, SCX: scx, BGP: bgp, IF:_if,
+		LCD_STAT: lcdStat}
 }
