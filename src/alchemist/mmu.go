@@ -6,6 +6,7 @@ type MMU struct {
 	BootMode      bool
 	Joypad 		*byte
 	Count int
+	Debug *bool
 }
 
 func NewMMU(joypad *byte) *MMU {
@@ -29,7 +30,7 @@ func (mmu *MMU) getJoypadState() byte {
 	val = SetBit(val, 1, 6)
 
 	var starting int
-	if GetBit(val, 4) == 1 {
+	if GetBit(val, 4) == 0 {
 		starting = 0
 	} else {
 		starting = 4
@@ -37,19 +38,31 @@ func (mmu *MMU) getJoypadState() byte {
 
 	for i := 0; i<4; i++ {
 		status := GetBit(*mmu.Joypad, starting+i)
+		if status != 1 {
+			*mmu.Debug = true
+		}
 		val = SetBit(val, status, i)
 	}
 
 	return val
 }
 
+func (mmu *MMU) inRomRegion(addr uint16) bool {
+	if (addr >= 0x000 && addr <= 0x3fff) && (addr >= 0x4000 && addr <= 0x9fff) {
+		return true
+	}
+	return false
+}
+
 func (mmu *MMU) Write(addr uint16, val byte) {
 	if mmu.BootMode && addr < 256 {
 		mmu.BootRomMemory[addr] = val
-	} else if addr == JOYPAD_INDEX{
+	}  else if addr == JOYPAD_INDEX {
 		mmu.writeToJoypad(val)
 	} else {
-		mmu.Memory[addr] = val
+		if !mmu.inRomRegion(addr) {
+			mmu.Memory[addr] = val
+		}
 	}
 }
 
@@ -78,6 +91,6 @@ func (mmu *MMU) LoadBootRom(bootrom []byte) {
 func (mmu *MMU) LoadBankRom0(rom []byte) {
 	mmu.SetRegularMode()
 	for i := 0; i < len(rom); i++ {
-		mmu.Write(uint16(i), rom[i])
+		mmu.Memory[uint16(i)] = rom[i]
 	}
 }

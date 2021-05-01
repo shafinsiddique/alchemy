@@ -1,12 +1,14 @@
 package main
 
 import (
+	"fmt"
 	log "github.com/sirupsen/logrus"
 	"os"
 	"time"
 )
 
 func initializeComponents() (*CPU, *MMU, *PPU, IDisplay) {
+	debug := false
 	joypad := byte(0b11111111)
 	mmu := NewMMU(&joypad)
 	cpu := NewCPU(mmu)
@@ -14,6 +16,8 @@ func initializeComponents() (*CPU, *MMU, *PPU, IDisplay) {
 	display.IE = cpu.Registers.IE
 	display.CPU = cpu
 	ppu := NewPPU(mmu, display)
+	cpu.Debug = &debug
+	mmu.Debug = &debug
 	return cpu, mmu, ppu, display
 }
 
@@ -41,15 +45,22 @@ func run(cpu *CPU, mmu *MMU, ppu *PPU) {
 		cycles := cpu.Execute(opcode)
 		ppu.UpdateGraphics(cycles)
 		cpu.HandleInterrupts(opcode)
-		if GetBit(*mmu.Joypad, 6) == 0 {
+		if *cpu.Debug && cpu.PC == 0x04a2 {
 			debug = true
 		}
 
-		if debug {
-			if cpu.PC > 0x2f0 {
-				debug2 = true
-			}
+		if !mmu.BootMode && cpu.PC == 0x40 {
+			debug2 = true
 		}
+		//if GetBit(*mmu.Joypad, 6) == 0 {
+		//	debug = true
+		//}
+		//
+		//if debug {
+		//	if cpu.PC > 0x2f0 {
+		//		debug2 = true
+		//	}
+		//}
 		//if cpu.PC == 0x40 && cpu.Registers.DE.Get() == 0x0479 {
 		//	debug = true
 		//}
@@ -75,7 +86,17 @@ func run(cpu *CPU, mmu *MMU, ppu *PPU) {
 		//	debug = true
 		//}
 
-		if debug2 && debug {
+		if  debug {
+			fmt.Println(fmt.Sprintf("AF: %x", cpu.Registers.AF.Get()))
+			fmt.Println(fmt.Sprintf("BC: %x", cpu.Registers.BC.Get()))
+			fmt.Println(fmt.Sprintf("DE: %x", cpu.Registers.DE.Get()))
+			fmt.Println(fmt.Sprintf("HL: %x", cpu.Registers.HL.Get()))
+			fmt.Println(fmt.Sprintf("SP: %x", cpu.SP))
+			fmt.Println(fmt.Sprintf("PC: %x", cpu.PC))
+			fmt.Println("END.")
+		}
+
+		if debug2{
 			//fmt.Println(fmt.Sprintf("AF: %x", cpu.Registers.AF.Get()))
 			//fmt.Println(fmt.Sprintf("BC: %x", cpu.Registers.BC.Get()))
 			//fmt.Println(fmt.Sprintf("DE: %x", cpu.Registers.DE.Get()))
