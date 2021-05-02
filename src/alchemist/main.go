@@ -87,7 +87,7 @@ func run(cpu *CPU, mmu *MMU, ppu *PPU) {
 		//}
 
 
-		if  debug {
+		if debug {
 			fmt.Println(fmt.Sprintf("%x", mmu.Read(0xff80)))
 			fmt.Println(fmt.Sprintf("AF: %x", cpu.Registers.AF.Get()))
 			fmt.Println(fmt.Sprintf("BC: %x", cpu.Registers.BC.Get()))
