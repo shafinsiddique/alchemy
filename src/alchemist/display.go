@@ -84,9 +84,9 @@ func (display SDLDisplay) UpdateScanline(pixels []*Pixel, palette byte, y int) {
 }
 
 func (display *SDLDisplay) handleKeyboardEvent(ev *sdl.KeyboardEvent){
-	//if ev.State == 0 {
-	//	return
-	//}
+	if ev.State == 0 {
+		return
+	}
 
 	var joypadIndex int
 	switch key := ev.Keysym ; key.Sym {
@@ -109,12 +109,13 @@ func (display *SDLDisplay) handleKeyboardEvent(ev *sdl.KeyboardEvent){
 	default:
 		return
 	}
-	*display.Joypad = SetBit(*display.Joypad,1-ev.State, joypadIndex) // 1-ev.state to flip the state.
-	// in the gameboy, 0 = Pressed, 1 = Released.
-	//display.IF.SetBit(1, JOYPAD)
+	*display.CPU.Debug = true
+	*display.Joypad = SetBit(*display.Joypad,0, joypadIndex)
+	display.IF.SetBit(1, JOYPAD)
 }
 
 func (display SDLDisplay) HandleEvent() bool {
+	*display.Joypad = 0b11111111
 	for event := sdl.PollEvent(); event != nil; event = sdl.PollEvent() {
 		switch event.(type) {
 		case *sdl.QuitEvent:

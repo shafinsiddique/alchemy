@@ -38,9 +38,9 @@ func (mmu *MMU) getJoypadState() byte {
 
 	for i := 0; i<4; i++ {
 		status := GetBit(*mmu.Joypad, starting+i)
-		if status != 1 {
-			*mmu.Debug = true
-		}
+		//if status != 1 {
+		//	*mmu.Debug = true
+		//}
 		val = SetBit(val, status, i)
 	}
 

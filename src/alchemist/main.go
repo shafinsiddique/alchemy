@@ -45,7 +45,7 @@ func run(cpu *CPU, mmu *MMU, ppu *PPU) {
 		cycles := cpu.Execute(opcode)
 		ppu.UpdateGraphics(cycles)
 		cpu.HandleInterrupts(opcode)
-		if *cpu.Debug && cpu.PC == 0x04B7 {
+		if *cpu.Debug && cpu.PC == 0x29A6 {
 			debug = true
 		}
 
@@ -86,7 +86,9 @@ func run(cpu *CPU, mmu *MMU, ppu *PPU) {
 		//	debug = true
 		//}
 
+
 		if  debug {
+			fmt.Println(fmt.Sprintf("%x", mmu.Read(0xff80)))
 			fmt.Println(fmt.Sprintf("AF: %x", cpu.Registers.AF.Get()))
 			fmt.Println(fmt.Sprintf("BC: %x", cpu.Registers.BC.Get()))
 			fmt.Println(fmt.Sprintf("DE: %x", cpu.Registers.DE.Get()))
