@@ -45,7 +45,7 @@ func run(cpu *CPU, mmu *MMU, ppu *PPU) {
 		cycles := cpu.Execute(opcode)
 		ppu.UpdateGraphics(cycles)
 		cpu.HandleInterrupts(opcode)
-		if *cpu.Debug && cpu.PC == 0x04a2 {
+		if *cpu.Debug && cpu.PC == 0x04B7 {
 			debug = true
 		}
 
