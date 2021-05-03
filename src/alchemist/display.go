@@ -107,9 +107,9 @@ func (display *SDLDisplay) handleKeyboardEvent(ev *sdl.KeyboardEvent){
 	case sdl.K_SPACE:
 		joypadIndex = START_JOYPAD
 	default:
+		*display.CPU.Debug = true
 		return
 	}
-	*display.CPU.Debug = true
 	*display.Joypad = SetBit(*display.Joypad,0, joypadIndex)
 	display.IF.SetBit(1, JOYPAD)
 }

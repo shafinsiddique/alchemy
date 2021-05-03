@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	log "github.com/sirupsen/logrus"
 	"os"
 	"time"
@@ -44,7 +45,7 @@ func run(cpu *CPU, mmu *MMU, ppu *PPU) {
 		cycles := cpu.Execute(opcode)
 		ppu.UpdateGraphics(cycles)
 		cpu.HandleInterrupts(opcode)
-		if *cpu.Debug && cpu.PC == 0x04e7 {
+		if *cpu.Debug && cpu.PC == 0x15bf {
 			debug = true
 		}
 
@@ -84,9 +85,7 @@ func run(cpu *CPU, mmu *MMU, ppu *PPU) {
 		//if !mmu.BootMode && cpu.PC == 0xC2b6 {
 		//	debug = true
 		//}
-
-
-		if debug {
+		if *cpu.Debug && cpu.PC != 0x2ef && cpu.PC != 0x2ed && cpu.PC != 0x2f0 {
 			//fmt.Println(fmt.Sprintf("%x", mmu.Read(0xff81)))
 			//fmt.Println(fmt.Sprintf("%x", mmu.Read(0xff80)))
 			//fmt.Println(fmt.Sprintf("AF: %x", cpu.Registers.AF.Get()))
@@ -96,6 +95,19 @@ func run(cpu *CPU, mmu *MMU, ppu *PPU) {
 			//fmt.Println(fmt.Sprintf("SP: %x", cpu.SP))
 			//fmt.Println(fmt.Sprintf("PC: %x", cpu.PC))
 			//fmt.Println("END.")
+		}
+
+		if debug {
+			fmt.Println(fmt.Sprintf("%x", mmu.Read(0xffe1)))
+			fmt.Println(fmt.Sprintf("%x", mmu.Read(0xff81)))
+			fmt.Println(fmt.Sprintf("%x", mmu.Read(0xff80)))
+			fmt.Println(fmt.Sprintf("AF: %x", cpu.Registers.AF.Get()))
+			fmt.Println(fmt.Sprintf("BC: %x", cpu.Registers.BC.Get()))
+			fmt.Println(fmt.Sprintf("DE: %x", cpu.Registers.DE.Get()))
+			fmt.Println(fmt.Sprintf("HL: %x", cpu.Registers.HL.Get()))
+			fmt.Println(fmt.Sprintf("SP: %x", cpu.SP))
+			fmt.Println(fmt.Sprintf("PC: %x", cpu.PC))
+			fmt.Println("END.")
 		}
 
 		if debug2{
