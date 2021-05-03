@@ -1024,7 +1024,8 @@ func (cpu *CPU) OR_D8() int {
 }
 
 func (cpu *CPU) xor(val byte) int {
-	cpu.Registers.A.Set(val ^ val)
+	a := cpu.Registers.A.Get()
+	cpu.Registers.A.Set(a ^ val)
 	cpu.CheckAndSetZeroFlag(cpu.Registers.A.Get())
 	cpu.ClearNegativeFlag()
 	cpu.ClearHCFlag()
