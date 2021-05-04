@@ -6,7 +6,7 @@ import (
 	"os"
 	"time"
 )
-
+var count = 0
 func initializeComponents() (*CPU, *MMU, *PPU, IDisplay) {
 	debug := false
 	joypad := byte(0b11111111)
@@ -45,12 +45,10 @@ func run(cpu *CPU, mmu *MMU, ppu *PPU) {
 		cycles := cpu.Execute(opcode)
 		ppu.UpdateGraphics(cycles)
 		cpu.HandleInterrupts(opcode)
-		if *cpu.Debug && cpu.PC == 0x15bf {
-			debug = true
-		}
 
-		if !mmu.BootMode && cpu.PC == 0x40 {
-			debug2 = true
+
+		if *cpu.Debug && cpu.PC == 0x02f8 && mmu.Read(0xffe1) == 0xa {
+			debug = true
 		}
 		//if GetBit(*mmu.Joypad, 6) == 0 {
 		//	debug = true
@@ -98,9 +96,10 @@ func run(cpu *CPU, mmu *MMU, ppu *PPU) {
 		}
 
 		if debug {
-			fmt.Println(fmt.Sprintf("%x", mmu.Read(0xffe1)))
-			fmt.Println(fmt.Sprintf("%x", mmu.Read(0xff81)))
-			fmt.Println(fmt.Sprintf("%x", mmu.Read(0xff80)))
+			fmt.Println(fmt.Sprintf("Game Status: %x", mmu.Read(0xffe1)))
+			fmt.Println(fmt.Sprintf("Button Hit %x", mmu.Read(0xff81)))
+			fmt.Println(fmt.Sprintf("Button Down %x", mmu.Read(0xff80)))
+			fmt.Println(fmt.Sprintf("LY: %x", ppu.Registers.LY.Get()))
 			fmt.Println(fmt.Sprintf("AF: %x", cpu.Registers.AF.Get()))
 			fmt.Println(fmt.Sprintf("BC: %x", cpu.Registers.BC.Get()))
 			fmt.Println(fmt.Sprintf("DE: %x", cpu.Registers.DE.Get()))

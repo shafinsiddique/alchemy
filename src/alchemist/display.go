@@ -14,7 +14,8 @@ type SDLDisplay struct {
 	CPU *CPU
 }
 
-var count = 0
+var KEY_COUNT = 0 // TODO: DELETE
+
 func getColor(first byte, second byte) color.RGBA {
 	switch first {
 	case 1:
@@ -76,7 +77,6 @@ func NewSDLDisplay(joypad *byte, interrupt *ReferenceRegister) (*SDLDisplay, err
 }
 
 func (display SDLDisplay) UpdateScanline(pixels []*Pixel, palette byte, y int) {
-	count += 1
 	surface, _ := display.Window.GetSurface()
 	for x := 0; x < len(pixels); x++ {
 		surface.Set(x, y,  getColorFromPixel(pixels[x], palette))
@@ -107,8 +107,12 @@ func (display *SDLDisplay) handleKeyboardEvent(ev *sdl.KeyboardEvent){
 	case sdl.K_SPACE:
 		joypadIndex = START_JOYPAD
 	default:
-		*display.CPU.Debug = true
 		return
+	}
+
+	KEY_COUNT += 1
+	if KEY_COUNT == 3 {
+		*display.CPU.Debug = true
 	}
 	*display.Joypad = SetBit(*display.Joypad,0, joypadIndex)
 	display.IF.SetBit(1, JOYPAD)
