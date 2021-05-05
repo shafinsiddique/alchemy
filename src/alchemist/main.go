@@ -65,7 +65,7 @@ func run(cpu *CPU, mmu *MMU, ppu *PPU) {
 		cpu.HandleInterrupts(opcode)
 
 
-		if *cpu.Debug && cpu.PC == 0x1ff1 && mmu.Read(0xffe1) == 0xa {
+		if *cpu.Debug && cpu.PC == 0x1bce && mmu.Read(0xffe1) == 0x0 {
 			debug = true
 		}
 		
