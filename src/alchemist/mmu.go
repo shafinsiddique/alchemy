@@ -48,7 +48,7 @@ func (mmu *MMU) getJoypadState() byte {
 }
 
 func (mmu *MMU) inRomRegion(addr uint16) bool {
-	if (addr >= 0x000 && addr <= 0x3fff) && (addr >= 0x4000 && addr <= 0x9fff) {
+	if addr <= 0x3fff || (addr >= 0x4000 && addr <= 0x7fff) {
 		return true
 	}
 	return false
@@ -57,7 +57,9 @@ func (mmu *MMU) inRomRegion(addr uint16) bool {
 func (mmu *MMU) Write(addr uint16, val byte) {
 	if mmu.BootMode && addr < 256 {
 		mmu.BootRomMemory[addr] = val
-	}  else if addr == JOYPAD_INDEX {
+	} else if mmu.BootMode {
+		mmu.Memory[addr] = val
+	} else if addr == JOYPAD_INDEX {
 		mmu.writeToJoypad(val)
 	} else {
 		if !mmu.inRomRegion(addr) {

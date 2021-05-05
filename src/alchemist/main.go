@@ -3,10 +3,28 @@ package main
 import (
 	"fmt"
 	log "github.com/sirupsen/logrus"
+	"io"
 	"os"
 	"time"
 )
 var count = 0
+var logger *log.Logger
+func initLogger() {
+	customFormatter := new(log.TextFormatter)
+	customFormatter.TimestampFormat = "2006-01-02 15:04:05"
+	logger = log.New()
+	logger.SetFormatter(&log.TextFormatter{})
+	logger.SetFormatter(customFormatter)
+	path, _ := os.Getwd()
+	fmt.Println(path)
+	logFile, err := os.OpenFile(path+"/logs/logs.txt", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0755)
+	if err == nil {
+		logger.SetOutput(io.MultiWriter(os.Stderr, logFile))
+	} else {
+		logger.Error("error trying to initialize log file.")
+	}
+}
+
 func initializeComponents() (*CPU, *MMU, *PPU, IDisplay) {
 	debug := false
 	joypad := byte(0b11111111)
@@ -47,54 +65,10 @@ func run(cpu *CPU, mmu *MMU, ppu *PPU) {
 		cpu.HandleInterrupts(opcode)
 
 
-		if *cpu.Debug && cpu.PC == 0x02f8 && mmu.Read(0xffe1) == 0xa {
+		if *cpu.Debug && cpu.PC == 0x1ff1 && mmu.Read(0xffe1) == 0xa {
 			debug = true
 		}
-		//if GetBit(*mmu.Joypad, 6) == 0 {
-		//	debug = true
-		//}
-		//
-		//if debug {
-		//	if cpu.PC > 0x2f0 {
-		//		debug2 = true
-		//	}
-		//}
-		//if cpu.PC == 0x40 && cpu.Registers.DE.Get() == 0x0479 {
-		//	debug = true
-		//}
-		//
-		//if debug {
-		//	if cpu.PC == 0x02ED {
-		//		debug2 = true
-		//	}
-		//}
-		//
-		//if debug2 {
-		//	if cpu.PC > 0x02F0 {
-		//		//fmt.Println(fmt.Sprintf("%x A:", cpu.Registers.A.Get()))
-		//		//fmt.Println(fmt.Sprintf("%x LY:", ppu.Registers.LY.Get()))
-		//
-		//	}
-		//}
-		//if !mmu.BootMode && mmu.Read(0xff02) == 0x81{
-		//	fmt.Println(fmt.Sprintf("%c", mmu.Read(0xff01)))
-		//	mmu.Memory[0xff02] = 0
-		//}
-		//if !mmu.BootMode && cpu.PC == 0xC2b6 {
-		//	debug = true
-		//}
-		if *cpu.Debug && cpu.PC != 0x2ef && cpu.PC != 0x2ed && cpu.PC != 0x2f0 {
-			//fmt.Println(fmt.Sprintf("%x", mmu.Read(0xff81)))
-			//fmt.Println(fmt.Sprintf("%x", mmu.Read(0xff80)))
-			//fmt.Println(fmt.Sprintf("AF: %x", cpu.Registers.AF.Get()))
-			//fmt.Println(fmt.Sprintf("BC: %x", cpu.Registers.BC.Get()))
-			//fmt.Println(fmt.Sprintf("DE: %x", cpu.Registers.DE.Get()))
-			//fmt.Println(fmt.Sprintf("HL: %x", cpu.Registers.HL.Get()))
-			//fmt.Println(fmt.Sprintf("SP: %x", cpu.SP))
-			//fmt.Println(fmt.Sprintf("PC: %x", cpu.PC))
-			//fmt.Println("END.")
-		}
-
+		
 		if debug {
 			fmt.Println(fmt.Sprintf("Game Status: %x", mmu.Read(0xffe1)))
 			fmt.Println(fmt.Sprintf("Button Hit %x", mmu.Read(0xff81)))
@@ -127,6 +101,8 @@ func run(cpu *CPU, mmu *MMU, ppu *PPU) {
 }
 
 func main() {
+	initLogger()
+	//var lastOpcode byte
 	cpu, mmu, ppu, dis := initializeComponents()
 	p, _ := os.Getwd()
 	load(p + "/bootstrap.gb", p + "/tetris.gb", mmu)
@@ -136,4 +112,6 @@ func main() {
 		_ = dis.UpdateGraphics()
 		time.Sleep(10*time.Millisecond)
 	}
+
+
 }
