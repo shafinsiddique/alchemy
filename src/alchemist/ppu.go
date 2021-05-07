@@ -60,22 +60,29 @@ func (ppu *PPU) addTileToPixels(pixels []*Pixel, tilePixels []*Pixel, x byte) {
 	}
 }
 
-func (ppu *PPU) fetchSprites() {
-	pixels := make([]*Pixel, NUMBER_OF_PIXELS_IN_SCANLINE)
+func (ppu *PPU) fetchSprites() []*Sprite {
+	sprites := make([]*Sprite, 10)
+	xValues := map[byte]bool{}
 	spriteHeight := getSpriteHeight()
+	count := 0
 	for i := 0xFE00; i < 0xFE9f; i+=4 {
 		index := uint16(i) // need to convert for signature
 		sprite := NewSprite(ppu.MMU.Read(index), ppu.MMU.Read(index+1), ppu.MMU.Read(index+2),
 			ppu.MMU.Read(index+3))
 
-		if ppu.spriteIsVisible(sprite.X, sprite.Y, spriteHeight){
-			tilePixels := ppu.getHorizontalPixelsFromTile(sprite.TileID, 9) // fix.
-			ppu.addTileToPixels(pixels, tilePixels, sprite.X)
-
+		if _, exists := xValues[sprite.X];
+		ppu.spriteIsVisible(sprite.X, sprite.Y, spriteHeight) && count < 10 && !exists{
+			//tilePixels := ppu.getHorizontalPixelsFromTile(sprite.TileID, 9) // fix.
+			//ppu.addTileToPixels(pixels, tilePixels, sprite.X)
+			sprites[count] = sprite
+			xValues[sprite.X] = true // go needs hash sets -_-.
+			count += 1
+		} else if count == 10 {
+			break
 		}
-		// We need to check if Sprite is Visible.
-
 	}
+
+	return sprites
 }
 
 func (ppu *PPU) fetchPixels() []*Pixel {
