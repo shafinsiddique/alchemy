@@ -94,7 +94,7 @@ func (ppu *PPU) fetchPixels() []*Pixel {
 	//found := false
 	for i := 0; i < NUMBER_OF_TILES_IN_SCANLINE; i++ {
 		tileId := ppu.MMU.Read(firstTileAddr + uint16(i))
-		pixels := ppu.getHorizontalPixelsFromTile(tileId, lineNumber)
+		pixels := ppu.getHorizontalPixelsFromTile(tileId, lineNumber, false)
 		for offset < NUMBER_OF_PIXELS_IN_TILE && pixelCount < NUMBER_OF_PIXELS_IN_SCANLINE {
 			row[pixelCount] = pixels[offset]
 			pixelCount += 1
@@ -112,11 +112,23 @@ func (ppu *PPU) getFirstOffset() int {
 }
 
 func (ppu *PPU) getHorizontalPixelsFromTile(tileId byte, lineNumber uint16, flipped bool) []*Pixel {
+	var high byte
+	var low byte
 	addr := ppu.getTileAddr(tileId)
+	if flipped {
+		addr += 15
+		lineStartingIndex := addr - (lineNumber * 2)
+		high = ppu.MMU.Read(lineStartingIndex)
+		low = ppu.MMU.Read(lineStartingIndex-1)
 
-	lineStartingIndex := addr + (lineNumber * 2)
-	low := ppu.MMU.Read(lineStartingIndex)
-	high := ppu.MMU.Read(lineStartingIndex + 1)
+	} else {
+		addr = ppu.getTileAddr(tileId)
+
+		lineStartingIndex := addr + (lineNumber * 2)
+		low = ppu.MMU.Read(lineStartingIndex)
+		high = ppu.MMU.Read(lineStartingIndex + 1)
+	}
+
 	return GetPixels(high, low)
 }
 
