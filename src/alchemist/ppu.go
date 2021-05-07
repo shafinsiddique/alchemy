@@ -70,8 +70,8 @@ func (ppu *PPU) fetchSprites() []*Sprite {
 		sprite := NewSprite(ppu.MMU.Read(index), ppu.MMU.Read(index+1), ppu.MMU.Read(index+2),
 			ppu.MMU.Read(index+3))
 
-		if _, exists := xValues[sprite.X];
-		ppu.spriteIsVisible(sprite.X, sprite.Y, spriteHeight) && count < 10 && !exists{
+		if _, ok := xValues[sprite.X];
+		ppu.spriteIsVisible(sprite.X, sprite.Y, spriteHeight) && count < 10 && !ok{
 			//tilePixels := ppu.getHorizontalPixelsFromTile(sprite.TileID, 9) // fix.
 			//ppu.addTileToPixels(pixels, tilePixels, sprite.X)
 			sprites[count] = sprite
@@ -111,8 +111,9 @@ func (ppu *PPU) getFirstOffset() int {
 	return sx % 8
 }
 
-func (ppu *PPU) getHorizontalPixelsFromTile(tileId byte, lineNumber uint16) []*Pixel {
+func (ppu *PPU) getHorizontalPixelsFromTile(tileId byte, lineNumber uint16, flipped bool) []*Pixel {
 	addr := ppu.getTileAddr(tileId)
+
 	lineStartingIndex := addr + (lineNumber * 2)
 	low := ppu.MMU.Read(lineStartingIndex)
 	high := ppu.MMU.Read(lineStartingIndex + 1)
@@ -163,10 +164,37 @@ func (ppu *PPU) runScanline() {
 
 	ppu.incrementScanline()
 }
+
 func (ppu *PPU) handleDisabledLCD() {
 	ppu.Cycles = SCANLINE_CYCLES
 	ppu.Registers.LY.Set(0)
 	ppu.setModeInLCDStat(0)
+}
+
+func (ppu *PPU) getSpriteTileAndLine(sprite *Sprite, height byte) (tileId byte, lineNumber uint16){
+	yPos := int(sprite.Y) - 16
+	if yPos < 0 {
+		lineNumber = uint16(0 + ppu.Registers.LY.Get())
+	} else {
+		lineNumber = uint16(ppu.Registers.LY.Get() - (sprite.Y - 16))
+	}
+
+	if height == 8 {
+		tileId = sprite.TileID
+
+	} else {
+		tileA, tileB := sprite.TileID & 0XFE, (sprite.TileID & 0xFe) + 1 // tileA always top, tileB bottom.
+		if sprite.YFlip {tileB, tileA = tileA, tileB}
+
+		tileId = tileA
+
+		if lineNumber > 7 {
+			tileId = tileB
+			lineNumber = lineNumber % 8
+		}
+	}
+
+	return tileId, lineNumber
 }
 
 func (ppu *PPU) UpdateGraphics(cycles int) {
