@@ -5,8 +5,8 @@ import (
 	log "github.com/sirupsen/logrus"
 	"io"
 	"os"
-	"time"
 )
+
 var count = 0
 var logger *log.Logger
 func initLogger() {
@@ -101,17 +101,17 @@ func run(cpu *CPU, mmu *MMU, ppu *PPU) {
 }
 
 func main() {
-	initLogger()
-	//var lastOpcode byte
-	cpu, mmu, ppu, dis := initializeComponents()
-	p, _ := os.Getwd()
-	load(p + "/bootstrap.gb", p + "/tetris.gb", mmu)
-	mmu.SetBootMode()
-	for dis.HandleEvent() {
-		run(cpu, mmu, ppu)
-		_ = dis.UpdateGraphics()
-		time.Sleep(10*time.Millisecond)
-	}
-
+	//initLogger()
+	////var lastOpcode byte
+	//cpu, mmu, ppu, dis := initializeComponents()
+	//p, _ := os.Getwd()
+	//load(p + "/bootstrap.gb", p + "/tetris.gb", mmu)
+	//mmu.SetBootMode()
+	//for dis.HandleEvent() {
+	//	run(cpu, mmu, ppu)
+	//	_ = dis.UpdateGraphics()
+	//	time.Sleep(10*time.Millisecond)
+	//}
+	fmt.Println()
 
 }

@@ -127,8 +127,8 @@ func (display SDLDisplay) HandleEvent() bool {
 		case *sdl.KeyboardEvent:
 			display.handleKeyboardEvent(event.(*sdl.KeyboardEvent))
 		}
-
 	}
+
 	return true
 }
 

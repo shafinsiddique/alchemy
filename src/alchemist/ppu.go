@@ -16,17 +16,69 @@ func NewPPU(mmu *MMU, display IDisplay) *PPU{
 		Display: display}
 }
 
-func (ppu *PPU) IncrementScanline() {
+func (ppu *PPU) incrementScanline() {
 	ppu.Registers.LY.Increment()
 	if line := ppu.Registers.LY.Get(); line == 144 {
 		ppu.Registers.IF.SetBit(1, V_BLANK)
 	} else if line == 154 {
 		ppu.Registers.LY.Set(0)
 	}
-
 }
 
-func (ppu *PPU) FetchPixels() []*Pixel {
+func (ppu *PPU) spriteIsVisible(x byte, y byte, spriteHeight byte) bool {
+	xPos := int(x)
+	yPos := int(y)
+	ly := int(ppu.Registers.LY.Get())
+	height := int(spriteHeight)
+	if xPos - 8 > -8 && yPos - 16 >= ly && ly <= yPos + height{
+		return true
+	}
+
+	return false
+}
+
+func getSpriteHeight() byte {
+	return 8 // need to add logic for 16s.
+}
+
+func (ppu *PPU) addTileToPixels(pixels []*Pixel, tilePixels []*Pixel, x byte) {
+	xPos := int(x)-8
+	var startingInPixels byte
+	var startingInTile byte
+	if xPos < 0 {
+		startingInTile = byte(math.Abs(float64(xPos)))
+		startingInPixels = 0
+	} else {
+		startingInTile = 0
+		startingInPixels = x-8
+	}
+
+	for startingInTile < NUMBER_OF_PIXELS_IN_TILE && startingInPixels < NUMBER_OF_PIXELS_IN_SCANLINE {
+		pixels[startingInPixels] = tilePixels[startingInTile]
+		startingInTile += 1
+		startingInPixels += 1
+	}
+}
+
+func (ppu *PPU) fetchSprites() {
+	pixels := make([]*Pixel, NUMBER_OF_PIXELS_IN_SCANLINE)
+	spriteHeight := getSpriteHeight()
+	for i := 0xFE00; i < 0xFE9f; i+=4 {
+		index := uint16(i) // need to convert for signature
+		sprite := NewSprite(ppu.MMU.Read(index), ppu.MMU.Read(index+1), ppu.MMU.Read(index+2),
+			ppu.MMU.Read(index+3))
+
+		if ppu.spriteIsVisible(sprite.X, sprite.Y, spriteHeight){
+			tilePixels := ppu.getHorizontalPixelsFromTile(sprite.TileID, 9) // fix.
+			ppu.addTileToPixels(pixels, tilePixels, sprite.X)
+
+		}
+		// We need to check if Sprite is Visible.
+
+	}
+}
+
+func (ppu *PPU) fetchPixels() []*Pixel {
 	firstTileAddr, lineNumber := ppu.getFirstTileIdAddr()
 	row := make([]*Pixel, NUMBER_OF_PIXELS_IN_SCANLINE)
 	offset := ppu.getFirstOffset() // we need an offset for the first one and then zero everytime afterwards.
@@ -95,14 +147,14 @@ func (ppu *PPU) runScanline() {
 	// OAM Search.
 	// Drawing
 	if ppu.Registers.LY.Get() <= 143 {
-		pixels := ppu.FetchPixels()
+		pixels := ppu.fetchPixels()
 		ppu.Display.UpdateScanline(pixels, ppu.Registers.BGP.Get(), int(ppu.Registers.LY.Get()))
 	} // else it is in H_BLANK.
 
 	// H-Blank
 	// V-Blank.
 
-	ppu.IncrementScanline()
+	ppu.incrementScanline()
 }
 func (ppu *PPU) handleDisabledLCD() {
 	ppu.Cycles = SCANLINE_CYCLES
