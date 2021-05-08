@@ -83,6 +83,13 @@ func (display SDLDisplay) UpdateScanline(pixels []*Pixel, palette byte, y int) {
 	}
 }
 
+func (display SDLDisplay) UpdateScanlinePixels(colors []color.RGBA, y int) {
+	surface, _ := display.Window.GetSurface()
+	for x := 0; x < len(colors); x++ {
+		surface.Set(x, y, colors[x])
+	}
+}
+
 func (display *SDLDisplay) handleKeyboardEvent(ev *sdl.KeyboardEvent){
 	if ev.State == 0 {
 		return

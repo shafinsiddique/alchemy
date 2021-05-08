@@ -178,12 +178,14 @@ func (ppu *PPU) fetchPixels()[]color.RGBA{
 			ppu.mergePixels(background, merged, tilePixels, sprite)
 		}
 	}
+
 	bgp := ppu.Registers.BGP.Get()
 	for i := 0 ; i<NUMBER_OF_PIXELS_IN_SCANLINE; i++ {
 		if merged[i].R == OBSCURE_COLOR {
 			merged[i] = getColorFromPixel(background[i], bgp)
 		}
 	}
+
 	return merged
 }
 
@@ -248,8 +250,10 @@ func (ppu *PPU) runScanline() {
 	// OAM Search.
 	// Drawing
 	if ppu.Registers.LY.Get() <= 143 {
-		pixels := ppu.fetchBackgroundPixels()
-		ppu.Display.UpdateScanline(pixels, ppu.Registers.BGP.Get(), int(ppu.Registers.LY.Get()))
+		//pixels := ppu.fetchBackgroundPixels()
+		//ppu.Display.UpdateScanline(pixels, ppu.Registers.BGP.Get(), int(ppu.Registers.LY.Get()))
+		pixels := ppu.fetchPixels()
+		ppu.Display.UpdateScanlinePixels(pixels, int(ppu.Registers.LY.Get()))
 	} // else it is in H_BLANK.
 
 	// H-Blank
