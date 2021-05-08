@@ -42,6 +42,8 @@ const (
 	START_JOYPAD                 = 7
 	MODE_2_CYCLES                = 80
 	MODE_3_CYCLES                = 172
+	OBP0_INDEX = 0xFF48
+	OBP1_INDEX = 0xFF49
 )
 
 var COLOR_MAP = map[byte]color.RGBA{

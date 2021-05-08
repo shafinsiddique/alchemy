@@ -1,6 +1,7 @@
 package main
 
 import (
+	"image/color"
 	"math"
 )
 
@@ -115,7 +116,15 @@ func (ppu *PPU) flipTilesIfRequired(pixels []*Pixel, flip bool) {
 	}
 }
 
-func (ppu *PPU) mergePixels(bgPixels []*Pixel, bgTemp []*Pixel, spritesTemp []*Pixel,
+func (ppu *PPU) getSpritePalette(sprite *Sprite) byte {
+	if sprite.Palette == 0 {
+		return ppu.Registers.OBP0.Get()
+	}
+
+	return ppu.Registers.OBP1.Get()
+}
+
+func (ppu *PPU) mergePixels(bgColors []*Pixel, merged []color.RGBA,
 	tileSprites []*Pixel, sprite *Sprite) {
 	var s1 int
 	var s2 int
@@ -128,26 +137,33 @@ func (ppu *PPU) mergePixels(bgPixels []*Pixel, bgTemp []*Pixel, spritesTemp []*P
 		s2 = xPos
 	}
 
+	palette := ppu.getSpritePalette(sprite)
+	bgPalette := ppu.Registers.BGP.Get()
 	for s1 < NUMBER_OF_PIXELS_IN_TILE && s2 < NUMBER_OF_PIXELS_IN_SCANLINE {
 		spritePixel := tileSprites[s1]
-		bgPixel := bgPixels[s2]
-
+		bgPixel := bgColors[s2]
+		bgColor := getColorFromPixel(bgPixel, bgPalette)
+		spriteColor := getColorFromPixel(spritePixel, palette)
 		if spritePixel.Get() == 0 {
-			bgTemp[s2] = bgPixel
+			merged[s2] = bgColor
 		} else if sprite.ObjToBG && bgPixel.Get() != 0 {
-			bgTemp[s2] = bgPixel
+			merged[s2] = bgColor
 		} else {
-			spritesTemp[s2] = spritePixel
+			merged[s2] = spriteColor
 		}
+
+		s1 += 1
+		s2 += 1
+
 	}
+
 
 }
 
-func (ppu *PPU) fetchPixels(){
+func (ppu *PPU) fetchPixels()[]color.RGBA{
 	background := ppu.fetchBackgroundPixels()
 	sprites := ppu.fetchSprites()
-	backgroundTemp := make([]*Pixel, NUMBER_OF_PIXELS_IN_SCANLINE)
-	spritesTemp := make([]*Pixel, NUMBER_OF_PIXELS_IN_SCANLINE)
+	merged := make([]color.RGBA, NUMBER_OF_PIXELS_IN_SCANLINE)
 	height := ppu.getSpriteHeight()
 	for i := 0; i < len(sprites); i++ {
 		sprite := sprites[i]
@@ -155,9 +171,16 @@ func (ppu *PPU) fetchPixels(){
 			tileId, lineNumber := ppu.getSpriteTileAndLine(sprite, height)
 			tilePixels := ppu.getHorizontalPixelsFromTile(tileId, lineNumber, sprite.YFlip)
 			ppu.flipTilesIfRequired(tilePixels, sprite.XFlip)
-
+			ppu.mergePixels(background, merged, tilePixels, sprite)
 		}
 	}
+	bgp := ppu.Registers.BGP.Get()
+	for i := 0 ; i<NUMBER_OF_PIXELS_IN_SCANLINE; i++ {
+		if merged[i].R == 0 && merged[i].G == 0 && merged[i].B == 0 {
+			merged[i] = getColorFromPixel(background[i], bgp)
+		}
+	}
+	return merged
 }
 
 func (ppu *PPU) getFirstOffset() int {
