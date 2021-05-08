@@ -113,11 +113,41 @@ func (ppu *PPU) flipTilesIfRequired(pixels []*Pixel, flip bool) {
 			pixels[l], pixels[r] = pixels[r], pixels[l]
 		}
 	}
+}
+
+func (ppu *PPU) mergePixels(bgPixels []*Pixel, bgTemp []*Pixel, spritesTemp []*Pixel,
+	tileSprites []*Pixel, sprite *Sprite) {
+	var s1 int
+	var s2 int
+	xPos := int(sprite.X)-8
+	if xPos < 0 {
+		s1 = int(math.Abs(float64(xPos)))
+		s2 = 0
+	} else {
+		s1 = 0
+		s2 = xPos
+	}
+
+	for s1 < NUMBER_OF_PIXELS_IN_TILE && s2 < NUMBER_OF_PIXELS_IN_SCANLINE {
+		spritePixel := tileSprites[s1]
+		bgPixel := bgPixels[s2]
+
+		if spritePixel.Get() == 0 {
+			bgTemp[s2] = bgPixel
+		} else if sprite.ObjToBG && bgPixel.Get() != 0 {
+			bgTemp[s2] = bgPixel
+		} else {
+			spritesTemp[s2] = spritePixel
+		}
+	}
 
 }
+
 func (ppu *PPU) fetchPixels(){
 	background := ppu.fetchBackgroundPixels()
 	sprites := ppu.fetchSprites()
+	backgroundTemp := make([]*Pixel, NUMBER_OF_PIXELS_IN_SCANLINE)
+	spritesTemp := make([]*Pixel, NUMBER_OF_PIXELS_IN_SCANLINE)
 	height := ppu.getSpriteHeight()
 	for i := 0; i < len(sprites); i++ {
 		sprite := sprites[i]
@@ -125,8 +155,6 @@ func (ppu *PPU) fetchPixels(){
 			tileId, lineNumber := ppu.getSpriteTileAndLine(sprite, height)
 			tilePixels := ppu.getHorizontalPixelsFromTile(tileId, lineNumber, sprite.YFlip)
 			ppu.flipTilesIfRequired(tilePixels, sprite.XFlip)
-			// if sprite overrides background.
-
 
 		}
 	}
