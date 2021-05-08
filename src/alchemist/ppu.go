@@ -164,6 +164,10 @@ func (ppu *PPU) fetchPixels()[]color.RGBA{
 	background := ppu.fetchBackgroundPixels()
 	sprites := ppu.fetchSprites()
 	merged := make([]color.RGBA, NUMBER_OF_PIXELS_IN_SCANLINE)
+	for i:=0; i<NUMBER_OF_PIXELS_IN_SCANLINE; i++ {merged[i].R = OBSCURE_COLOR} // we do this so that
+	// later on we can check if a pixel at a certain index was never entered. color.RGBA doesnt have a nill
+	// default type. The default is black which clashes with gb color.
+
 	height := ppu.getSpriteHeight()
 	for i := 0; i < len(sprites); i++ {
 		sprite := sprites[i]
@@ -176,7 +180,7 @@ func (ppu *PPU) fetchPixels()[]color.RGBA{
 	}
 	bgp := ppu.Registers.BGP.Get()
 	for i := 0 ; i<NUMBER_OF_PIXELS_IN_SCANLINE; i++ {
-		if merged[i].R == 0 && merged[i].G == 0 && merged[i].B == 0 {
+		if merged[i].R == OBSCURE_COLOR {
 			merged[i] = getColorFromPixel(background[i], bgp)
 		}
 	}

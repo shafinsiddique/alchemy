@@ -44,6 +44,7 @@ const (
 	MODE_3_CYCLES                = 172
 	OBP0_INDEX = 0xFF48
 	OBP1_INDEX = 0xFF49
+	OBSCURE_COLOR = 210
 )
 
 var COLOR_MAP = map[byte]color.RGBA{
