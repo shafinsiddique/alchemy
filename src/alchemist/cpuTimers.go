@@ -1,6 +1,8 @@
 package main
 
 func (cpu *CPU) UpdateTimers(cycles byte) {
+	cpu.resetIfTimerChanged()
+
 	if !cpu.timerIsEnabled() {
 		return
 	}
@@ -19,25 +21,37 @@ func (cpu *CPU) UpdateTimers(cycles byte) {
 	}
 }
 
+func (cpu *CPU) requestTimerInterrupt() {
+	cpu.Registers.IF.SetBit(1, TIMER)
+}
+
 func (cpu *CPU) timerIsEnabled() bool {
 	return cpu.Registers.TAC.GetBit(2) == 1
 }
 
-
-func (cpu *CPU) getTimer() (frequency int) {
+func (cpu *CPU) getTimer() (timer int) {
 	val := cpu.Registers.TAC.Get() & 0x3
 	switch val {
 	case 0:
-		frequency = 1024
+		timer = 1024
 	case 1:
-		frequency = 16
+		timer = 16
 	case 2:
-		frequency = 64
+		timer = 64
 	case 3:
-		frequency = 256
+		timer = 256
 	}
 
-	return frequency
+	return timer
+}
+
+func (cpu *CPU) resetIfTimerChanged() {
+	current := cpu.getTimer()
+	existing := cpu.currentTimer
+
+	if current != existing {
+		cpu.setTimer()
+	}
 }
 
 func (cpu *CPU) setTimer() {
