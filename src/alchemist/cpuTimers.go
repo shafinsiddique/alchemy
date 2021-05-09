@@ -8,14 +8,16 @@ func (cpu *CPU) UpdateTimers(cycles byte) {
 	}
 
 	cpu.Timer -= int(cycles)
-
+	counter := cpu.Registers.TIMA.Get()
+	var newVal byte
 	if cpu.Timer <= 0 {
-		if cpu.Counter == 255 {
-			cpu.Counter = 0
+		if counter == 255 {
+			cpu.requestTimerInterrupt()
+			newVal = 0
 		} else {
-			cpu.Counter += 1
+			newVal = counter + 1
 		}
-
+		cpu.Registers.TIMA.Set(newVal)
 		cpu.setTimer()
 
 	}
