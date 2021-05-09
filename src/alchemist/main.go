@@ -62,6 +62,7 @@ func run(cpu *CPU, mmu *MMU, ppu *PPU) {
 	for cyclesThisUpdate < MAX_CYCLES {
 		opcode := cpu.FetchAndIncrement()
 		cycles := cpu.Execute(opcode)
+		cpu.UpdateTimers(cycles)
 		ppu.UpdateGraphics(cycles)
 		cpu.HandleInterrupts(opcode)
 
@@ -106,7 +107,7 @@ func main() {
 	//var lastOpcode byte
 	cpu, mmu, ppu, dis := initializeComponents()
 	p, _ := os.Getwd()
-	load(p + "/bootstrap.gb", p + "/tetris.gb", mmu)
+	load(p + "/bootstrap.gb", p + "/dmg-acid2.gb", mmu)
 	mmu.SetBootMode()
 	for dis.HandleEvent() {
 		run(cpu, mmu, ppu)

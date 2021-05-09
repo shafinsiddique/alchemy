@@ -18,6 +18,7 @@ type Registers struct {
 	TIMA *ReferenceRegister
 	TMA *ReferenceRegister
 	TAC *ReferenceRegister
+	DIV *ReferenceRegister
 }
 
 func InitializeRegisters(memory []byte) *Registers {
@@ -38,6 +39,7 @@ func InitializeRegisters(memory []byte) *Registers {
 	tima := NewReferenceRegister(&memory[TIMA_INDEX])
 	tma := NewReferenceRegister(&memory[TMA_INDEX])
 	tmc := NewReferenceRegister(&memory[TAC_INDEX])
+	div := NewReferenceRegister(&memory[DIV_INDEX])
 	return &Registers{A: a, B: b, C: c, D: d, E: e, F: f, H: h, L: l, AF: af, BC: bc, DE: de,
-		HL: hl, IE: ie, IF: _if, TIMA: tima, TMA: tma, TAC: tmc}
+		HL: hl, IE: ie, IF: _if, TIMA: tima, TMA: tma, TAC: tmc, DIV: div}
 }

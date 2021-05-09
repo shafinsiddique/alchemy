@@ -11,6 +11,7 @@ type CPU struct {
 	Halted         bool
 	Debug *bool
 	Timer int
+	DivideTimer int
 	currentTimer int
 }
 

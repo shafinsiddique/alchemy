@@ -42,16 +42,18 @@ const (
 	START_JOYPAD                 = 7
 	MODE_2_CYCLES                = 80
 	MODE_3_CYCLES                = 172
-	OBP0_INDEX = 0xFF48
-	OBP1_INDEX = 0xFF49
-	OBSCURE_COLOR = 210
-	TIMA_INDEX = 0xFF05
-	TMA_INDEX = 0xff06
-	TAC_INDEX = 0xff07
+	OBP0_INDEX                   = 0xFF48
+	OBP1_INDEX                   = 0xFF49
+	OBSCURE_COLOR                = 210
+	TIMA_INDEX                   = 0xFF05
+	TMA_INDEX                    = 0xff06
+	TAC_INDEX                    = 0xff07
+	DIV_INDEX                    = 0xff04
+	LYC_INDEX                    = 0xff45
 )
 
 var COLOR_MAP = map[byte]color.RGBA{
-	3: {R: 0, G: 0, B: 0}, // Blakc.
+	3: {R: 0, G: 0, B: 0},       // Blakc.
 	2: {R: 169, G: 169, B: 169}, // Light Gray
 	1: {R: 211, G: 211, B: 211}, // Dark Grey
 	0: {R: 255, G: 255, B: 255}, // White

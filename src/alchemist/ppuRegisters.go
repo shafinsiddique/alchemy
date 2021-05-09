@@ -10,6 +10,7 @@ type PPURegisters struct {
 	LCD_STAT *ReferenceRegister
 	OBP0 *ReferenceRegister
 	OBP1 *ReferenceRegister
+	LYC *ReferenceRegister
 }
 
 func InitializePPURegisters(memory []byte) *PPURegisters {
@@ -22,7 +23,7 @@ func InitializePPURegisters(memory []byte) *PPURegisters {
 	lcdStat := &ReferenceRegister{&memory[LCD_STATUS]}
 	obp0 := &ReferenceRegister{&memory[OBP0_INDEX]}
 	obp1 := &ReferenceRegister{&memory[OBP1_INDEX]}
-
+	lyc := &ReferenceRegister{&memory[LYC_INDEX]}
 	return &PPURegisters{LY: ly, LCDC: lcdc, SCY: scy, SCX: scx, BGP: bgp, IF:_if,
-		LCD_STAT: lcdStat, OBP0: obp0, OBP1: obp1}
+		LCD_STAT: lcdStat, OBP0: obp0, OBP1: obp1, LYC:lyc}
 }

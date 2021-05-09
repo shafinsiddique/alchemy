@@ -10,6 +10,7 @@ type PPU struct {
 	Registers *PPURegisters
 	Cycles    int
 	Display   IDisplay
+	interruptRequested bool
 }
 
 func NewPPU(mmu *MMU, display IDisplay) *PPU{
@@ -24,6 +25,8 @@ func (ppu *PPU) incrementScanline() {
 	} else if line == 154 {
 		ppu.Registers.LY.Set(0)
 	}
+
+	ppu.checkForCoincidence()
 }
 
 func (ppu *PPU) spriteIsVisible(x byte, y byte, spriteHeight byte) bool {
@@ -322,9 +325,11 @@ func  (ppu *PPU) getCurrentMode() byte {
 
 func (ppu *PPU) checkForInterrupts(oldMode byte, newMode byte) {
 	mode := int(newMode)
-	if (newMode == 0 || newMode == 1 || newMode == 2) && (oldMode != newMode) &&
-		ppu.Registers.LCD_STAT.GetBit(mode+3) == 1 {
+	enabled := ppu.Registers.LCD_STAT.GetBit(mode+3) == 1
+	requested := ppu.interruptRequested
+	if (newMode == 0 || newMode == 1 || newMode == 2) && (oldMode != newMode) && enabled && !requested {
 		ppu.requestPPUInterrupt()
+		ppu.interruptRequested = true
 	}
 }
 
@@ -334,14 +339,18 @@ func (ppu *PPU) requestPPUInterrupt(){
 
 func (ppu *PPU) checkForCoincidence() {
 	var bit byte = 0
-	if ppu.Registers.LY.Get() == ppu.MMU.Read(0xff45) {
+	interruptRequested := false
+	if ppu.Registers.LY.Get() == ppu.Registers.LYC.Get() {
 		bit = 1
 		if ppu.Registers.LCD_STAT.GetBit(6) == 1 {
 			ppu.requestPPUInterrupt()
+			interruptRequested = true
 		}
+
 	}
 
-	ppu.Registers.LCD_STAT.SetBit(bit, 2)
+	ppu.interruptRequested = interruptRequested
+	ppu.Registers.LCD_STAT.SetBit(bit, 2) // 0 if LY == LYC.
 }
 
 func (ppu *PPU) setLCDStatus() {
@@ -361,7 +370,6 @@ func (ppu *PPU) setLCDStatus() {
 	}
 	ppu.setModeInLCDStat(mode)
 	ppu.checkForInterrupts(currentMode, mode)
-	ppu.checkForCoincidence()
 
 }
 

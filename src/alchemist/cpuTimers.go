@@ -1,13 +1,13 @@
 package main
 
-func (cpu *CPU) UpdateTimers(cycles byte) {
+func (cpu *CPU) UpdateTimers(cycles int) {
 	cpu.resetIfTimerChanged()
-
+	cpu.updateDivideTimers(cycles)
 	if !cpu.timerIsEnabled() {
 		return
 	}
 
-	cpu.Timer -= int(cycles)
+	cpu.Timer -= cycles
 	counter := cpu.Registers.TIMA.Get()
 	var newVal byte
 	if cpu.Timer <= 0 {
@@ -17,9 +17,25 @@ func (cpu *CPU) UpdateTimers(cycles byte) {
 		} else {
 			newVal = counter + 1
 		}
+
 		cpu.Registers.TIMA.Set(newVal)
 		cpu.setTimer()
 
+	}
+}
+
+func (cpu *CPU) updateDivideTimers(cycles int){
+	cpu.DivideTimer -= cycles
+	val := cpu.Registers.DIV.Get()
+	if cpu.DivideTimer <= 0 {
+		cpu.DivideTimer = 256
+		var newVal byte
+
+		if val < 255 {
+			newVal = val + 1 // otherwise its just 0.
+		}
+
+		cpu.Registers.DIV.Set(newVal)
 	}
 }
 
