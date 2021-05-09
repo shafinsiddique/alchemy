@@ -31,6 +31,10 @@ func getColor(first byte, second byte) color.RGBA {
 }
 
 func getColorFromPixel(pixel *Pixel, palette byte) color.RGBA {
+	if pixel == nil {
+		return COLOR_MAP[0]
+	}
+
 	switch current := pixel.Get(); current {
 	case 0:
 		return getColor(GetBit(palette, 0), GetBit(palette, 1))

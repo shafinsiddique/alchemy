@@ -45,6 +45,9 @@ const (
 	OBP0_INDEX = 0xFF48
 	OBP1_INDEX = 0xFF49
 	OBSCURE_COLOR = 210
+	TIMA_INDEX = 0xFF05
+	TMA_INDEX = 0xff06
+	TAC_INDEX = 0xff07
 )
 
 var COLOR_MAP = map[byte]color.RGBA{
