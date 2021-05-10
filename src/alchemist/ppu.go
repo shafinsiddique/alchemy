@@ -32,11 +32,13 @@ func (ppu *PPU) incrementScanline() {
 }
 
 func (ppu *PPU) spriteIsVisible(x byte, y byte, spriteHeight byte) bool {
-	xPos := int(x)
-	yPos := int(y)
+	spriteX := int(x)
+	spriteY := int(y)
+	xPos := spriteX-8
+	yPos := spriteY-16
 	ly := int(ppu.Registers.LY.Get())
 	height := int(spriteHeight)
-	if xPos - 8 > -8 &&  ly >= yPos - 16 && ly < (yPos - 16) + height {
+	if xPos > -8 &&  ly >= yPos && ly < yPos + height {
 		return true
 	}
 
@@ -44,7 +46,10 @@ func (ppu *PPU) spriteIsVisible(x byte, y byte, spriteHeight byte) bool {
 }
 
 func (ppu *PPU) getSpriteHeight() byte {
-	return 8 // need to add logic for 16s.
+	if ppu.Registers.LCDC.GetBit(2) == 1 {
+		return 16
+	}
+	return 8
 }
 
 func (ppu *PPU) addTileToPixels(pixels []*Pixel, tilePixels []*Pixel, x byte) {
@@ -168,7 +173,7 @@ func (ppu *PPU) mergePixels(bgColors []*Pixel, merged []color.RGBA,
 
 func (ppu *PPU) fetchPixels()[]color.RGBA{
 	background := ppu.fetchBackgroundPixels()
-	if *ppu.Debug && ppu.Registers.LY.Get() == 80 {
+	if *ppu.Debug && ppu.Registers.LY.Get() == 88 {
 		fmt.Println("here")
 	}
 	sprites := ppu.fetchSprites()
