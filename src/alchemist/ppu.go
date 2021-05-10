@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"image/color"
 	"math"
 )
@@ -76,7 +75,7 @@ func (ppu *PPU) fetchSprites() []*Sprite {
 	xValues := map[byte]bool{}
 	spriteHeight := ppu.getSpriteHeight()
 	count := 0
-	for i := 0xFE00; i < 0xFE9f; i+=4 {
+	for i := OAM_START; i < OAM_END; i+=4 {
 		index := uint16(i) // need to convert for signature
 		sprite := NewSprite(ppu.MMU.Read(index), ppu.MMU.Read(index+1), ppu.MMU.Read(index+2),
 			ppu.MMU.Read(index+3))
@@ -173,9 +172,9 @@ func (ppu *PPU) mergePixels(bgColors []*Pixel, merged []color.RGBA,
 
 func (ppu *PPU) fetchPixels()[]color.RGBA{
 	background := ppu.fetchBackgroundPixels()
-	if *ppu.Debug && ppu.Registers.LY.Get() == 88 {
-		fmt.Println("here")
-	}
+	//if *ppu.Debug && ppu.Registers.LY.Get() == 88 {
+	//	fmt.Println("here")
+	//}
 	sprites := ppu.fetchSprites()
 	merged := make([]color.RGBA, NUMBER_OF_PIXELS_IN_SCANLINE)
 	for i:=0; i<NUMBER_OF_PIXELS_IN_SCANLINE; i++ {merged[i].R = OBSCURE_COLOR} // we do this so that

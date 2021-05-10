@@ -61,10 +61,20 @@ func (mmu *MMU) Write(addr uint16, val byte) {
 		mmu.Memory[addr] = val
 	} else if addr == JOYPAD_INDEX {
 		mmu.writeToJoypad(val)
+	} else if addr == DMA_INDEX {
+		mmu.dmaTransfer(val)
 	} else {
 		if !mmu.inRomRegion(addr) {
 			mmu.Memory[addr] = val
 		}
+	}
+}
+
+func (mmu *MMU) dmaTransfer(val byte) {
+	src := uint16(val) << 8
+	for i := 0; i < 160; i++ {
+		index := uint16(i)
+		mmu.Write(OAM_START+index, mmu.Read(src+index))
 	}
 }
 

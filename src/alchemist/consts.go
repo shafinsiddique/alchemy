@@ -50,13 +50,16 @@ const (
 	TAC_INDEX                    = 0xff07
 	DIV_INDEX                    = 0xff04
 	LYC_INDEX                    = 0xff45
+	OAM_START                    = 0xFE00
+	OAM_END                      = 0xFE95
+	DMA_INDEX                    = 0xFF46
 )
 
 var COLOR_MAP = map[byte]color.RGBA{
-	3: {R: 0, G: 0, B: 0},       // Blakc.
-	2: {R: 169, G: 169, B: 169}, // Light Gray
-	1: {R: 211, G: 211, B: 211}, // Dark Grey
-	0: {R: 255, G: 255, B: 255}, // White
+	3: {R: 0, G: 0, B: 0},       // black.
+	2: {R: 136, G: 192, B: 112}, // Light Gray
+	1: {R: 52, G: 104, B: 86}, // Dark Grey
+	0: {R: 224, G: 248, B: 208}, // White
 }
 
 var INTERRUPT_INSTRUCTIONS = map[byte]bool{0x0: false, 0x1: false, 0x76: false, 0x2f: false, 0x3f: false,

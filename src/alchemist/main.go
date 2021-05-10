@@ -108,11 +108,12 @@ func main() {
 	//var lastOpcode byte
 	cpu, mmu, ppu, dis := initializeComponents()
 	p, _ := os.Getwd()
-	load(p + "/bootstrap.gb", p + "/dmg-acid2.gb", mmu)
+	load(p + "/bootstrap.gb", p + "/Dr. Mario (World).gb", mmu)
 	mmu.SetBootMode()
 	for dis.HandleEvent() {
 		run(cpu, mmu, ppu)
 		_ = dis.UpdateGraphics()
 		time.Sleep(10*time.Millisecond)
 	}
+
 }
