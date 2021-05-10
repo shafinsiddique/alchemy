@@ -230,6 +230,7 @@ func (ppu *PPU) getTileAddr(tileId byte) uint16 {
 	if ppu.Registers.LCDC.GetBit(4) == 1 {
 		addr += tileNo*16
 	} else {
+		addr = 0x9000
 		complement, isNegative := GetTwosComplement(tileId)
 		offset := uint16(complement) * 16
 		if isNegative {
