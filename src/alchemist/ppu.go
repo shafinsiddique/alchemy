@@ -36,7 +36,7 @@ func (ppu *PPU) spriteIsVisible(x byte, y byte, spriteHeight byte) bool {
 	yPos := int(y)
 	ly := int(ppu.Registers.LY.Get())
 	height := int(spriteHeight)
-	if xPos - 8 > -8 &&  ly >= yPos - 16 && ly <= yPos + height {
+	if xPos - 8 > -8 &&  ly >= yPos - 16 && ly < (yPos - 16) + height {
 		return true
 	}
 
@@ -168,7 +168,7 @@ func (ppu *PPU) mergePixels(bgColors []*Pixel, merged []color.RGBA,
 
 func (ppu *PPU) fetchPixels()[]color.RGBA{
 	background := ppu.fetchBackgroundPixels()
-	if *ppu.Debug && ppu.Registers.LY.Get() == 0 {
+	if *ppu.Debug && ppu.Registers.LY.Get() == 80 {
 		fmt.Println("here")
 	}
 	sprites := ppu.fetchSprites()
@@ -178,6 +178,8 @@ func (ppu *PPU) fetchPixels()[]color.RGBA{
 	// default type. The default is black which clashes with gb color.
 
 	height := ppu.getSpriteHeight()
+
+
 
 	for i := 0; i < len(sprites); i++ {
 		sprite := sprites[i]
