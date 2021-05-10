@@ -36,7 +36,7 @@ func (ppu *PPU) spriteIsVisible(x byte, y byte, spriteHeight byte) bool {
 	yPos := int(y)
 	ly := int(ppu.Registers.LY.Get())
 	height := int(spriteHeight)
-	if xPos - 8 > -8 && yPos - 16 >= ly && ly <= yPos + height{
+	if xPos - 8 > -8 &&  ly >= yPos - 16 && ly <= yPos + height {
 		return true
 	}
 
@@ -76,6 +76,7 @@ func (ppu *PPU) fetchSprites() []*Sprite {
 		sprite := NewSprite(ppu.MMU.Read(index), ppu.MMU.Read(index+1), ppu.MMU.Read(index+2),
 			ppu.MMU.Read(index+3))
 
+
 		if _, ok := xValues[sprite.X];
 		ppu.spriteIsVisible(sprite.X, sprite.Y, spriteHeight) && count < 10 && !ok{
 			//tilePixels := ppu.getHorizontalPixelsFromTile(sprite.TileID, 9) // fix.
@@ -100,11 +101,7 @@ func (ppu *PPU) fetchBackgroundPixels() []*Pixel {
 	//found := false
 	for i := 0; i < NUMBER_OF_TILES_IN_SCANLINE; i++ {
 		tileId := ppu.MMU.Read(firstTileAddr + uint16(i))
-		if *ppu.Debug && ppu.Registers.LY.Get() == 8*6 {
-			fmt.Println(ppu.Registers.SCY.Get())
-
-		}
-		pixels := ppu.getHorizontalPixelsFromTile(tileId, lineNumber, false)
+		pixels := ppu.getHorizontalPixelsFromTile(tileId, lineNumber, false, false)
 		for offset < NUMBER_OF_PIXELS_IN_TILE && pixelCount < NUMBER_OF_PIXELS_IN_SCANLINE {
 			row[pixelCount] = pixels[offset]
 			pixelCount += 1
@@ -171,6 +168,9 @@ func (ppu *PPU) mergePixels(bgColors []*Pixel, merged []color.RGBA,
 
 func (ppu *PPU) fetchPixels()[]color.RGBA{
 	background := ppu.fetchBackgroundPixels()
+	if *ppu.Debug && ppu.Registers.LY.Get() == 0 {
+		fmt.Println("here")
+	}
 	sprites := ppu.fetchSprites()
 	merged := make([]color.RGBA, NUMBER_OF_PIXELS_IN_SCANLINE)
 	for i:=0; i<NUMBER_OF_PIXELS_IN_SCANLINE; i++ {merged[i].R = OBSCURE_COLOR} // we do this so that
@@ -178,11 +178,12 @@ func (ppu *PPU) fetchPixels()[]color.RGBA{
 	// default type. The default is black which clashes with gb color.
 
 	height := ppu.getSpriteHeight()
+
 	for i := 0; i < len(sprites); i++ {
 		sprite := sprites[i]
 		if sprite != nil {
 			tileId, lineNumber := ppu.getSpriteTileAndLine(sprite, height)
-			tilePixels := ppu.getHorizontalPixelsFromTile(tileId, lineNumber, sprite.YFlip)
+			tilePixels := ppu.getHorizontalPixelsFromTile(tileId, lineNumber, sprite.YFlip, true)
 			ppu.flipTilesIfRequired(tilePixels, sprite.XFlip)
 			ppu.mergePixels(background, merged, tilePixels, sprite)
 		}
@@ -203,10 +204,11 @@ func (ppu *PPU) getFirstOffset() int {
 	return sx % 8
 }
 
-func (ppu *PPU) getHorizontalPixelsFromTile(tileId byte, lineNumber uint16, flipped bool) []*Pixel {
+func (ppu *PPU) getHorizontalPixelsFromTile(tileId byte, lineNumber uint16, flipped bool,
+	spriteMode bool) []*Pixel {
 	var high byte
 	var low byte
-	addr := ppu.getTileAddr(tileId)
+	addr := ppu.getTileAddr(tileId, spriteMode)
 	if flipped {
 		addr += 15
 		lineStartingIndex := addr - (lineNumber * 2)
@@ -214,8 +216,6 @@ func (ppu *PPU) getHorizontalPixelsFromTile(tileId byte, lineNumber uint16, flip
 		low = ppu.MMU.Read(lineStartingIndex-1)
 
 	} else {
-		addr = ppu.getTileAddr(tileId)
-
 		lineStartingIndex := addr + (lineNumber * 2)
 		low = ppu.MMU.Read(lineStartingIndex)
 		high = ppu.MMU.Read(lineStartingIndex + 1)
@@ -224,10 +224,10 @@ func (ppu *PPU) getHorizontalPixelsFromTile(tileId byte, lineNumber uint16, flip
 	return GetPixels(high, low)
 }
 
-func (ppu *PPU) getTileAddr(tileId byte) uint16 {
+func (ppu *PPU) getTileAddr(tileId byte, spriteMode bool) uint16 {
 	var addr uint16 = 0x8000
 	tileNo := uint16(tileId)
-	if ppu.Registers.LCDC.GetBit(4) == 1 {
+	if ppu.Registers.LCDC.GetBit(4) == 1 || spriteMode {
 		addr += tileNo*16
 	} else {
 		addr = 0x9000
@@ -263,10 +263,10 @@ func (ppu *PPU) runScanline() {
 	// OAM Search.
 	// Drawing
 	if ppu.Registers.LY.Get() <= 143 {
-		pixels := ppu.fetchBackgroundPixels()
-		ppu.Display.UpdateScanline(pixels, ppu.Registers.BGP.Get(), int(ppu.Registers.LY.Get()))
-		//pixels := ppu.fetchPixels()
-		//ppu.Display.UpdateScanlinePixels(pixels, int(ppu.Registers.LY.Get()))
+		//pixels := ppu.fetchBackgroundPixels()
+		//ppu.Display.UpdateScanline(pixels, ppu.Registers.BGP.Get(), int(ppu.Registers.LY.Get()))
+		pixels := ppu.fetchPixels()
+		ppu.Display.UpdateScanlinePixels(pixels, int(ppu.Registers.LY.Get()))
 	} // else it is in H_BLANK.
 
 	// H-Blank
