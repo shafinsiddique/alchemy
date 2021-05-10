@@ -37,6 +37,7 @@ func initializeComponents() (*CPU, *MMU, *PPU, IDisplay) {
 	ppu := NewPPU(mmu, display)
 	cpu.Debug = &debug
 	mmu.Debug = &debug
+	ppu.Debug = &debug
 	return cpu, mmu, ppu, display
 }
 

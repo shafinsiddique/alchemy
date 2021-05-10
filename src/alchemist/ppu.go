@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"image/color"
 	"math"
 )
@@ -11,10 +12,11 @@ type PPU struct {
 	Cycles    int
 	Display   IDisplay
 	interruptRequested bool
+	Debug *bool
 }
 
 func NewPPU(mmu *MMU, display IDisplay) *PPU{
-	return &PPU{Registers: InitializePPURegisters(mmu.Memory), Cycles: SCANLINE_CYCLES, MMU: mmu,
+	return &PPU{Registers: InitializePPURegisters(mmu.Memory), Cycles: SCANLINE_CYCLES, MMU: mmu ,
 		Display: display}
 }
 
@@ -98,6 +100,10 @@ func (ppu *PPU) fetchBackgroundPixels() []*Pixel {
 	//found := false
 	for i := 0; i < NUMBER_OF_TILES_IN_SCANLINE; i++ {
 		tileId := ppu.MMU.Read(firstTileAddr + uint16(i))
+		if *ppu.Debug && ppu.Registers.LY.Get() == 8*6 {
+			fmt.Println(ppu.Registers.SCY.Get())
+
+		}
 		pixels := ppu.getHorizontalPixelsFromTile(tileId, lineNumber, false)
 		for offset < NUMBER_OF_PIXELS_IN_TILE && pixelCount < NUMBER_OF_PIXELS_IN_SCANLINE {
 			row[pixelCount] = pixels[offset]
@@ -219,10 +225,10 @@ func (ppu *PPU) getHorizontalPixelsFromTile(tileId byte, lineNumber uint16, flip
 }
 
 func (ppu *PPU) getTileAddr(tileId byte) uint16 {
-	var addr uint16
+	var addr uint16 = 0x8000
 	tileNo := uint16(tileId)
 	if ppu.Registers.LCDC.GetBit(4) == 1 {
-		addr = 0x8000 + (tileNo*16)
+		addr += tileNo*16
 	} else {
 		complement, isNegative := GetTwosComplement(tileId)
 		offset := uint16(complement) * 16
@@ -245,6 +251,9 @@ func (ppu *PPU) getFirstTileIdAddr() (uint16, uint16) {
 }
 
 func (ppu *PPU) getBackgroundMapAddr() uint16 {
+	if ppu.Registers.LCDC.GetBit(3) == 1 {
+		return 0x9c00
+	}
 	return 0x9800 // need to determine based on register.
 }
 
@@ -253,10 +262,10 @@ func (ppu *PPU) runScanline() {
 	// OAM Search.
 	// Drawing
 	if ppu.Registers.LY.Get() <= 143 {
-		//pixels := ppu.fetchBackgroundPixels()
-		//ppu.Display.UpdateScanline(pixels, ppu.Registers.BGP.Get(), int(ppu.Registers.LY.Get()))
-		pixels := ppu.fetchPixels()
-		ppu.Display.UpdateScanlinePixels(pixels, int(ppu.Registers.LY.Get()))
+		pixels := ppu.fetchBackgroundPixels()
+		ppu.Display.UpdateScanline(pixels, ppu.Registers.BGP.Get(), int(ppu.Registers.LY.Get()))
+		//pixels := ppu.fetchPixels()
+		//ppu.Display.UpdateScanlinePixels(pixels, int(ppu.Registers.LY.Get()))
 	} // else it is in H_BLANK.
 
 	// H-Blank
