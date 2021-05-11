@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"image/color"
 	"math"
 )
@@ -76,10 +77,17 @@ func (ppu *PPU) fetchSprites() []*Sprite {
 	spriteHeight := ppu.getSpriteHeight()
 	count := 0
 	for i := OAM_START; i < OAM_END; i+=4 {
+
+
 		index := uint16(i) // need to convert for signature
 		sprite := NewSprite(ppu.MMU.Read(index), ppu.MMU.Read(index+1), ppu.MMU.Read(index+2),
 			ppu.MMU.Read(index+3))
-
+		if *ppu.Debug {
+			fmt.Println(fmt.Sprintf("X: %x", sprite.X))
+			fmt.Println(fmt.Sprintf("Y: %x", sprite.Y))
+			fmt.Println(fmt.Sprintf("ID: %x", sprite.TileID))
+			fmt.Println("END")
+		}
 
 		if _, ok := xValues[sprite.X];
 		ppu.spriteIsVisible(sprite.X, sprite.Y, spriteHeight) && count < 10 && !ok{

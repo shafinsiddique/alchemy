@@ -67,10 +67,13 @@ func run(cpu *CPU, mmu *MMU, ppu *PPU) {
 		ppu.UpdateGraphics(cycles)
 		cpu.HandleInterrupts(opcode)
 
-
-		if *cpu.Debug && cpu.PC == 0x1bce && mmu.Read(0xffe1) == 0x0 {
+		if cpu.PC == 0x0b8f {
 			debug = true
 		}
+
+		//if *cpu.Debug && cpu.PC == 0x1bce && mmu.Read(0xffe1) == 0x0 {
+		//	debug = true
+		//}
 		
 		if debug {
 			//fmt.Println(fmt.Sprintf("Game Status: %x", mmu.Read(0xffe1)))
@@ -108,7 +111,7 @@ func main() {
 	//var lastOpcode byte
 	cpu, mmu, ppu, dis := initializeComponents()
 	p, _ := os.Getwd()
-	load(p + "/bootstrap.gb", p + "/Dr. Mario (World).gb", mmu)
+	load(p + "/bootstrap.gb", p + "/tetris.gb", mmu)
 	mmu.SetBootMode()
 	for dis.HandleEvent() {
 		run(cpu, mmu, ppu)

@@ -14,7 +14,7 @@ type SDLDisplay struct {
 	CPU *CPU
 }
 
-var KEY_COUNT = 0 // TODO: DELETE
+var KEY_COUNT = 0 // TODO: DELETE DURING CLEANUP.
 
 func getColor(first byte, second byte) color.RGBA {
 	switch first {
@@ -103,6 +103,7 @@ func (display *SDLDisplay) handleKeyboardEvent(ev *sdl.KeyboardEvent){
 	switch key := ev.Keysym ; key.Sym {
 	case sdl.K_RETURN:
 		joypadIndex = SELECT_JOYPAD
+		*display.CPU.Debug = true
 	case sdl.K_RIGHT:
 		joypadIndex = RIGHT_JOYPAD
 	case sdl.K_LEFT:
@@ -121,10 +122,12 @@ func (display *SDLDisplay) handleKeyboardEvent(ev *sdl.KeyboardEvent){
 		return
 	}
 
-	KEY_COUNT += 1
-	if KEY_COUNT == 3 {
-		*display.CPU.Debug = true
-	}
+	//KEY_COUNT += 1
+	//
+	//if KEY_COUNT == 3 {
+	//	*display.CPU.Debug = true
+	//}
+
 	*display.Joypad = SetBit(*display.Joypad,0, joypadIndex)
 	display.IF.SetBit(1, JOYPAD)
 }

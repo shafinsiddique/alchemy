@@ -55,6 +55,7 @@ func (mmu *MMU) inRomRegion(addr uint16) bool {
 }
 
 func (mmu *MMU) Write(addr uint16, val byte) {
+
 	if mmu.BootMode && addr < 256 {
 		mmu.BootRomMemory[addr] = val
 	} else if mmu.BootMode {
