@@ -176,7 +176,7 @@ func (cpu *CPU) Execute(opcode byte) int {
 	case 0x3:
 		cycles = cpu.INC_BC()
 	case 0x7:
-		cycles = cpu.INC_B()
+		cycles = cpu.RLCA()
 	case 0x8:
 		cycles = cpu.LD_LOC_A16_SP()
 	case 0x9:

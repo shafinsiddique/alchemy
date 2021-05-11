@@ -55,7 +55,6 @@ func (mmu *MMU) inRomRegion(addr uint16) bool {
 }
 
 func (mmu *MMU) Write(addr uint16, val byte) {
-
 	if mmu.BootMode && addr < 256 {
 		mmu.BootRomMemory[addr] = val
 	} else if mmu.BootMode {
@@ -75,7 +74,8 @@ func (mmu *MMU) dmaTransfer(val byte) {
 	src := uint16(val) << 8
 	for i := 0; i < 160; i++ {
 		index := uint16(i)
-		mmu.Write(OAM_START+index, mmu.Read(src+index))
+		obj := mmu.Read(src+index)
+		mmu.Write(OAM_START+index, obj)
 	}
 }
 

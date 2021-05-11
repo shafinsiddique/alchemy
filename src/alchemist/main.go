@@ -67,26 +67,27 @@ func run(cpu *CPU, mmu *MMU, ppu *PPU) {
 		ppu.UpdateGraphics(cycles)
 		cpu.HandleInterrupts(opcode)
 
-		if cpu.PC == 0x0b8f {
-			debug = true
-		}
-
-		//if *cpu.Debug && cpu.PC == 0x1bce && mmu.Read(0xffe1) == 0x0 {
+		//if cpu.PC == 0x0b8f {
 		//	debug = true
 		//}
+
+		if *cpu.Debug && cpu.PC == 0x2ab5 {
+			debug = true
+		}
 		
 		if debug {
-			//fmt.Println(fmt.Sprintf("Game Status: %x", mmu.Read(0xffe1)))
-			//fmt.Println(fmt.Sprintf("Button Hit %x", mmu.Read(0xff81)))
-			//fmt.Println(fmt.Sprintf("Button Down %x", mmu.Read(0xff80)))
-			//fmt.Println(fmt.Sprintf("LY: %x", ppu.Registers.LY.Get()))
-			//fmt.Println(fmt.Sprintf("AF: %x", cpu.Registers.AF.Get()))
-			//fmt.Println(fmt.Sprintf("BC: %x", cpu.Registers.BC.Get()))
-			//fmt.Println(fmt.Sprintf("DE: %x", cpu.Registers.DE.Get()))
-			//fmt.Println(fmt.Sprintf("HL: %x", cpu.Registers.HL.Get()))
-			//fmt.Println(fmt.Sprintf("SP: %x", cpu.SP))
-			//fmt.Println(fmt.Sprintf("PC: %x", cpu.PC))
-			//fmt.Println("END.")
+			fmt.Println(fmt.Sprintf("Game Status: %x", mmu.Read(0xffe1)))
+			fmt.Println(fmt.Sprintf("Button Hit %x", mmu.Read(0xff81)))
+			fmt.Println(fmt.Sprintf("Button Down %x", mmu.Read(0xff80)))
+			fmt.Println(fmt.Sprintf("LY: %x", ppu.Registers.LY.Get()))
+			fmt.Println(fmt.Sprintf("AF: %x", cpu.Registers.AF.Get()))
+			fmt.Println(fmt.Sprintf("BC: %x", cpu.Registers.BC.Get()))
+			fmt.Println(fmt.Sprintf("DE: %x", cpu.Registers.DE.Get()))
+			fmt.Println(fmt.Sprintf("HL: %x", cpu.Registers.HL.Get()))
+			fmt.Println(fmt.Sprintf("SP: %x", cpu.SP))
+			fmt.Println(fmt.Sprintf("SP: %x", cpu.SP))
+			fmt.Println(fmt.Sprintf("PC: %x", cpu.PC))
+			fmt.Println("END.")
 		}
 
 		if debug2{
