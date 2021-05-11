@@ -1314,6 +1314,31 @@ func (cpu *CPU) STOP() int {
 }
 
 func (cpu *CPU) DAA() int {
+	val := uint16(cpu.Registers.A.Get())
+	f := cpu.Registers.F
+	if f.GetBit(NEGATIVE_FLAG) == 1{ // last op was subtraction.
+		if f.GetBit(HALF_CARRY_FLAG) == 1 {
+			val -= 0x6
+		}
+
+		if f.GetBit(CARRY_FLAG) == 1{
+			val -= 0x60
+		}
+
+	} else {
+		if f.GetBit(HALF_CARRY_FLAG) == 1 || val & 0xf > 0x9 {
+			val += 0x6
+		}
+
+		if f.GetBit(CARRY_FLAG) == 1 || val > 0x9f {
+			val += 0x60
+			cpu.SetOverflowFlag()
+		}
+	}
+
+	cpu.CheckAndSetZeroFlagSixteenBit(val&0xff)
+	cpu.ClearHCFlag()
+	cpu.Registers.A.Set(byte(val))
 	return 4
 }
 

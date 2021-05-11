@@ -561,7 +561,6 @@ func (cpu *CPU) Execute(opcode byte) int {
 		cycles = cpu.EI()
 	case 0xff:
 		cycles = cpu.RST_7()
-
 	default:
 		//hex := fmt.Sprintf("0x%x %d", opcode, cpu.PC-1)
 		//fmt.Println(hex)

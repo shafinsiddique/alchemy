@@ -71,7 +71,7 @@ func run(cpu *CPU, mmu *MMU, ppu *PPU) {
 		//	debug = true
 		//}
 
-		if *cpu.Debug && cpu.PC == 0x2ab5 {
+		if cpu.PC == 0x211a {
 			debug = true
 		}
 		
