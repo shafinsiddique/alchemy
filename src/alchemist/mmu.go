@@ -6,7 +6,6 @@ type MMU struct {
 	BootMode      bool
 	Joypad 		*byte
 	Count int
-	Debug *bool
 }
 
 func NewMMU(joypad *byte) *MMU {

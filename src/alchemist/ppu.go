@@ -11,7 +11,6 @@ type PPU struct {
 	Cycles    int
 	Display   IDisplay
 	interruptRequested bool
-	Debug *bool
 }
 
 func NewPPU(mmu *MMU, display IDisplay) *PPU{
@@ -76,22 +75,12 @@ func (ppu *PPU) fetchSprites() []*Sprite {
 	spriteHeight := ppu.getSpriteHeight()
 	count := 0
 	for i := OAM_START; i < OAM_END; i+=4 {
-
-
 		index := uint16(i) // need to convert for signature
 		sprite := NewSprite(ppu.MMU.Read(index), ppu.MMU.Read(index+1), ppu.MMU.Read(index+2),
 			ppu.MMU.Read(index+3))
-		//if *ppu.Debug {
-		//	fmt.Println(fmt.Sprintf("X: %x", sprite.X))
-		//	fmt.Println(fmt.Sprintf("Y: %x", sprite.Y))
-		//	fmt.Println(fmt.Sprintf("ID: %x", sprite.TileID))
-		//	fmt.Println("END")
-		//}
 
 		if _, ok := xValues[sprite.X];
 		ppu.spriteIsVisible(sprite.X, sprite.Y, spriteHeight) && count < 10 && !ok{
-			//tilePixels := ppu.getHorizontalPixelsFromTile(sprite.TileID, 9) // fix.
-			//ppu.addTileToPixels(pixels, tilePixels, sprite.X)
 			sprites[count] = sprite
 			xValues[sprite.X] = true // go needs hash sets -_-.
 			count += 1
@@ -179,9 +168,6 @@ func (ppu *PPU) mergePixels(bgColors []*Pixel, merged []color.RGBA,
 
 func (ppu *PPU) fetchPixels()[]color.RGBA{
 	background := ppu.fetchBackgroundPixels()
-	//if *ppu.Debug && ppu.Registers.LY.Get() == 88 {
-	//	fmt.Println("here")
-	//}
 	sprites := ppu.fetchSprites()
 	merged := make([]color.RGBA, NUMBER_OF_PIXELS_IN_SCANLINE)
 	for i:=0; i<NUMBER_OF_PIXELS_IN_SCANLINE; i++ {merged[i].R = OBSCURE_COLOR} // we do this so that
@@ -273,17 +259,10 @@ func (ppu *PPU) getBackgroundMapAddr() uint16 {
 
 func (ppu *PPU) runScanline() {
 	ppu.Cycles = SCANLINE_CYCLES
-	// OAM Search.
-	// Drawing
 	if ppu.Registers.LY.Get() <= 143 {
-		//pixels := ppu.fetchBackgroundPixels()
-		//ppu.Display.UpdateScanline(pixels, ppu.Registers.BGP.Get(), int(ppu.Registers.LY.Get()))
 		pixels := ppu.fetchPixels()
 		ppu.Display.UpdateScanlinePixels(pixels, int(ppu.Registers.LY.Get()))
-	} // else it is in H_BLANK.
-
-	// H-Blank
-	// V-Blank.
+	}
 
 	ppu.incrementScanline()
 }

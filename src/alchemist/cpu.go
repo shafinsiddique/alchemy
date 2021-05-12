@@ -9,7 +9,6 @@ type CPU struct {
 	MMU            *MMU
 	IME            bool
 	Halted         bool
-	Debug *bool
 	Timer int
 	DivideTimer int
 	currentTimer int
