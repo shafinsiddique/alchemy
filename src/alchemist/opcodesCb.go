@@ -695,7 +695,7 @@ func (cpu *CPU) cb_swap(register interface{}) int {
 
 func (cpu *CPU) cb_srl(register interface{}) int {
 	cpu.Registers.F.SetBit(0, CARRY_FLAG)                // ensuring bit 7 is set to 0.
-	result := cpu.SetRegisterOrLoc(register, cpu.get_rl) // carry flag will be set here.
+	result := cpu.SetRegisterOrLoc(register, cpu.get_rr) // carry flag will be set here.
 	cpu.CheckAndSetZeroFlag(result)
 	cpu.ClearNegativeFlag()
 	cpu.ClearHCFlag()
