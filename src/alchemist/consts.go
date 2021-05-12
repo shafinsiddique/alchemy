@@ -58,7 +58,7 @@ const (
 var COLOR_MAP = map[byte]color.RGBA{
 	3: {R: 0, G: 0, B: 0},       // black.
 	2: {R: 136, G: 192, B: 112}, // Light Gray
-	1: {R: 52, G: 104, B: 86}, // Dark Grey
+	1: {R: 52, G: 104, B: 86},   // Dark Grey
 	0: {R: 224, G: 248, B: 208}, // White
 }
 

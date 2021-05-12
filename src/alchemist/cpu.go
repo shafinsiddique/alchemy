@@ -1,17 +1,17 @@
 package main
 
 type CPU struct {
-	Registers      *Registers
-	BootRomMemory  []byte
-	Memory         []byte
-	PC             uint16
-	SP             uint16
-	MMU            *MMU
-	IME            bool
-	Halted         bool
-	Timer int
-	DivideTimer int
-	currentTimer int
+	Registers     *Registers
+	BootRomMemory []byte
+	Memory        []byte
+	PC            uint16
+	SP            uint16
+	MMU           *MMU
+	IME           bool
+	Halted        bool
+	Timer         int
+	DivideTimer   int
+	currentTimer  int
 }
 
 func NewCPU(mmu *MMU) *CPU {

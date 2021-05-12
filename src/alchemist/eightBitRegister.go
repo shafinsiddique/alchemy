@@ -27,12 +27,10 @@ func (register *EightBitRegister) SetBit(bit byte, index int) {
 	register.Set(SetBit(current, bit, index))
 }
 
-func (register *EightBitRegister) Increment()  {
+func (register *EightBitRegister) Increment() {
 	register.Value += 1
 }
 
-func (register *EightBitRegister) Decrement()  {
+func (register *EightBitRegister) Decrement() {
 	register.Value -= 1
 }
-
-

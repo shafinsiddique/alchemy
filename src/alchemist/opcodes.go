@@ -71,7 +71,7 @@ func (cpu *CPU) RLCA() int {
 }
 
 func (cpu *CPU) RRA() int {
-	for i := 7; i>=0; i-- {
+	for i := 7; i >= 0; i-- {
 		bit := cpu.Registers.A.GetBit(i)
 		replace := cpu.Registers.F.GetBit(CARRY_FLAG)
 		cpu.Registers.A.SetBit(replace, i)
@@ -230,7 +230,7 @@ func (cpu *CPU) pop(register *SixteenBitRegister) int {
 	return 12
 }
 
-func (cpu *CPU) pop_pc() int  { // not instruction
+func (cpu *CPU) pop_pc() int { // not instruction
 	low := cpu.PopFromStack()
 	high := cpu.PopFromStack()
 	cpu.PC = MergeBytes(high, low)
@@ -295,7 +295,7 @@ func (cpu *CPU) DEC_A() int {
 }
 
 func (cpu *CPU) JR_Z_S8() int {
-	return cpu.jr_s8(Z_FLAG,1)
+	return cpu.jr_s8(Z_FLAG, 1)
 }
 
 func (cpu *CPU) LD_H_A() int {
@@ -365,7 +365,7 @@ func (cpu *CPU) LD_L_D8() int {
 func (cpu *CPU) cp(val byte) int {
 	// compare the contents of register A with Val by calculating A-(HL)
 	a := cpu.Registers.A.Get()
-	cpu.CheckAndSetZeroFlag(a-val)
+	cpu.CheckAndSetZeroFlag(a - val)
 	cpu.CheckAndSetOverflowFlag(a, val, true)
 	cpu.SetNegativeFlag()
 	cpu.CheckAndSetHCFlag(a, val, true)
@@ -781,7 +781,7 @@ func (cpu *CPU) inc_or_dec_loc(register *SixteenBitRegister, dec bool) int {
 	initial := cpu.MMU.Read(loc)
 	var val byte
 	if dec {
-		val = initial-1
+		val = initial - 1
 		cpu.SetNegativeFlag()
 	} else {
 		val = initial + 1
@@ -806,9 +806,9 @@ func (cpu *CPU) add_dst_src_sixteen(dst *SixteenBitRegister, src uint16) int {
 	sum := first + second
 	bytes := SplitInt16ToBytes(sum)
 	dst.Set(bytes[0], bytes[1])
-	cpu.CheckAndSetOverflowFlagSixteenBit(first,second, false)
+	cpu.CheckAndSetOverflowFlagSixteenBit(first, second, false)
 	cpu.ClearNegativeFlag()
-	cpu.CheckAndSetHCFlagSixteenBit(first,second, false)
+	cpu.CheckAndSetHCFlagSixteenBit(first, second, false)
 	return 8
 }
 
@@ -842,7 +842,7 @@ func (cpu *CPU) add_dst_src(dst *EightBitRegister, src byte) int {
 func (cpu *CPU) sub(val byte) int {
 	a := cpu.Registers.A.Get()
 	b := val
-	diff := a-b
+	diff := a - b
 	cpu.Registers.A.Set(diff)
 	cpu.SetNegativeFlag()
 	cpu.CheckAndSetZeroFlag(diff)
@@ -1162,7 +1162,7 @@ func (cpu *CPU) adc(val byte) int {
 	cpu.Registers.A.Set(sum)
 	cpu.CheckAndSetZeroFlag(sum)
 	cpu.ClearNegativeFlag()
-	if !cpu.CheckAndSetOverflowFlag(val, cy, false)  {
+	if !cpu.CheckAndSetOverflowFlag(val, cy, false) {
 		cpu.CheckAndSetOverflowFlag(val+cy, initial, false)
 	}
 	cpu.CheckAndSetHCFlag(initial, val+cy, false)
@@ -1293,7 +1293,7 @@ func (cpu *CPU) RETI() int {
 	return cpu.RET()
 }
 
-func (cpu *CPU) PUSH_16(val uint16)  {
+func (cpu *CPU) PUSH_16(val uint16) {
 	bytes := SplitInt16ToBytes(val)
 	cpu.PushToStack(bytes[0])
 	cpu.PushToStack(bytes[1])
@@ -1316,17 +1316,17 @@ func (cpu *CPU) STOP() int {
 func (cpu *CPU) DAA() int {
 	val := uint16(cpu.Registers.A.Get())
 	f := cpu.Registers.F
-	if f.GetBit(NEGATIVE_FLAG) == 1{ // last op was subtraction.
+	if f.GetBit(NEGATIVE_FLAG) == 1 { // last op was subtraction.
 		if f.GetBit(HALF_CARRY_FLAG) == 1 {
 			val -= 0x6
 		}
 
-		if f.GetBit(CARRY_FLAG) == 1{
+		if f.GetBit(CARRY_FLAG) == 1 {
 			val -= 0x60
 		}
 
 	} else {
-		if f.GetBit(HALF_CARRY_FLAG) == 1 || val & 0xf > 0x9 {
+		if f.GetBit(HALF_CARRY_FLAG) == 1 || val&0xf > 0x9 {
 			val += 0x6
 		}
 
@@ -1336,7 +1336,7 @@ func (cpu *CPU) DAA() int {
 		}
 	}
 
-	cpu.CheckAndSetZeroFlagSixteenBit(val&0xff)
+	cpu.CheckAndSetZeroFlagSixteenBit(val & 0xff)
 	cpu.ClearHCFlag()
 	cpu.Registers.A.Set(byte(val))
 	return 4
@@ -1358,7 +1358,7 @@ func (cpu *CPU) SCF() int {
 
 func (cpu *CPU) CCF() int {
 	cy := cpu.Registers.F.GetBit(CARRY_FLAG)
-	cy = 1-cy // probs could have been done with bit manipualtion.
+	cy = 1 - cy // probs could have been done with bit manipualtion.
 	cpu.Registers.F.SetBit(cy, CARRY_FLAG)
 	cpu.ClearNegativeFlag()
 	cpu.ClearHCFlag()
@@ -1397,7 +1397,7 @@ func (cpu *CPU) HALT() int {
 
 func (cpu *CPU) rst(index uint16) int {
 	cpu.PUSH_16(cpu.PC)
-	cpu.PC = 0x0000 + (8*index)
+	cpu.PC = 0x0000 + (8 * index)
 	return 16
 }
 
@@ -1433,12 +1433,12 @@ func (cpu *CPU) RST_7() int {
 	return cpu.rst(7)
 }
 
-func (cpu *CPU) jp_a16_conditonal(flagIndex int, flagValue byte) int  {
+func (cpu *CPU) jp_a16_conditonal(flagIndex int, flagValue byte) int {
 	flag := cpu.Registers.F.GetBit(flagIndex)
 	low := cpu.FetchAndIncrement()
 	high := cpu.FetchAndIncrement()
 	cycles := 12
-	if flag == flagValue  {
+	if flag == flagValue {
 		cpu.PC = MergeBytes(high, low)
 		cycles = 16
 	}

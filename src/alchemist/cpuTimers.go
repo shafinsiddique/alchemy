@@ -24,7 +24,7 @@ func (cpu *CPU) UpdateTimers(cycles int) {
 	}
 }
 
-func (cpu *CPU) updateDivideTimers(cycles int){
+func (cpu *CPU) updateDivideTimers(cycles int) {
 	cpu.DivideTimer -= cycles
 	val := cpu.Registers.DIV.Get()
 	if cpu.DivideTimer <= 0 {

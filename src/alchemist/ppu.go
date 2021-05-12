@@ -6,15 +6,15 @@ import (
 )
 
 type PPU struct {
-	MMU       *MMU
-	Registers *PPURegisters
-	Cycles    int
-	Display   IDisplay
+	MMU                *MMU
+	Registers          *PPURegisters
+	Cycles             int
+	Display            IDisplay
 	interruptRequested bool
 }
 
-func NewPPU(mmu *MMU, display IDisplay) *PPU{
-	return &PPU{Registers: InitializePPURegisters(mmu.Memory), Cycles: SCANLINE_CYCLES, MMU: mmu ,
+func NewPPU(mmu *MMU, display IDisplay) *PPU {
+	return &PPU{Registers: InitializePPURegisters(mmu.Memory), Cycles: SCANLINE_CYCLES, MMU: mmu,
 		Display: display}
 }
 
@@ -32,11 +32,11 @@ func (ppu *PPU) incrementScanline() {
 func (ppu *PPU) spriteIsVisible(x byte, y byte, spriteHeight byte) bool {
 	spriteX := int(x)
 	spriteY := int(y)
-	xPos := spriteX-8
-	yPos := spriteY-16
+	xPos := spriteX - 8
+	yPos := spriteY - 16
 	ly := int(ppu.Registers.LY.Get())
 	height := int(spriteHeight)
-	if xPos > -8 &&  ly >= yPos && ly < yPos + height {
+	if xPos > -8 && ly >= yPos && ly < yPos+height {
 		return true
 	}
 
@@ -51,7 +51,7 @@ func (ppu *PPU) getSpriteHeight() byte {
 }
 
 func (ppu *PPU) addTileToPixels(pixels []*Pixel, tilePixels []*Pixel, x byte) {
-	xPos := int(x)-8
+	xPos := int(x) - 8
 	var startingInPixels byte
 	var startingInTile byte
 	if xPos < 0 {
@@ -59,7 +59,7 @@ func (ppu *PPU) addTileToPixels(pixels []*Pixel, tilePixels []*Pixel, x byte) {
 		startingInPixels = 0
 	} else {
 		startingInTile = 0
-		startingInPixels = x-8
+		startingInPixels = x - 8
 	}
 
 	for startingInTile < NUMBER_OF_PIXELS_IN_TILE && startingInPixels < NUMBER_OF_PIXELS_IN_SCANLINE {
@@ -74,13 +74,12 @@ func (ppu *PPU) fetchSprites() []*Sprite {
 	xValues := map[byte]bool{}
 	spriteHeight := ppu.getSpriteHeight()
 	count := 0
-	for i := OAM_START; i < OAM_END; i+=4 {
+	for i := OAM_START; i < OAM_END; i += 4 {
 		index := uint16(i) // need to convert for signature
 		sprite := NewSprite(ppu.MMU.Read(index), ppu.MMU.Read(index+1), ppu.MMU.Read(index+2),
 			ppu.MMU.Read(index+3))
 
-		if _, ok := xValues[sprite.X];
-		ppu.spriteIsVisible(sprite.X, sprite.Y, spriteHeight) && count < 10 && !ok{
+		if _, ok := xValues[sprite.X]; ppu.spriteIsVisible(sprite.X, sprite.Y, spriteHeight) && count < 10 && !ok {
 			sprites[count] = sprite
 			xValues[sprite.X] = true // go needs hash sets -_-.
 			count += 1
@@ -134,7 +133,7 @@ func (ppu *PPU) mergePixels(bgColors []*Pixel, merged []color.RGBA,
 	tileSprites []*Pixel, sprite *Sprite) {
 	var s1 int
 	var s2 int
-	xPos := int(sprite.X)-8
+	xPos := int(sprite.X) - 8
 	if xPos < 0 {
 		s1 = int(math.Abs(float64(xPos)))
 		s2 = 0
@@ -163,20 +162,19 @@ func (ppu *PPU) mergePixels(bgColors []*Pixel, merged []color.RGBA,
 
 	}
 
-
 }
 
-func (ppu *PPU) fetchPixels()[]color.RGBA{
+func (ppu *PPU) fetchPixels() []color.RGBA {
 	background := ppu.fetchBackgroundPixels()
 	sprites := ppu.fetchSprites()
 	merged := make([]color.RGBA, NUMBER_OF_PIXELS_IN_SCANLINE)
-	for i:=0; i<NUMBER_OF_PIXELS_IN_SCANLINE; i++ {merged[i].R = OBSCURE_COLOR} // we do this so that
+	for i := 0; i < NUMBER_OF_PIXELS_IN_SCANLINE; i++ {
+		merged[i].R = OBSCURE_COLOR
+	} // we do this so that
 	// later on we can check if a pixel at a certain index was never entered. color.RGBA doesnt have a nill
 	// default type. The default is black which clashes with gb color.
 
 	height := ppu.getSpriteHeight()
-
-
 
 	for i := 0; i < len(sprites); i++ {
 		sprite := sprites[i]
@@ -189,7 +187,7 @@ func (ppu *PPU) fetchPixels()[]color.RGBA{
 	}
 
 	bgp := ppu.Registers.BGP.Get()
-	for i := 0 ; i<NUMBER_OF_PIXELS_IN_SCANLINE; i++ {
+	for i := 0; i < NUMBER_OF_PIXELS_IN_SCANLINE; i++ {
 		if merged[i].R == OBSCURE_COLOR {
 			merged[i] = getColorFromPixel(background[i], bgp)
 		}
@@ -212,7 +210,7 @@ func (ppu *PPU) getHorizontalPixelsFromTile(tileId byte, lineNumber uint16, flip
 		addr += 15
 		lineStartingIndex := addr - (lineNumber * 2)
 		high = ppu.MMU.Read(lineStartingIndex)
-		low = ppu.MMU.Read(lineStartingIndex-1)
+		low = ppu.MMU.Read(lineStartingIndex - 1)
 
 	} else {
 		lineStartingIndex := addr + (lineNumber * 2)
@@ -227,7 +225,7 @@ func (ppu *PPU) getTileAddr(tileId byte, spriteMode bool) uint16 {
 	var addr uint16 = 0x8000
 	tileNo := uint16(tileId)
 	if ppu.Registers.LCDC.GetBit(4) == 1 || spriteMode {
-		addr += tileNo*16
+		addr += tileNo * 16
 	} else {
 		addr = 0x9000
 		complement, isNegative := GetTwosComplement(tileId)
@@ -244,7 +242,7 @@ func (ppu *PPU) getTileAddr(tileId byte, spriteMode bool) uint16 {
 
 func (ppu *PPU) getFirstTileIdAddr() (uint16, uint16) {
 	totalYOffsetInPixels := ppu.Registers.SCY.Get() + ppu.Registers.LY.Get()
-	tileBlockStartingAddr :=  ppu.getBackgroundMapAddr() + (uint16(math.Floor(float64(totalYOffsetInPixels)/8)*32))
+	tileBlockStartingAddr := ppu.getBackgroundMapAddr() + (uint16(math.Floor(float64(totalYOffsetInPixels)/8) * 32))
 	scanlineOffset := uint16(totalYOffsetInPixels % 8)
 	withXOffset := tileBlockStartingAddr + uint16(math.Floor(float64(ppu.Registers.SCX.Get())/8))
 	return withXOffset, scanlineOffset
@@ -273,7 +271,7 @@ func (ppu *PPU) handleDisabledLCD() {
 	ppu.setModeInLCDStat(0)
 }
 
-func (ppu *PPU) getSpriteTileAndLine(sprite *Sprite, height byte) (tileId byte, lineNumber uint16){
+func (ppu *PPU) getSpriteTileAndLine(sprite *Sprite, height byte) (tileId byte, lineNumber uint16) {
 	yPos := int(sprite.Y) - 16
 	if yPos < 0 {
 		lineNumber = uint16(0 + ppu.Registers.LY.Get())
@@ -285,8 +283,10 @@ func (ppu *PPU) getSpriteTileAndLine(sprite *Sprite, height byte) (tileId byte, 
 		tileId = sprite.TileID
 
 	} else {
-		tileA, tileB := sprite.TileID & 0XFE, (sprite.TileID & 0xFe) + 1 // tileA always top, tileB bottom.
-		if sprite.YFlip {tileB, tileA = tileA, tileB}
+		tileA, tileB := sprite.TileID&0xFE, (sprite.TileID&0xFe)+1 // tileA always top, tileB bottom.
+		if sprite.YFlip {
+			tileB, tileA = tileA, tileB
+		}
 
 		tileId = tileA
 
@@ -317,10 +317,10 @@ func (ppu *PPU) setModeInLCDStat(mode byte) {
 	ppu.Registers.LCD_STAT.SetBit(b0, 0)
 }
 
-func  (ppu *PPU) getCurrentMode() byte {
+func (ppu *PPU) getCurrentMode() byte {
 	var mode byte
 	lcdStat := ppu.Registers.LCD_STAT
-	mode = SetBit(mode, lcdStat.GetBit(1),1)
+	mode = SetBit(mode, lcdStat.GetBit(1), 1)
 	mode = SetBit(mode, lcdStat.GetBit(0), 0)
 	return mode
 }
@@ -335,7 +335,7 @@ func (ppu *PPU) checkForInterrupts(oldMode byte, newMode byte) {
 	}
 }
 
-func (ppu *PPU) requestPPUInterrupt(){
+func (ppu *PPU) requestPPUInterrupt() {
 	ppu.Registers.IF.SetBit(1, LCD_STAT)
 }
 

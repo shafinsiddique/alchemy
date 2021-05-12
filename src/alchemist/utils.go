@@ -50,7 +50,7 @@ func GetTwosComplement(value byte) (byte, bool) { // using bool to indicate whet
 }
 
 func GetOnesComplement(value byte) byte {
-	for i := 0; i<8; i++ {
+	for i := 0; i < 8; i++ {
 		value = SetBit(value, 1-GetBit(value, i), i)
 	}
 	return value

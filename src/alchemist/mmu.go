@@ -4,8 +4,8 @@ type MMU struct {
 	BootRomMemory []byte
 	Memory        []byte
 	BootMode      bool
-	Joypad 		*byte
-	Count int
+	Joypad        *byte
+	Count         int
 }
 
 func NewMMU(joypad *byte) *MMU {
@@ -35,7 +35,7 @@ func (mmu *MMU) getJoypadState() byte {
 		starting = 4
 	}
 
-	for i := 0; i<4; i++ {
+	for i := 0; i < 4; i++ {
 		status := GetBit(*mmu.Joypad, starting+i)
 		//if status != 1 {
 		//	*mmu.Debug = true
@@ -73,7 +73,7 @@ func (mmu *MMU) dmaTransfer(val byte) {
 	src := uint16(val) << 8
 	for i := 0; i < 160; i++ {
 		index := uint16(i)
-		obj := mmu.Read(src+index)
+		obj := mmu.Read(src + index)
 		mmu.Write(OAM_START+index, obj)
 	}
 }

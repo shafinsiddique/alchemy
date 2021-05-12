@@ -9,9 +9,9 @@ import (
 type SDLDisplay struct {
 	Window *sdl.Window
 	Joypad *byte
-	IF *ReferenceRegister
-	IE *ReferenceRegister
-	CPU *CPU
+	IF     *ReferenceRegister
+	IE     *ReferenceRegister
+	CPU    *CPU
 }
 
 var KEY_COUNT = 0 // TODO: DELETE DURING CLEANUP.
@@ -83,7 +83,7 @@ func NewSDLDisplay(joypad *byte, interrupt *ReferenceRegister) (*SDLDisplay, err
 func (display SDLDisplay) UpdateScanline(pixels []*Pixel, palette byte, y int) {
 	surface, _ := display.Window.GetSurface()
 	for x := 0; x < len(pixels); x++ {
-		surface.Set(x, y,  getColorFromPixel(pixels[x], palette))
+		surface.Set(x, y, getColorFromPixel(pixels[x], palette))
 	}
 }
 
@@ -94,16 +94,15 @@ func (display SDLDisplay) UpdateScanlinePixels(colors []color.RGBA, y int) {
 	}
 }
 
-func (display *SDLDisplay) handleKeyboardEvent(ev *sdl.KeyboardEvent){
+func (display *SDLDisplay) handleKeyboardEvent(ev *sdl.KeyboardEvent) {
 	if ev.State == 0 {
 		return
 	}
 
 	var joypadIndex int
-	switch key := ev.Keysym ; key.Sym {
+	switch key := ev.Keysym; key.Sym {
 	case sdl.K_RETURN:
 		joypadIndex = SELECT_JOYPAD
-		*display.CPU.Debug = true
 	case sdl.K_RIGHT:
 		joypadIndex = RIGHT_JOYPAD
 	case sdl.K_LEFT:
@@ -128,7 +127,7 @@ func (display *SDLDisplay) handleKeyboardEvent(ev *sdl.KeyboardEvent){
 	//	*display.CPU.Debug = true
 	//}
 
-	*display.Joypad = SetBit(*display.Joypad,0, joypadIndex)
+	*display.Joypad = SetBit(*display.Joypad, 0, joypadIndex)
 	display.IF.SetBit(1, JOYPAD)
 }
 
@@ -145,7 +144,6 @@ func (display SDLDisplay) HandleEvent() bool {
 
 	return true
 }
-
 
 func (display SDLDisplay) UpdateGraphics() error {
 	return display.Window.UpdateSurface()
