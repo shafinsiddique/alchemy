@@ -102,7 +102,7 @@ func (display *SDLDisplay) handleKeyboardEvent(ev *sdl.KeyboardEvent) {
 	var joypadIndex int
 	switch key := ev.Keysym; key.Sym {
 	case sdl.K_RETURN:
-		joypadIndex = SELECT_JOYPAD
+		joypadIndex = START_JOYPAD
 	case sdl.K_RIGHT:
 		joypadIndex = RIGHT_JOYPAD
 	case sdl.K_LEFT:
@@ -113,10 +113,10 @@ func (display *SDLDisplay) handleKeyboardEvent(ev *sdl.KeyboardEvent) {
 		joypadIndex = DOWN_JOYPAD
 	case sdl.K_a:
 		joypadIndex = A_JOYPAD
-	case sdl.K_b:
+	case sdl.K_s:
 		joypadIndex = B_JOYPAD
 	case sdl.K_SPACE:
-		joypadIndex = START_JOYPAD
+		joypadIndex = SELECT_JOYPAD
 	default:
 		return
 	}

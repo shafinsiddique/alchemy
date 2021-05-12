@@ -16,7 +16,17 @@ In order to run Alchemy, you will need to clone the repository and then compile 
     cd alchemy/src/alchemy
     go build -o alchemy
     ./alchemy
-    
+
+### Controls
+    - Left Arrow
+    - Right Arrow
+    - Up Arrow
+    - Down Arrow
+    - Space for 'Select'
+    - Enter for 'Start'
+    - A for 'a'
+    - S for 'b   
+     
 ### Testing
 
 Currently, Alchemy passes all of [Blargg's CPU Instruction Tests](https://github.com/retrio/gb-test-roms).
